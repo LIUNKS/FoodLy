@@ -11,6 +11,7 @@ interface FormData {
 }
 
 export default function LoginForm() {
+  //REDERIJIR A OTRA PAGINA
   const router = useRouter()
   const [formData, setFormData] = useState<FormData>({
     role: "",
@@ -52,16 +53,20 @@ export default function LoginForm() {
       switch (formData.role) {
         case "admin":
           console.log("Rol de administrador")
+          //router.push("/admin")
           break
         case "cajero":
           console.log("Rol de cajero")
+          //router.push("/cajero")
           break
         case "cocina":
           console.log("Rol de cocina")
+          //router.push("/cocina")
           break
         default:
           console.log("Rol no reconocido")
-      }
+          //setFormError("Rol no reconocido")
+        }
     }, 800)
   }
 

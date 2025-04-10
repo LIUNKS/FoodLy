@@ -4,6 +4,10 @@ import type { ReactNode } from 'react'
 export const metadata: Metadata = {
   title: 'FoodLy - Login',
   description: 'Sistema de gestión para el restaurante FoodLy',
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+  },
 }
 
 interface RootLayoutProps {
