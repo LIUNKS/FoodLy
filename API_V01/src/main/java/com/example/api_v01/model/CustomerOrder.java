@@ -7,32 +7,36 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "box")
+@Table(name = "customer_order")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class Box {
+public class CustomerOrder  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_box")
-    private UUID id_box;
+    @Column(name = "id_customer_order")
+    private UUID id_order;
 
     @Column(nullable = false)
-    private String name_box;
+    private String name_client;
 
     @Column(nullable = false)
-    private LocalDate date;
+    private LocalDate date_order;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "id_atm" ,referencedColumnName = "id_atm")
-    private ATM atm;
+    @Column(nullable = false)
+    private LocalTime time_order;
+
+    @Column(nullable = false)
+    private Double total_order;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "id_admin",referencedColumnName = "id_admin")
-    private Admin admin;
+    @JoinColumn(name = "id_arching",referencedColumnName = "id_arching")
+    private Arching arching;
+
 }
