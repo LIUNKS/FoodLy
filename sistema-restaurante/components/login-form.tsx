@@ -1,77 +1,50 @@
-"use client"
+"use client";
 
-import { useState, FormEvent, ChangeEvent } from 'react'
-import { useRouter } from 'next/navigation'
-import '../styles/login.css'
+import { useState, type FormEvent, type ChangeEvent, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+// Asegurarnos de importar los estilos correctos
+import "@/styles/login.css";
 
 interface FormData {
-  role: string;
   username: string;
   password: string;
 }
 
 export default function LoginForm() {
-  //REDERIJIR A OTRA PAGINA
-  const router = useRouter()
+  const { login, isLoading, error } = useAuth();
   const [formData, setFormData] = useState<FormData>({
-    role: "",
     username: "",
     password: "",
-  })
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formError, setFormError] = useState<string>("")
+  });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
+  useEffect(() => {
+    // Log para depuración
+    console.log("Estado de isLoading:", isLoading);
+  }, [isLoading]);
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-    
-    // Limpiar errores cuando el usuario comienza a escribir
-    if (formError) setFormError("")
-  }
+    }));
+  };
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    setFormError("")
-
-    // Validar que todos los campos estén completos
-    if (!formData.role || !formData.username || !formData.password) {
-      setFormError("Por favor, complete todos los campos.")
-      return
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    console.log("Intentando iniciar sesión con:", formData);
+    try {
+      await login(formData.username, formData.password);
+    } catch (err) {
+      console.error("Error de inicio de sesión:", err);
     }
-
-    // Simular carga
-    setIsLoading(true)
-    
-    // Simulamos un tiempo de procesamiento para mostrar el estado de carga
-    setTimeout(() => {
-      setIsLoading(false)
-      
-      // Imprimir en consola según el rol
-      switch (formData.role) {
-        case "admin":
-          console.log("Rol de administrador")
-          //router.push("/admin")
-          break
-        case "cajero":
-          console.log("Rol de cajero")
-          //router.push("/cajero")
-          break
-        case "cocina":
-          console.log("Rol de cocina")
-          //router.push("/cocina")
-          break
-        default:
-          console.log("Rol no reconocido")
-          //setFormError("Rol no reconocido")
-        }
-    }, 800)
-  }
+  };
 
   return (
-    <div className="login-container">
+    // Asegurarnos de que el contenedor ocupe toda la pantalla y tenga el centrado correcto
+    <div className="login-container" style={{ width: '100vw', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <div className="background-pattern"></div>
       <div className="login-form-container">
         <div className="login-card">
@@ -79,47 +52,23 @@ export default function LoginForm() {
             <h1>FOODLY</h1>
           </div>
           <div className="login-body">
-            
-            {formError && (
-              <div style={{
-                padding: '10px',
-                marginBottom: '20px',
-                backgroundColor: '#FFF0F0',
-                color: '#E53935',
-                borderRadius: '6px',
-                fontSize: '14px',
-                textAlign: 'center'
-              }}>
-                {formError}
+            {error && (
+              <div
+                style={{
+                  padding: "10px",
+                  marginBottom: "20px",
+                  backgroundColor: "#FFF0F0",
+                  color: "#E53935",
+                  borderRadius: "6px",
+                  fontSize: "14px",
+                  textAlign: "center",
+                }}
+              >
+                {error}
               </div>
             )}
-            
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label htmlFor="role" className="form-label">
-                  Seleccionar Rol
-                </label>
-                <div className="form-select-container">
-                  <select
-                    className="form-select"
-                    id="role"
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange}
-                    required
-                    disabled={isLoading}
-                  >
-                    <option value="" disabled>
-                      Seleccione su rol
-                    </option>
-                    <option value="admin">Administrador</option>
-                    <option value="cajero">Cajero</option>
-                    <option value="cocina">Cocina</option>
-                  </select>
-                  <span className="select-icon"></span>
-                </div>
-              </div>
 
+            <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label htmlFor="username" className="form-label">
                   Usuario
@@ -136,7 +85,7 @@ export default function LoginForm() {
                     required
                     disabled={isLoading}
                   />
-                  <span className="icon user-icon"></span>
+                  <i className="fas fa-user icon"></i>
                 </div>
               </div>
 
@@ -156,7 +105,7 @@ export default function LoginForm() {
                     required
                     disabled={isLoading}
                   />
-                  <span className="icon lock-icon"></span>
+                  <i className="fas fa-lock icon"></i>
                 </div>
               </div>
 
@@ -176,5 +125,5 @@ export default function LoginForm() {
         </div>
       </div>
     </div>
-  )
+  );
 }
