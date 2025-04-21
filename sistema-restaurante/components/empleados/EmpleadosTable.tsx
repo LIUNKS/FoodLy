@@ -1,7 +1,14 @@
+// Importación del componente DataTable para mostrar datos tabulares
 import DataTable from "../common/DataTable"
+// Importación de estilos comunes para mantener la consistencia visual
 import "@/styles/common.css"
 
+/**
+ * Componente que renderiza una tabla de empleados con sus datos
+ * Muestra información detallada de cada empleado y opciones para editarlos
+ */
 export default function EmpleadosTable() {
+  // Array de datos de empleados (en una aplicación real estos datos vendrían de una API)
   const empleados = [
     {
       id: 1,
@@ -42,16 +49,20 @@ export default function EmpleadosTable() {
   ]
 
   return (
+    // Contenedor con animación de aparición
     <div className="fade-in-up">
+      {/* Componente DataTable reutilizable con definición de cabeceras */}
       <DataTable 
         headers={["#", "Alias", "Correo", "Documento / Nombre", "Perfil", "Estado", "Acción"]}
         title="Listado de Empleados"
       >
+        {/* Mapeo de cada empleado para generar una fila en la tabla */}
         {empleados.map((empleado) => (
           <tr key={empleado.id}>
             <th scope="row">{empleado.id}</th>
             <td>{empleado.alias}</td>
             <td>{empleado.correo}</td>
+            {/* Celda con formato especial para mostrar documento y nombre */}
             <td>
               <div>
                 <div style={{ fontWeight: '500', color: 'var(--primary)' }}>{empleado.documento}</div>
@@ -59,6 +70,7 @@ export default function EmpleadosTable() {
               </div>
             </td>
             <td>{empleado.perfil}</td>
+            {/* Badge condicional que cambia de color según el estado */}
             <td>
               <span className="badge" style={{ 
                 backgroundColor: empleado.estado === "Activo" ? 'var(--primary)' : '#dc3545',
@@ -69,6 +81,7 @@ export default function EmpleadosTable() {
                 {empleado.estado}
               </span>
             </td>
+            {/* Botón de acción para editar cada empleado */}
             <td>
               <button className="foodly-btn-secondary" style={{ 
                 padding: '5px 10px',
