@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Login",
+  title: "FoodLy - Login",
 }
 
 export default function AuthLayout({

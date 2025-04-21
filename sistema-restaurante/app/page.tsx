@@ -4,7 +4,7 @@ import LoginForm from "@/components/login-form"
 
 // Definir la metadata para la página login (ruta raíz)
 export const metadata: Metadata = {
-  title: "Login",
+  title: "FoodLy - Login",
 }
 
 // Componente servidor que envuelve el componente cliente
