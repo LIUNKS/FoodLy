@@ -19,12 +19,10 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_Product")
+    @Column(name = "id_product")
     private UUID id_Product;
 
     private String name_product;
-
-    private Integer stock;
 
     private Double price;
 
@@ -33,9 +31,15 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "id_customer_order",referencedColumnName = "id_customer_order")
-    private CustomerOrder  order;
+    @OneToOne(
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            fetch = FetchType.EAGER
+    )
+    @JoinColumn(
+            name = "id_product_stock",
+            referencedColumnName = "id_product_stock"
+    )
+    private ProductStock stock;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id_admin",referencedColumnName = "id_admin")

@@ -34,5 +34,4 @@ public class Admin {
     @JoinColumn(name = "id_user" , referencedColumnName = "id_user")
     private User user_admin;
 
-
 }

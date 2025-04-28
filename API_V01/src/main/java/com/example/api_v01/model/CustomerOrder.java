@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
@@ -23,20 +21,18 @@ public class CustomerOrder  {
     @Column(name = "id_customer_order")
     private UUID id_order;
 
-    @Column(nullable = false)
-    private String name_client;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+    private Product product;
 
-    @Column(nullable = false)
-    private LocalDate date_order;
+    private Integer count;
 
-    @Column(nullable = false)
-    private LocalTime time_order;
+    private Double total_rice;
 
-    @Column(nullable = false)
-    private Double total_order;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "id_arching",referencedColumnName = "id_arching")
-    private Arching arching;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+    @JoinColumn(
+            name = "id_orde_set",
+            referencedColumnName = "id_orde_set"
+    )
+    private OrderSet order;
 
 }

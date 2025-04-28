@@ -4,5 +4,6 @@ public enum Category {
     MARINO,
     CRIOLLOS,
     PASTAS,
-    BEBIDAS
+    BEBIDAS,
+    COMIDA_RAPIDA
 }
