@@ -2,6 +2,7 @@ package com.example.api_v01.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +34,7 @@ public class ProductoController {
 
     @PostMapping
     public ResponseEntity<Product> crearProducto(@Valid @RequestBody ProductDTO productDTO) {
-        return ResponseEntity.ok(productService.saveProduct(productDTO));
+        return new ResponseEntity<>(productService.saveProduct(productDTO), HttpStatus.CREATED); //status code 201
     }
 
 }
