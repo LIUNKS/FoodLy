@@ -13,7 +13,6 @@ import com.example.api_v01.dto.ProductDTO;
 import com.example.api_v01.model.Product;
 import com.example.api_v01.service.product_service.ProductService;
 
-import jakarta.validation.Valid; //data validation
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
