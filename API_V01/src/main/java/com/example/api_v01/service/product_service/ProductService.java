@@ -19,4 +19,6 @@ public interface ProductService {
     List<Product> getProducts();
 
     Product getProduct(UUID id);
+
+    Product updateProduct(UUID id, ProductDTO productDTO);
 }

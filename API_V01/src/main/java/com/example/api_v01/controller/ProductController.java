@@ -41,6 +41,21 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable UUID id){
+        if(productService.isExist(id)){
+            productService.deleteProduct(id); //llamada
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // respuesta 204 exito
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado");
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProduct(@PathVariable UUID id, @RequestBody ProductDTO productDTO) {
+        Product updateProduct = productService.updateProduct(id, productDTO);
+        return ResponseEntity.ok(updateProduct);
+    }
+
     @PostMapping()
     public ResponseEntity<?> CreateProduct(@RequestBody ProductDTO productDTO) {
         Product product = productService.saveProduct(productDTO);

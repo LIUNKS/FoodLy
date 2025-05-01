@@ -6,7 +6,10 @@ import com.example.api_v01.repository.ProductRepository;
 import com.example.api_v01.utils.ProductMovement;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,5 +41,17 @@ public class ProductServiceImp implements ProductService {
     @Override
     public Product getProduct(UUID id) {
         return productRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Product updateProduct(UUID id, ProductDTO productDTO) {
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado mamoso"));
+        // Actualiza solo los campos permitidos
+        existingProduct.setName_product(productDTO.getName_product());
+        existingProduct.setPrice(productDTO.getPrice());
+        existingProduct.setAdditional_observation(productDTO.getAdditional_observation());
+
+        return productRepository.save(existingProduct);
     }
 }
