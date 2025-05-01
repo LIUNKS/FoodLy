@@ -10,6 +10,8 @@ import java.util.UUID;
 
 public interface ProductService {
 
+    Boolean isExist(UUID id);
+
     Product saveProduct(ProductDTO product);
 
     void deleteProduct(UUID id);

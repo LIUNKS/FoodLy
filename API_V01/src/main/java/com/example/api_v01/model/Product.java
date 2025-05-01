@@ -41,7 +41,13 @@ public class Product {
     )
     private ProductStock stock;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "id_admin",referencedColumnName = "id_admin")
+    @ManyToOne(
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            fetch = FetchType.LAZY
+    )
+    @JoinColumn(
+            name = "id_admin",
+            referencedColumnName = "id_admin"
+    )
     private Admin admin;
 }
