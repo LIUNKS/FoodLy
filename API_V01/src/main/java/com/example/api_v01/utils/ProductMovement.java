@@ -8,9 +8,9 @@ import com.example.api_v01.model.ProductStock;
 public class ProductMovement {
     public static Product createProductAndStock (ProductDTO productDTO) {
         ProductStock stock = ProductStock.builder()
-                .ini_stock(productDTO.getIni_stock())
-                .current_stock(productDTO.getCurrent_stock())
-                .total_sold(productDTO.getTotal_sold())
+                .ini_stock(0)
+                .current_stock(0)
+                .total_sold(0)
                 .build();
         return  Product.builder()
                 .name_product(productDTO.getName_product())
@@ -18,6 +18,16 @@ public class ProductMovement {
                 .additional_observation(productDTO.getAdditional_observation())
                 .category(productDTO.getCategory())
                 .stock(stock)
+                .admin(productDTO.getAdmin())
+                .build();
+    }
+
+    public static Product createProduct(ProductDTO productDTO) {
+        return  Product.builder()
+                .name_product(productDTO.getName_product())
+                .price(productDTO.getPrice())
+                .additional_observation(productDTO.getAdditional_observation())
+                .category(productDTO.getCategory())
                 .admin(productDTO.getAdmin())
                 .build();
     }

@@ -1,26 +1,16 @@
 package com.example.api_v01;
 
-import com.example.api_v01.dto.ProductDTO;
-import com.example.api_v01.model.CustomerOrder;
-import com.example.api_v01.model.OrderSet;
 import com.example.api_v01.model.Product;
-import com.example.api_v01.model.enums.Category;
 import com.example.api_v01.service.customer_order_service.CustomerOrderService;
 import com.example.api_v01.service.order_set_service.OrderSetService;
 import com.example.api_v01.service.product_service.ProductService;
-import com.example.api_v01.service.product_stock_service.ProductStockService;
-import com.example.api_v01.utils.InventoryMovement;
-import com.example.api_v01.utils.OrderMovement;
-import com.example.api_v01.utils.ProductMovement;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.UUID;
 
 @SpringBootTest
 class ApiV01ApplicationTests {
