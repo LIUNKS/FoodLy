@@ -28,6 +28,10 @@ public class Box {
     @Column(nullable = false)
     private LocalDate date;
 
+    @Column
+    @Builder.Default
+    private Boolean is_open = false;
+
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id_atm" ,referencedColumnName = "id_atm")
     private ATM atm;
