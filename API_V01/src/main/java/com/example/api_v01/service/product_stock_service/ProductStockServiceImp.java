@@ -111,7 +111,41 @@ public class ProductStockServiceImp implements ProductStockService {
         ProductStock stock = InventoryMovement.discountStock(productStock.get(), count);
 
         if(stock == null) {
-            throw new NotFoundException("La cantida ingresada a desconstar supera la actual del stock");
+            throw new BadRequestException("La cantida ingresada a desconstar supera la actual del stock");
+        }
+
+        productStockRepository.save(stock);
+
+        return stock;
+    }
+
+    @Override
+    public ProductStock updateStockById(UUID id, ProductStockDTO productStockDTO) throws NotFoundException, BadRequestException {
+
+        Optional<ProductStock>stockOptional = productStockRepository.findById(id);
+
+        if(!stockOptional.isPresent()){
+            throw new NotFoundException("Stock no encontrado!!");
+        }
+
+        ProductStock stock = stockOptional.get();
+
+        if( productStockDTO.getIni_stock() != null && productStockDTO.getIni_stock() >=0 ){
+            stock.setIni_stock(productStockDTO.getIni_stock());
+        }else{
+            throw new BadRequestException("El stock inical no puede sere null o negativo");
+        }
+
+        if( productStockDTO.getCurrent_stock() != null && productStockDTO.getCurrent_stock() >=0 ){
+            stock.setCurrent_stock(productStockDTO.getCurrent_stock());
+        }else{
+            throw new BadRequestException("El stock actual no puede sere null o negativo");
+        }
+
+        if( productStockDTO.getTotal_sold() != null && productStockDTO.getTotal_sold() >= 0 ){
+            stock.setTotal_sold(productStockDTO.getTotal_sold());
+        }else{
+            throw new BadRequestException("El stock total no puede sere null o negativo");
         }
 
         productStockRepository.save(stock);

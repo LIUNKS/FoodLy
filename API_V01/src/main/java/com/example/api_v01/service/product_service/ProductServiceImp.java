@@ -23,11 +23,6 @@ public class ProductServiceImp implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
-    public Boolean isExist(UUID id) {
-        return productRepository.existsById(id);
-    }
-
-    @Override
     public Product saveProduct(ProductDTO productDTO) {
         Product product = ProductMovement.createProductAndStock(productDTO);
         product = productRepository.save(product);
@@ -61,19 +56,22 @@ public class ProductServiceImp implements ProductService {
         Optional<Product> product = productRepository.findById(id);
 
         if(!product.isPresent()){
-            throw new NotFoundException("Producto no encontrado mamoso");
+            throw new NotFoundException("Producto no encontrado");
         }
 
         Product existingProduct = product.get();
+
         // Actualiza solo los campos permitidos
         if (productDTO.getName_product() != null) {existingProduct.setName_product(productDTO.getName_product());}
         if (productDTO.getPrice() != null) {existingProduct.setPrice(productDTO.getPrice());}
         if (productDTO.getAdditional_observation() != null) {existingProduct.setAdditional_observation(productDTO.getAdditional_observation());}
         if (productDTO.getCategory() != null) {existingProduct.setCategory(productDTO.getCategory());}
         if (productDTO.getStock() != null) {existingProduct.setStock(productDTO.getStock());}
+
         return productRepository.save(existingProduct);
     }
 
+    //Esto es un metodo que se utiliza en ProductServiceImp
     @Override
     public void product_stockDelete(UUID id_stock) throws NotFoundException {
         Optional<Product>Optional=productRepository.findProductById_Stock(id_stock);
