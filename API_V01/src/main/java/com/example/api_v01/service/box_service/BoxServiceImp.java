@@ -8,97 +8,69 @@ import com.example.api_v01.model.Box;
 import com.example.api_v01.repository.ATMRepository;
 import com.example.api_v01.repository.AdminRepository;
 import com.example.api_v01.repository.BoxRepository;
+import com.example.api_v01.utils.BoxMovement;
+import com.example.api_v01.utils.ExceptionMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class BoxServiceImp implements BoxService{
+public class BoxServiceImp implements BoxService, ExceptionMessage {
 
     private final BoxRepository boxRepository;
     private final ATMRepository atmRepository;
 
     @Override
     public Box saveBox(BoxDTO box) {
-        return null;
+        Box newBox = BoxMovement.CreateBox(box);
+        return boxRepository.save(newBox);
     }
 
     @Override
-    public Box toggleBoxStatus(UUID id_box) {
-        return null;
+    public Box toggleBoxStatus(UUID id_box) throws NotFoundException {
+        Optional<Box> BoxOptional = boxRepository.findById(id_box);
+
+        if(!BoxOptional.isPresent()) {
+            throw new NotFoundException(BOX_NOT_FOUND);
+        }
+        if(BoxOptional.get().getIs_open() == true) {
+            BoxOptional.get().setIs_open(false);
+        }
+        if(BoxOptional.get().getIs_open() == false) {
+            BoxOptional.get().setIs_open(true);
+        }
+        return boxRepository.save(BoxOptional.get());
     }
 
     @Override
-    public Box assignAtmToBox(UUID id_box, BoxDTO boxDTO) {
-        return null;
+    public Box assignAtmToBox(UUID id_box, UUID id_atm) throws NotFoundException {
+        ATM atm = atmRepository.findById(id_atm)
+                .orElseThrow( () -> new NotFoundException(ATM_NOT_FOUND));
+        Box box = boxRepository.findById(id_box)
+                .orElseThrow( () -> new NotFoundException(BOX_NOT_FOUND));
+        box.setAtm(atm);
+        return boxRepository.save(box);
     }
 
     @Override
-    public Box getBoxInfo(UUID boxId) {
-        return null;
+    public Box getBoxInfo(UUID boxId) throws NotFoundException {
+        return boxRepository.findById(boxId)
+                .orElseThrow( () -> new NotFoundException(BOX_NOT_FOUND) );
     }
 
     @Override
     public List<Box> getBoxes() {
-        return List.of();
+        return boxRepository.findAll();
     }
 
     @Override
     public List<Box> getBoxesByAtm(UUID id_atm) {
-        return List.of();
+        return boxRepository.BoxByATM(id_atm);
     }
-
-
-    //Opcional si realmente se usaria
-//    @Transactional
-//    public Box createBox(String name, UUID adminId) throws NotFoundException {
-//        Box box = new Box();
-//        box.setName_box(name);
-//        box.setDate(LocalDate.now());
-//        box.setIs_open(false);
-//
-//        Admin admin = adminRepository.findById(adminId)
-//                .orElseThrow(() -> new NotFoundException("Admin no encontrado"));
-//        box.setAdmin(admin);
-//
-//        return boxRepository.save(box);
-//    }
-//
-//    // Cambiar estado de la caja (abrir/cerrar)
-//    @Transactional
-//    public Box toggleBoxStatus(UUID boxId, boolean newStatus) throws NotFoundException{
-//        Box box = boxRepository.findById(boxId)
-//                .orElseThrow(() -> new NotFoundException("Caja no encontrada"));
-//        box.setIs_open(newStatus);
-//        return boxRepository.save(box);
-//    }
-//
-//    // Asignar un ATM a la caja
-//    @Transactional
-//    public Box assignAtmToBox(UUID boxId, UUID atmId) throws NotFoundException{
-//        Box box = boxRepository.findById(boxId)
-//                .orElseThrow(() -> new NotFoundException("Caja no encontrada"));
-//        ATM atm = atmRepository.findById(atmId)
-//                .orElseThrow(() -> new NotFoundException("ATM no encontrado"));
-//        box.setAtm(atm);
-//        return boxRepository.save(box);
-//    }
-//
-//    // Obtener el estado actual de la caja
-//    public boolean getBoxStatus(UUID boxId) throws NotFoundException{
-//        return boxRepository.findById(boxId)
-//                .map(Box::getIs_open)
-//                .orElseThrow(() -> new NotFoundException("Caja no encontrada"));
-//    }
-//
-//    // Obtener información básica de la caja
-//    public Box getBoxInfo(UUID boxId) throws NotFoundException{
-//        return boxRepository.findById(boxId)
-//                .orElseThrow(() -> new NotFoundException("Caja no encontrada"));
-//    }
 }

@@ -1,5 +1,6 @@
 package com.example.api_v01.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,9 +28,11 @@ public class OrderSet {
     private String name_client;
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date_order;
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime time_order;
 
     @Column(nullable = true)
@@ -39,6 +42,7 @@ public class OrderSet {
     @JoinColumn(name = "id_arching",referencedColumnName = "id_arching")
     private Arching arching;
 
-    private Boolean dispatch;
+    @Builder.Default
+    private Boolean dispatch = false;
 
 }

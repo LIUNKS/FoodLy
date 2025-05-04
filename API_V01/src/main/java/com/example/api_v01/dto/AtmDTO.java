@@ -1,5 +1,6 @@
 package com.example.api_v01.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ public class AtmDTO {
 
     private String name_atm;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
     private String alias;

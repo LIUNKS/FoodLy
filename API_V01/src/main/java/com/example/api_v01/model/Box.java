@@ -1,5 +1,6 @@
 package com.example.api_v01.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,7 @@ public class Box {
     private String name_box;
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
     @Column

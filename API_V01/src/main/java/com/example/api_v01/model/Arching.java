@@ -1,5 +1,6 @@
 package com.example.api_v01.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,12 +24,15 @@ public class Arching {
     private UUID id_arching;
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime star_time;
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime end_time;
 
     @Column(nullable = false)

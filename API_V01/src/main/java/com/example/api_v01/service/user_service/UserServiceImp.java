@@ -52,32 +52,25 @@ public class UserServiceImp implements UserService, ExceptionMessage {
     @Override
     public User UpdateUser(UUID id,UserDTO userDTO) throws NotFoundException,BadRequestException {
         Optional<User>UserOptional = userRepository.findById(id);
-
         if (!UserOptional.isPresent()) {
             throw new NotFoundException(USER_NOT_FOUND);
         }
-
         User user = UserOptional.get();
+        User UserValidation = ValidationUser(user,userDTO);
+        return userRepository.save(UserValidation);
+    }
 
+    private User ValidationUser(User user,UserDTO userDTO){
         if(userDTO.getUsername() != null){
             user.setUsername(userDTO.getUsername());
-        }else{
-            throw new BadRequestException(USER_USERNAME_INVALID);
         }
-
         if(userDTO.getPassword() != null){
             user.setPassword(userDTO.getPassword());
-        }else{
-            throw new BadRequestException(USER_PASSWORD_INVALID);
         }
-
         if(userDTO.getRole() != null){
             user.setRole(userDTO.getRole());
-        }else{
-            throw new BadRequestException(USER_ROLE_INVALID);
         }
-
-        return userRepository.save(user);
+        return user;
     }
 
 }
