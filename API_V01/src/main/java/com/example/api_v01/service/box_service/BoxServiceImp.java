@@ -8,6 +8,8 @@ import com.example.api_v01.model.Box;
 import com.example.api_v01.repository.ATMRepository;
 import com.example.api_v01.repository.AdminRepository;
 import com.example.api_v01.repository.BoxRepository;
+import com.example.api_v01.service.admin_service.AdminService;
+import com.example.api_v01.service.atm_service.ATMService;
 import com.example.api_v01.utils.BoxMovement;
 import com.example.api_v01.utils.ExceptionMessage;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +26,13 @@ import java.util.UUID;
 public class BoxServiceImp implements BoxService, ExceptionMessage {
 
     private final BoxRepository boxRepository;
-    private final ATMRepository atmRepository;
+    private final ATMService atmService;
+    private final AdminService adminService;
 
     @Override
-    public Box saveBox(BoxDTO box) {
-        Box newBox = BoxMovement.CreateBox(box);
+    public Box saveBox(UUID id_admin,BoxDTO box) throws NotFoundException {
+        Admin admin = adminService.findById(id_admin);
+        Box newBox = BoxMovement.CreateBox(admin,box);
         return boxRepository.save(newBox);
     }
 
@@ -50,10 +54,12 @@ public class BoxServiceImp implements BoxService, ExceptionMessage {
 
     @Override
     public Box assignAtmToBox(UUID id_box, UUID id_atm) throws NotFoundException {
-        ATM atm = atmRepository.findById(id_atm)
-                .orElseThrow( () -> new NotFoundException(ATM_NOT_FOUND));
+
+        ATM atm = atmService.getAtmById(id_atm);
+
         Box box = boxRepository.findById(id_box)
                 .orElseThrow( () -> new NotFoundException(BOX_NOT_FOUND));
+
         box.setAtm(atm);
         return boxRepository.save(box);
     }

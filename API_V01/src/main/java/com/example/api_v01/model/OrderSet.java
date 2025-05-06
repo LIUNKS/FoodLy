@@ -43,6 +43,9 @@ public class OrderSet {
     private Arching arching;
 
     @Builder.Default
+    private Boolean active = false;
+
+    @Builder.Default
     private Boolean dispatch = false;
 
 }

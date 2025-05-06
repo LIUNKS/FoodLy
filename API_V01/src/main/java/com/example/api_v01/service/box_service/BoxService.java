@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface BoxService {
 
 
-    Box saveBox(BoxDTO box);
+    Box saveBox(UUID id_admin,BoxDTO box) throws NotFoundException;
 
     Box toggleBoxStatus(UUID id_box) throws NotFoundException;
 

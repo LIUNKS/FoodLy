@@ -14,4 +14,6 @@ public interface ExceptionMessage {
     final String USER_ROLE_INVALID = "El role no puede ser null";
     final String PRODUCT_NOT_FOUND = "El producto no encontrado";
     final String BOX_NOT_FOUND = "El box no encontrado";
+    final String ARCHING_NOT_FOUND = "El arqueo no encontrado";
+    final String ATM_ARCHING_NOT_FOUND = "No se contro arqueos de este cajero";
 }

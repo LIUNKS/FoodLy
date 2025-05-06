@@ -5,9 +5,6 @@ import java.util.UUID;
 
 public class Employee {
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.AUTO)
-//    @Column(name = "id_atm")
     private UUID id_atm;
 
     private String name;
@@ -23,4 +20,5 @@ public class Employee {
     private String dni;
 
     private Admin admin;
+
 }

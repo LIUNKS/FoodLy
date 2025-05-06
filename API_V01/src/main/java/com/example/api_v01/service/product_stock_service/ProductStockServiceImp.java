@@ -50,8 +50,8 @@ public class ProductStockServiceImp implements ProductStockService, ExceptionMes
     }
 
     @Override
-    public ProductStock getProductStockById(UUID id) throws NotFoundException {
-        Optional<ProductStock>productStock = productStockRepository.findById(id);
+    public ProductStock getProductStockById(UUID id_productStock) throws NotFoundException {
+        Optional<ProductStock>productStock = productStockRepository.findById(id_productStock);
         if(!productStock.isPresent()){
             throw new NotFoundException(STOCK_NOT_FOUND);
         }
@@ -73,8 +73,8 @@ public class ProductStockServiceImp implements ProductStockService, ExceptionMes
     }
 
     @Override
-    public ProductStock cleanStockById(UUID id) throws NotFoundException {
-        Optional<ProductStock>productStock = productStockRepository.findById(id);
+    public ProductStock cleanStockById(UUID id_productStock) throws NotFoundException {
+        Optional<ProductStock>productStock = productStockRepository.findById(id_productStock);
         if (!productStock.isPresent()) {
             throw new NotFoundException(STOCK_NOT_FOUND);
         }
@@ -103,8 +103,8 @@ public class ProductStockServiceImp implements ProductStockService, ExceptionMes
     }
 
     @Override
-    public ProductStock discountStockById(UUID id, Integer count) throws NotFoundException , BadRequestException {
-        Optional<ProductStock>productStock = productStockRepository.findById(id);
+    public ProductStock discountStockById(UUID id_productStock, Integer count) throws NotFoundException , BadRequestException {
+        Optional<ProductStock>productStock = productStockRepository.findById(id_productStock);
 
         if(!productStock.isPresent()){
             throw new NotFoundException(STOCK_NOT_FOUND);
@@ -122,9 +122,9 @@ public class ProductStockServiceImp implements ProductStockService, ExceptionMes
     }
 
     @Override
-    public ProductStock updateStockById(UUID id, ProductStockDTO productStockDTO) throws NotFoundException {
+    public ProductStock updateStockById(UUID id_productStock, ProductStockDTO productStockDTO) throws NotFoundException {
 
-        Optional<ProductStock>stockOptional = productStockRepository.findById(id);
+        Optional<ProductStock>stockOptional = productStockRepository.findById(id_productStock);
 
         if(!stockOptional.isPresent()){
             throw new NotFoundException(STOCK_NOT_FOUND);

@@ -27,7 +27,7 @@ public class AtmDTO {
 
     private String dni;
 
-    private UserDTO userDTO;
+    private RegisterATMDTO user;
 
     private AdminDTO adminDTO;
 }
