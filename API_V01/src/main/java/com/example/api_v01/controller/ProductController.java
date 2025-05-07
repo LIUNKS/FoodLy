@@ -33,6 +33,11 @@ public class ProductController {
         this.productService = productService;
     }
 
+
+
+
+
+
     @Operation(
             summary = "Obtiene todos los productos",
             description = "Este endpoint devuelve una lista de productos disponibles en el sistema."
@@ -49,7 +54,6 @@ public class ProductController {
                     content = @Content
             )
     })
-
     // Implementacion de los metodos aqui
     @GetMapping("/list")
     public ResponseEntity<?> getAllProducts() {
@@ -60,6 +64,11 @@ public class ProductController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(successMessage);
     }
+
+
+
+
+
 
     @Operation(
             summary = "Obtiene un producto por ID",
@@ -87,6 +96,11 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(successMessage);
     }
 
+
+
+
+
+
     @Operation(
             summary = "Eliminar un producto por ID",
             description = "Este endpoint elimina un producto disponible en el sistema indicando su UUID."
@@ -108,6 +122,11 @@ public class ProductController {
         productService.deleteProduct(id); //llamada
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // respuesta 204 exito
     }
+
+
+
+
+
 
     @Operation(
             summary = "Actualizar un producto por ID",
@@ -135,6 +154,11 @@ public class ProductController {
                 .build();
         return ResponseEntity.ok(successMessage);
     }
+
+
+
+
+
 
     @Operation(
             summary = "Crear un producto",
@@ -171,8 +195,13 @@ public class ProductController {
         return ResponseEntity.created(location).body(successMessage);
     }
 
+
+
+
+
+
     @Operation(
-            summary = "Obtener producto",
+            summary = "Endponit de Excepcion",
             description = "Lanza una excepción en caso de que no se proporcione el ID del producto."
     )
     @ApiResponses(value = {
@@ -183,8 +212,13 @@ public class ProductController {
         throw new BadRequestException("Se necesita el ID del producto para buscarlo");
     }
 
+
+
+
+
+
     @Operation(
-            summary = "Actualizar producto",
+            summary = "Endponit de Excepcion",
             description = "Lanza una excepción en caso de que no se proporcione el ID del producto para la actualización."
     )
     @ApiResponses(value = {
@@ -195,8 +229,13 @@ public class ProductController {
         throw new BadRequestException("Se necesita el ID del producto para actualizarlo");
     }
 
+
+
+
+
+
     @Operation(
-            summary = "Eliminar producto",
+            summary = "Endponit de Excepcion",
             description = "Lanza una excepción en caso de que no se proporcione el ID del producto para eliminarlo."
     )
     @ApiResponses(value = {
