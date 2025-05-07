@@ -22,6 +22,10 @@ public class CustomerOrder  {
     private UUID id_order;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+    @JoinColumn(
+            name = "id_product",
+            referencedColumnName = "id_product"
+    )
     private Product product;
 
     private Integer count;
@@ -34,5 +38,7 @@ public class CustomerOrder  {
             referencedColumnName = "id_orde_set"
     )
     private OrderSet order;
+
+
 
 }

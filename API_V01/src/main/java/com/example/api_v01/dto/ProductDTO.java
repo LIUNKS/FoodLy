@@ -31,6 +31,6 @@ public class ProductDTO {
 
     private Integer total_sold;
 
-    private Admin admin;
+    private AdminDTO adminDTO;
 
 }

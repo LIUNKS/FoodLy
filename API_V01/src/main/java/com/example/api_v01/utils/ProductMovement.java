@@ -18,7 +18,7 @@ public class ProductMovement {
                 .additional_observation(productDTO.getAdditional_observation())
                 .category(productDTO.getCategory())
                 .stock(stock)
-                .admin(productDTO.getAdmin())
+                .admin(null)
                 .build();
     }
 
@@ -28,7 +28,7 @@ public class ProductMovement {
                 .price(productDTO.getPrice())
                 .additional_observation(productDTO.getAdditional_observation())
                 .category(productDTO.getCategory())
-                .admin(productDTO.getAdmin())
+                .admin(null)
                 .build();
     }
 

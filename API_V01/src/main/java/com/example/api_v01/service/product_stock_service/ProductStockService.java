@@ -17,4 +17,5 @@ public interface ProductStockService {
     ProductStock cleanStockById(UUID id) throws NotFoundException;
     ProductStock increaseStockById(UUID id,Integer count) throws NotFoundException;
     ProductStock discountStockById(UUID id,Integer count) throws NotFoundException , BadRequestException;
+    ProductStock updateStockById(UUID id,ProductStockDTO productStockDTO) throws NotFoundException , BadRequestException;
 }

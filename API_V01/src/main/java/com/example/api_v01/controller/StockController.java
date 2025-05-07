@@ -223,12 +223,16 @@ public class StockController {
         return ResponseEntity.ok().body(successMessage);
     }
 
-    //Falta implementar
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable UUID id, @RequestBody ProductDTO productDTO) throws NotFoundException {
-        return null;
+    public ResponseEntity<?> updateProduct(@PathVariable UUID id, @RequestBody ProductStockDTO stockDTO) throws NotFoundException,BadRequestException {
+        ProductStock stock = productStockService.updateStockById(id,stockDTO);
+        SuccessMessage<ProductStock>successMessage= SuccessMessage.<ProductStock>builder()
+                .status(HttpStatus.OK)
+                .message("Se actualizo el producto correctamente")
+                .data(stock)
+                .build();
+        return ResponseEntity.ok().body(successMessage);
     }
-
 
     @Operation(
             summary = "Obtener stock por ID",

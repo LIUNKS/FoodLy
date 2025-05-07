@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-/*Aun falta vincular con las demas clases*/
 @Entity
 @Table(name = "admin")
 @AllArgsConstructor
@@ -16,6 +15,7 @@ import java.util.UUID;
 @Data
 @Builder
 public class Admin {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_admin")

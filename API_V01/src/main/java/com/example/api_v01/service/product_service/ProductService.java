@@ -12,8 +12,6 @@ import java.util.UUID;
 
 public interface ProductService {
 
-    Boolean isExist(UUID id) throws NotFoundException;
-
     Product saveProduct(ProductDTO product);
 
     void deleteProduct(UUID id) throws NotFoundException;

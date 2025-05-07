@@ -1,5 +1,6 @@
 package com.example.api_v01.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,7 +27,12 @@ public class Box {
     private String name_box;
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
+
+    @Column
+    @Builder.Default
+    private Boolean is_open = false;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id_atm" ,referencedColumnName = "id_atm")
