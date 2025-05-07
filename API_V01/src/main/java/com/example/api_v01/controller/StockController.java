@@ -223,7 +223,11 @@ public class StockController {
         return ResponseEntity.ok().body(successMessage);
     }
 
-    //Falta implementar
+
+    @Operation(
+        summary = "Falta implementar",
+        description = "En siguientes versiones estara disponible"
+    )
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable UUID id, @RequestBody ProductDTO productDTO) throws NotFoundException {
         return null;
@@ -231,7 +235,7 @@ public class StockController {
 
 
     @Operation(
-            summary = "Obtener stock por ID",
+            summary = "Endponit de Excepcion",
             description = "Este endpoint lanza una excepción si no se proporciona el ID necesario para buscar el stock."
     )
     @ApiResponses(value = {
@@ -243,7 +247,7 @@ public class StockController {
     }
 
     @Operation(
-            summary = "Actualizar stock",
+            summary = "Endponit de Excepcion",
             description = "Este endpoint lanza una excepción si no se proporciona el ID necesario para actualizar el stock."
     )
     @ApiResponses(value = {
@@ -255,7 +259,7 @@ public class StockController {
     }
 
     @Operation(
-            summary = "Eliminar stock",
+            summary = "Endponit de Excepcion",
             description = "Este endpoint lanza una excepción si no se proporciona el ID necesario para eliminar el stock."
     )
     @ApiResponses(value = {
