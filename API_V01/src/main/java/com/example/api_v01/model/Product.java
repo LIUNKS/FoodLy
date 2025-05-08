@@ -32,7 +32,7 @@ public class Product {
     private Category category;
 
     @OneToOne(
-            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            cascade = {CascadeType.ALL},
             fetch = FetchType.EAGER
     )
     @JoinColumn(

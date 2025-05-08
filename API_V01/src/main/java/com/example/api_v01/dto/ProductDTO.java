@@ -23,14 +23,5 @@ public class ProductDTO {
 
     private Category category;
 
-    private ProductStock stock;
-
-    private Integer ini_stock;
-
-    private Integer current_stock;
-
-    private Integer total_sold;
-
-    private AdminDTO adminDTO;
 
 }

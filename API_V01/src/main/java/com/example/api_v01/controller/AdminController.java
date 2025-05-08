@@ -1,12 +1,9 @@
 package com.example.api_v01.controller;
 
 
-import com.example.api_v01.dto.ErrorMassage;
 import com.example.api_v01.dto.SuccessMessage;
 import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
-import com.example.api_v01.model.Admin;
-import com.example.api_v01.repository.AdminRepository;
 import com.example.api_v01.service.admin_service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

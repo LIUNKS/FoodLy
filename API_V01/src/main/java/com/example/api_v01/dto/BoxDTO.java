@@ -14,13 +14,4 @@ import java.time.LocalDate;
 @Builder
 public class BoxDTO {
     private String name_box;
-
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
-
-    private Boolean is_open;
-
-    private AtmDTO atmDTO;
-
-    private AdminDTO adminDTO;
 }

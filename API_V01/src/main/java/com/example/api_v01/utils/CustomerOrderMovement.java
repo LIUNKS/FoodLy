@@ -9,6 +9,18 @@ import java.util.List;
 
 public class CustomerOrderMovement {
 
+    public static CustomerOrder createCustomerOrder(Product product, Integer count) {
+        if(product.getStock().getCurrent_stock() >= count){
+            return CustomerOrder.builder()
+                    .product(product)
+                    .order(null)
+                    .count(count)
+                    .total_rice( product.getPrice() * count )
+                    .build();
+        }
+        return null;
+    }
+
     public static CustomerOrder createCustomerOrder(OrderSet orderSet,Product product, Integer count) {
         if(product.getStock().getCurrent_stock() >= count){
             return CustomerOrder.builder()
@@ -49,18 +61,6 @@ public class CustomerOrderMovement {
         }
         return null;
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     public static CustomerOrder createCustomerOrder2 (Integer stock, Product product, OrderSet order) {
         if(product.getStock().getCurrent_stock() >= stock) {

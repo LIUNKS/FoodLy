@@ -5,6 +5,7 @@ import com.example.api_v01.dto.ProductStockDTO;
 import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.Product;
+import org.aspectj.weaver.ast.Not;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +13,7 @@ import java.util.UUID;
 
 public interface ProductService {
 
-    Product saveProduct(ProductDTO product);
+    Product saveProduct(UUID id_admin,ProductDTO product) throws NotFoundException;
 
     void deleteProduct(UUID id) throws NotFoundException;
 
@@ -23,4 +24,7 @@ public interface ProductService {
     Product updateProduct(UUID id, ProductDTO productDTO) throws NotFoundException;
 
     void product_stockDelete(UUID id_stock) throws NotFoundException;
+
+    List<ProductStockDTO> getProductByCategory(String categoria) throws NotFoundException;
+
 }

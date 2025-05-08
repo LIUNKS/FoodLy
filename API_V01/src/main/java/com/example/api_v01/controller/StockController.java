@@ -27,24 +27,6 @@ public class StockController {
         this.productStockService = productStockService;
     }
 
-    //Posiblemente se descontinue
-    @PostMapping("/{id_product}")
-    public ResponseEntity<?> CreateStock(@PathVariable UUID id_product,@RequestBody ProductStockDTO productStockDTO) throws NotFoundException {
-        ProductStock productStock = productStockService.saveProductStock(id_product,productStockDTO);
-        SuccessMessage<ProductStock>successMessage = SuccessMessage.<ProductStock>builder()
-                .status(HttpStatus.CREATED)
-                .message("Se creo y asigno correctamente el stock al producto indicado")
-                .data(productStock)
-                .build();
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id_stock}")
-                .buildAndExpand(productStock.getId_product_stock())
-                .toUri();
-        return ResponseEntity.created(location).body(successMessage);
-    }
-
     @GetMapping("/list")
     public ResponseEntity<?> getAllStocks() {
         SuccessMessage<List<ProductStock>> successMessage = SuccessMessage.<List<ProductStock>>builder()
@@ -66,14 +48,13 @@ public class StockController {
         return ResponseEntity.ok(successMessage);
     }
 
-
     @DeleteMapping("/{id_stock}")
     public ResponseEntity<?> deleteStock(@PathVariable UUID id_stock) throws NotFoundException {
         productStockService.deleteProductStock(id_stock);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/clean/{id_stock}")
+    @PostMapping("/{id_stock}/clean")
     public ResponseEntity<?> cleanStock(@PathVariable UUID id_stock) throws NotFoundException {
         ProductStock stock = productStockService.cleanStockById(id_stock);
         SuccessMessage<ProductStock>successMessage = SuccessMessage.<ProductStock>builder()
@@ -84,7 +65,7 @@ public class StockController {
         return ResponseEntity.ok().body(successMessage);
     }
 
-    @PostMapping("/discount/{id_stock}")
+    @PostMapping("/{id_stock}/discount")
     public ResponseEntity<?> discountStock(@PathVariable UUID id_stock,@RequestParam Integer count) throws NotFoundException,BadRequestException {
         ProductStock stock = productStockService.discountStockById(id_stock,count);
         SuccessMessage<ProductStock>successMessage = SuccessMessage.<ProductStock>builder()
@@ -95,7 +76,7 @@ public class StockController {
         return ResponseEntity.ok().body(successMessage);
     }
 
-    @PostMapping("/increase/{id_stock}")
+    @PostMapping("/{id_stock}/increase")
     public ResponseEntity<?> increaseStock(@PathVariable UUID id_stock,@RequestParam Integer count) throws NotFoundException{
         ProductStock stock = productStockService.increaseStockById(id_stock,count);
         SuccessMessage<ProductStock>successMessage = SuccessMessage.<ProductStock>builder()

@@ -27,7 +27,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    // Implementacion de los metodos aqui
+    // Me devuelve la lista entera de productos
     @GetMapping("/list")
     public ResponseEntity<?> getAllProducts() {
         SuccessMessage<List<Product>> successMessage = SuccessMessage.<List<Product>>builder()
@@ -38,25 +38,28 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(successMessage);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getProduct(@PathVariable UUID id) throws NotFoundException {
+    // Me devuelve un producto buscado por su id
+    @GetMapping("/{id_product}")
+    public ResponseEntity<?> getProduct(@PathVariable UUID id_product) throws NotFoundException {
         SuccessMessage<Product> successMessage = SuccessMessage.<Product>builder()
                 .status(HttpStatus.OK)
                 .message("Producto encontrado!!")
-                .data(productService.getProduct(id))
+                .data(productService.getProduct(id_product))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(successMessage);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable UUID id) throws NotFoundException {
-        productService.deleteProduct(id); //llamada
+    // Elimina un producto junto con su stock ,necesita el id del producto
+    @DeleteMapping("/{id_product}")
+    public ResponseEntity<?> deleteProduct(@PathVariable UUID id_product) throws NotFoundException {
+        productService.deleteProduct(id_product); //llamada
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // respuesta 204 exito
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable UUID id, @RequestBody ProductDTO productDTO) throws NotFoundException {
-        Product updateProduct = productService.updateProduct(id, productDTO);
+    //actualiza el producto
+    @PatchMapping("/{id_product}")
+    public ResponseEntity<?> updateProduct(@PathVariable UUID id_product, @RequestBody ProductDTO productDTO) throws NotFoundException {
+        Product updateProduct = productService.updateProduct(id_product, productDTO);
         SuccessMessage<Product> successMessage = SuccessMessage.<Product>builder()
                 .status(HttpStatus.OK)
                 .message("Producto Actualizado correctamente!!")
@@ -65,10 +68,10 @@ public class ProductController {
         return ResponseEntity.ok(successMessage);
     }
 
-    @PostMapping("/")
-    public ResponseEntity<?> CreateProduct(@RequestBody ProductDTO productDTO) {
-        Product product = productService.saveProduct(productDTO);
-
+    //agrega un producto,necesita el id del admin que lo va agregar
+    @PostMapping("/{id_admin}")
+    public ResponseEntity<?> CreateProduct(@PathVariable UUID id_admin,@RequestBody ProductDTO productDTO) throws NotFoundException {
+        Product product = productService.saveProduct(id_admin,productDTO);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")

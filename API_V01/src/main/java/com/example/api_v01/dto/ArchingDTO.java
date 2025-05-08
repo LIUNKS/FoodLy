@@ -18,12 +18,6 @@ public class ArchingDTO {
 
     private UUID id_arching;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
-
-    @JsonFormat(pattern = "HH:mm:ss")
-    private LocalTime star_time;
-
     @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime end_time;
 

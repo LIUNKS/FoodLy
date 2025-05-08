@@ -16,9 +16,6 @@ public class AtmDTO {
 
     private String name_atm;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
-
     private String alias;
 
     private String email;
@@ -27,7 +24,4 @@ public class AtmDTO {
 
     private String dni;
 
-    private RegisterATMDTO user;
-
-    private AdminDTO adminDTO;
 }

@@ -25,5 +25,4 @@ public class EmployeeDTO {
 
     private String dni;
 
-    private AdminDTO adminDTO;
 }

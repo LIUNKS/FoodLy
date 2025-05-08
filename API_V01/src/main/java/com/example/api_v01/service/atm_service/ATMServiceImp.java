@@ -44,7 +44,7 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
         if (!ATMOptional.isPresent()) {
             throw new NotFoundException(ATM_NOT_FOUND);
         }
-        ATM ATM = validateATM(ATMOptional.get(), atm);
+        ATM ATM = ATMMovement.validateATM(ATMOptional.get(), atm);
         return atmRepository.save(ATM);
     }
 
@@ -57,8 +57,12 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
             throw new NotFoundException(ATM_NOT_FOUND);
         }
 
+        ATMOptional.get().setAdmin(null);
+
         atmRepository.delete(ATMOptional.get());
     }
+
+    //Implementar para buscar el atm por nombre,apellido o dni para eliminarlo
 
     @Override
     public ATM getAtmById(UUID id_atm) throws NotFoundException {
@@ -69,31 +73,6 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
     @Override
     public List<ATM> getAllATMs() {
         return atmRepository.findAll();
-    }
-
-    private ATM validateATM(ATM atm,AtmDTO atmDTO) {
-        if(atmDTO.getName_atm() != null){
-            atm.setName_atm(atmDTO.getName_atm());
-        }
-        if(atm.getDate() != null){
-            atm.setDate(atm.getDate());
-        }
-        if(atm.getAlias() != null){
-            atm.setAlias(atm.getAlias());
-        }
-        if(atm.getEmail() != null){
-            atm.setEmail(atm.getEmail());
-        }
-        if(atm.getPhone() != null){
-            atm.setPhone(atm.getPhone());
-        }
-        if(atm.getDni() != null){
-            atm.setDni(atm.getDni());
-        }
-        if(atm.getUser_atm() != null){
-            atm.setUser_atm(atm.getUser_atm());
-        }
-        return atm;
     }
 
 }

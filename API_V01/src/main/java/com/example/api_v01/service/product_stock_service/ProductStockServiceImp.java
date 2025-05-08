@@ -28,27 +28,6 @@ public class ProductStockServiceImp implements ProductStockService, ExceptionMes
 
     private final ProductService productService;
 
-    //Posiblemente deje de estar
-    @Override
-    public ProductStock saveProductStock(UUID id_product,ProductStockDTO productStock) throws NotFoundException {
-
-        ProductStock stock = ProductStock.builder()
-                .ini_stock(productStock.getIni_stock())
-                .current_stock(productStock.getCurrent_stock())
-                .total_sold(productStock.getTotal_sold())
-                .build();
-
-        stock = productStockRepository.save(stock);
-
-        ProductDTO productDTO = ProductDTO.builder()
-                .stock(stock)
-                .build();
-
-        productService.updateProduct(id_product,productDTO);
-
-        return stock;
-    }
-
     @Override
     public ProductStock getProductStockById(UUID id_productStock) throws NotFoundException {
         Optional<ProductStock>productStock = productStockRepository.findById(id_productStock);
@@ -74,14 +53,11 @@ public class ProductStockServiceImp implements ProductStockService, ExceptionMes
 
     @Override
     public ProductStock cleanStockById(UUID id_productStock) throws NotFoundException {
-        Optional<ProductStock>productStock = productStockRepository.findById(id_productStock);
-        if (!productStock.isPresent()) {
+        Optional<ProductStock>productStockOptional = productStockRepository.findById(id_productStock);
+        if (!productStockOptional.isPresent()) {
             throw new NotFoundException(STOCK_NOT_FOUND);
         }
-        ProductStock stock = productStock.get();
-        stock.setIni_stock(0);
-        stock.setCurrent_stock(0);
-        stock.setTotal_sold(0);
+        ProductStock stock = InventoryMovement.CleanStock(productStockOptional.get());
         productStockRepository.save(stock);
         return stock;
     }
@@ -96,9 +72,7 @@ public class ProductStockServiceImp implements ProductStockService, ExceptionMes
         }
 
         ProductStock stock = InventoryMovement.increaseStock(productStock.get(), count);
-
         productStockRepository.save(stock);
-
         return stock;
     }
 
@@ -132,24 +106,12 @@ public class ProductStockServiceImp implements ProductStockService, ExceptionMes
 
         ProductStock stock = stockOptional.get();
 
-        ProductStock stockValidation = ValidationStock(stock,productStockDTO);
+        ProductStock stockValidation = InventoryMovement.ValidationStock(stock,productStockDTO);
 
         productStockRepository.save(stockValidation);
 
         return stock;
     }
 
-    private ProductStock ValidationStock(ProductStock stock,ProductStockDTO productStockDTO){
-        if( productStockDTO.getIni_stock() != null && productStockDTO.getIni_stock() >=0 ){
-            stock.setIni_stock(productStockDTO.getIni_stock());
-        }
-        if( productStockDTO.getCurrent_stock() != null && productStockDTO.getCurrent_stock() >=0 ){
-            stock.setCurrent_stock(productStockDTO.getCurrent_stock());
-        }
-        if( productStockDTO.getTotal_sold() != null && productStockDTO.getTotal_sold() >= 0 ){
-            stock.setTotal_sold(productStockDTO.getTotal_sold());
-        }
-        return stock;
-    }
 
 }

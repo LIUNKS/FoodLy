@@ -1,17 +1,18 @@
 package com.example.api_v01.service.product_service;
 
 import com.example.api_v01.dto.ProductDTO;
-import com.example.api_v01.handler.BadRequestException;
+import com.example.api_v01.dto.ProductStockDTO;
 import com.example.api_v01.handler.NotFoundException;
+import com.example.api_v01.model.Admin;
 import com.example.api_v01.model.Product;
 import com.example.api_v01.repository.ProductRepository;
+import com.example.api_v01.service.admin_service.AdminService;
 import com.example.api_v01.utils.ExceptionMessage;
 import com.example.api_v01.utils.ProductMovement;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpStatus;
+
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,10 +23,11 @@ import java.util.UUID;
 public class ProductServiceImp implements ProductService , ExceptionMessage {
 
     private final ProductRepository productRepository;
-
+    private final AdminService adminService;
     @Override
-    public Product saveProduct(ProductDTO productDTO) {
-        Product product = ProductMovement.createProductAndStock(productDTO);
+    public Product saveProduct(UUID id_admin,ProductDTO productDTO) throws NotFoundException {
+        Admin admin = adminService.findById(id_admin);
+        Product product = ProductMovement.createProductAndStock(admin,productDTO);
         return productRepository.save(product);
     }
 
@@ -58,7 +60,7 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
             throw new NotFoundException(PRODUCT_NOT_FOUND);
         }
         Product existingProduct = product.get();
-        Product ProductValidation = ValidateProduct(existingProduct,productDTO);
+        Product ProductValidation = ProductMovement.ValidateProduct(existingProduct,productDTO);
         return productRepository.save(ProductValidation);
     }
 
@@ -74,12 +76,9 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
         productRepository.save(product);
     }
 
-    private Product ValidateProduct(Product existingProduct,ProductDTO productDTO) {
-        if (productDTO.getName_product() != null) {existingProduct.setName_product(productDTO.getName_product());}
-        if (productDTO.getPrice() != null) {existingProduct.setPrice(productDTO.getPrice());}
-        if (productDTO.getAdditional_observation() != null) {existingProduct.setAdditional_observation(productDTO.getAdditional_observation());}
-        if (productDTO.getCategory() != null) {existingProduct.setCategory(productDTO.getCategory());}
-        if (productDTO.getStock() != null) {existingProduct.setStock(productDTO.getStock());}
-        return existingProduct;
+    @Override
+    public List<ProductStockDTO> getProductByCategory(String categoria) throws NotFoundException {
+        return List.of();
     }
+
 }

@@ -31,14 +31,25 @@ public class CustomerOrderServiceImp implements CustomerOrderService {
 
     private final ProductStockService productStockService;
 
+    //Servico para crear el customerOrder
+
     @Override
-    public CustomerOrder saveCustomerOrder(UUID id_product,UUID id_orderSet,Integer count) throws NotFoundException, BadRequestException {
+    public CustomerOrder IncrementStockCustomerOrder(UUID id_CustomerOrder, Integer count) throws BadRequestException {
+        return null;
+    }
+
+    @Override
+    public CustomerOrder AssignCustomerOrderAOderSET(UUID id_CustomerOrder, UUID id_OrderSet) throws NotFoundException, BadRequestException {
+        return null;
+    }
+
+    //Se usar para pruebas
+    @Override
+    public CustomerOrder saveCustomerOrder(UUID id_product, Integer count) throws NotFoundException, BadRequestException {
 
         Product product = productService.getProduct(id_product);
 
-        OrderSet orderSet = orderSetService.getOrderSet(id_orderSet);
-
-        CustomerOrder customerOrder = CustomerOrderMovement.createCustomerOrder(orderSet,product,count);
+        CustomerOrder customerOrder = CustomerOrderMovement.createCustomerOrder(product,count);
 
         if(customerOrder==null){
             throw new BadRequestException("No se puede quitar mas del stock actual del producto");
@@ -49,6 +60,20 @@ public class CustomerOrderServiceImp implements CustomerOrderService {
         return customerOrderRepository.save(customerOrder);
     }
 
+    //Preliminar de agregar (Aun no esta en uso)
+    @Override
+    public CustomerOrder saveCustomerOrder(UUID id_product,UUID id_orderSet,Integer count) throws NotFoundException, BadRequestException {
+        Product product = productService.getProduct(id_product);
+        OrderSet orderSet = orderSetService.getOrderSet(id_orderSet);
+        CustomerOrder customerOrder = CustomerOrderMovement.createCustomerOrder(orderSet,product,count);
+        if(customerOrder==null){
+            throw new BadRequestException("No se puede quitar mas del stock actual del producto");
+        }
+        productStockService.discountStockById(product.getStock().getId_product_stock(),count);
+        return customerOrderRepository.save(customerOrder);
+    }
+
+    //Servicio que elimina el costomerOrder
     @Override
     public void DeleteCustomerOrder(UUID id_CustomerOrder) throws NotFoundException {
 

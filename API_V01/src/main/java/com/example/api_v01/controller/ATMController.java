@@ -16,9 +16,12 @@ import java.util.UUID;
 public class ATMController {
 
     private final ATMService atmservice;
+
     public ATMController(ATMService atmservice) {
         this.atmservice = atmservice;
     }
+
+    //Corregir el envio de la data: Usar SuccessMessage plis.
 
     @PostMapping("/{adminId}")
     public ResponseEntity<ATM> saveATM(@PathVariable("adminId") UUID adminId, @RequestBody AtmDTO atmDTO) {
