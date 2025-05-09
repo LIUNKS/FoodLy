@@ -1,17 +1,19 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useState } from "react"
+import Link from "next/link";
+import { useState } from "react";
 
 export default function Sidebar() {
-  const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>({})
+  const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
   const toggleSubmenu = (name: string) => {
     setOpenSubmenus((prev) => ({
       ...prev,
       [name]: !prev[name],
-    }))
-  }
+    }));
+  };
 
   return (
     <div id="sidebar">
@@ -26,14 +28,17 @@ export default function Sidebar() {
             href="#"
             className="active"
             onClick={(e) => {
-              e.preventDefault()
-              toggleSubmenu("Caja")
+              e.preventDefault();
+              toggleSubmenu("Caja");
             }}
           >
             <i className="fas fa-th"></i>Caja
             <i className="fas fa-chevron-down toggle-icon"></i>
           </a>
-          <ul className="submenu" style={{ display: openSubmenus["Caja"] ? "block" : "none" }}>
+          <ul
+            className="submenu"
+            style={{ display: openSubmenus["Caja"] ? "block" : "none" }}
+          >
             <li>
               <Link href="/arqueo" className="active">
                 <i className="fa-regular fa-clipboard"></i> Arqueo
@@ -55,14 +60,17 @@ export default function Sidebar() {
           <a
             href="#"
             onClick={(e) => {
-              e.preventDefault()
-              toggleSubmenu("Reportes")
+              e.preventDefault();
+              toggleSubmenu("Reportes");
             }}
           >
             <i className="fa-regular fa-file-lines"></i>Reportes
             <i className="fas fa-chevron-down toggle-icon"></i>
           </a>
-          <ul className="submenu" style={{ display: openSubmenus["Reportes"] ? "block" : "none" }}>
+          <ul
+            className="submenu"
+            style={{ display: openSubmenus["Reportes"] ? "block" : "none" }}
+          >
             <li>
               <Link href="/consolidados">
                 <i className="fa-regular fa-chart-bar"></i> Consolidados
@@ -71,6 +79,33 @@ export default function Sidebar() {
             <li>
               <Link href="/graficos">
                 <i className="fa-solid fa-chart-pie"></i>Gráficos
+              </Link>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              toggleSubmenu("Productos");
+            }}
+          >
+            <i className="fa-regular fa-file-lines"></i>Productos
+            <i className="fas fa-chevron-down toggle-icon"></i>
+          </a>
+          <ul
+            className="submenu"
+            style={{ display: openSubmenus["Productos"] ? "block" : "none" }}
+          >
+            <li>
+              <Link href="/productos">
+                <i className="fa-regular fa-chart-bar"></i> Poroductos
+              </Link>
+            </li>
+            <li>
+              <Link href="/inventario">
+                <i className="fa-solid fa-chart-pie"></i>Inventario
               </Link>
             </li>
           </ul>
@@ -97,5 +132,5 @@ export default function Sidebar() {
         </li>
       </ul>
     </div>
-  )
+  );
 }

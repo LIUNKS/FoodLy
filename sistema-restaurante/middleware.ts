@@ -6,7 +6,7 @@ const publicRoutes = ["/"]
 
 // Rutas específicas por rol
 const roleRoutes: Record<string, string[]> = {
-  admin: ["/arqueo", "/apertura-cierre", "/pedido", "/consolidados", "/graficos", "/empleados", "/cocina", "/logros"],
+  admin: ["/arqueo", "/apertura-cierre","/productos","/inventario", "/pedido", "/consolidados", "/graficos", "/empleados", "/cocina", "/logros"],
   cajero: ["/arqueo", "/apertura-cierre", "/pedido"],
   cocina: ["/pedido", "/cocina"],
 }
