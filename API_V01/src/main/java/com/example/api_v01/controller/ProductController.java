@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.example.api_v01.dto.response.SuccessMessage;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.enums.Category;
+import com.example.api_v01.utils.UriGeneric;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ public class ProductController {
         this.productService = productService;
     }
 
+    //Busca todos los productos por categoria
     @GetMapping("/list/category")
     public ResponseEntity<?> getAllProductsByCategory(@RequestParam Category category) throws NotFoundException{
         SuccessMessage <List<ProductDTO>> successMessage = SuccessMessage.<List<ProductDTO>>builder()
@@ -33,7 +35,7 @@ public class ProductController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(successMessage);
     }
-
+    //Busca todos los productos que tengan el mismo nombre
     @GetMapping("/list/name")
     public ResponseEntity<?> getAllProductsByName(@RequestParam String name) throws NotFoundException {
         SuccessMessage <List<ProductDTO>> successMessage = SuccessMessage.<List<ProductDTO>>builder()
@@ -66,7 +68,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(successMessage);
     }
 
-    // Elimina un producto junto con su stock ,necesita el id del producto
+    // Elimina un producto junto con su stock, necesita el ID del producto
     @DeleteMapping("/{id_product}")
     public ResponseEntity<?> deleteProduct(@PathVariable UUID id_product) throws NotFoundException {
         productService.deleteProduct(id_product); //llamada
@@ -85,15 +87,15 @@ public class ProductController {
         return ResponseEntity.ok(successMessage);
     }
 
-    //agrega un producto,necesita el id del admin que lo va agregar
+    //agrega un producto, necesita el ID del admin que lo va a agregar
     @PostMapping("/{id_admin}")
     public ResponseEntity<?> CreateProduct(@PathVariable UUID id_admin,@RequestBody ProductDTO productDTO) throws NotFoundException {
         ProductDTO product = productService.saveProduct(id_admin,productDTO);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(product.getId_product())
-                .toUri();
+
+        URI location = UriGeneric.GenereURI(
+                "/{id}",
+                product.getId_product()
+        );
 
         SuccessMessage<ProductDTO> successMessage = SuccessMessage.<ProductDTO>builder()
                 .status(HttpStatus.CREATED)

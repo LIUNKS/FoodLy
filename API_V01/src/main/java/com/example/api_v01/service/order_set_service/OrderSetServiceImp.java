@@ -25,6 +25,7 @@ public class OrderSetServiceImp implements  OrderSetService {
     private final OrderSetRepository orderSetRepository;
     private final ArchingService archingService;
 
+    //Lo utiliza para guardar el OrderSet junto con sus ordenes, es usado en un servicio aux
     @Override
     public OrderSet saveBaseOrderSet(UUID id_arching, OrderSetDTO orderSetDTO) throws NotFoundException {
         Arching arching = archingService.getArchingById(id_arching);

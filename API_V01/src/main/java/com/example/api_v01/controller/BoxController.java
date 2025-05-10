@@ -24,12 +24,10 @@ public class BoxController {
         this.boxservice = boxservice;
     }
 
-    //Tareas
-    //Agregarle URI a saveBox (Faltante)
-    //Falta implementar los endponts con los servicios
+    //Agregarle URI a saveBox (Faltante) para sabe donde esta ubicado (Usar UriGenric es un utils del proyecto propio)
 
     @PostMapping("/{id_admin}")
-    public ResponseEntity<SuccessMessage> saveBox(@PathVariable("id_admin") UUID id_admin, @RequestBody BoxResponseDTO boxDTO) throws NotFoundException {
+    public ResponseEntity<?> saveBox(@PathVariable("id_admin") UUID id_admin, @RequestBody BoxResponseDTO boxDTO) throws NotFoundException {
         SuccessMessage<BoxResponseDTO>successMessage = SuccessMessage.<BoxResponseDTO>builder()
                 .status(HttpStatus.OK)
                 .message("La data del box creado")
@@ -39,7 +37,7 @@ public class BoxController {
     }
 
     @PutMapping("/{id_box}/assign-atm/{id_atm}")
-    public ResponseEntity<SuccessMessage> assignAtmToBox(@PathVariable("id_box") UUID id_box, @PathVariable("id_atm") UUID id_atm) throws NotFoundException {
+    public ResponseEntity<?> assignAtmToBox(@PathVariable("id_box") UUID id_box, @PathVariable("id_atm") UUID id_atm) throws NotFoundException {
         SuccessMessage<BoxWithAtmDTO>successMessage = SuccessMessage.<BoxWithAtmDTO>builder()
                 .status(HttpStatus.OK)
                 .message("La data del box creado:")
@@ -49,7 +47,7 @@ public class BoxController {
     }
 
     @GetMapping("/{id_box}")
-    public ResponseEntity<SuccessMessage> getBoxInfo(@PathVariable("id_box") UUID id_box) throws NotFoundException {
+    public ResponseEntity<?> getBoxInfo(@PathVariable("id_box") UUID id_box) throws NotFoundException {
         SuccessMessage<BoxDTO>successMessage = SuccessMessage.<BoxDTO>builder()
                 .status(HttpStatus.OK)
                 .message("La data del box creado:")
@@ -59,7 +57,7 @@ public class BoxController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<SuccessMessage> getBoxes() {
+    public ResponseEntity<?> getBoxes() {
         SuccessMessage<List<BoxDTO>>successMessage = SuccessMessage.<List<BoxDTO>>builder()
                 .status(HttpStatus.OK)
                 .message("La data del box creado:")
@@ -69,7 +67,7 @@ public class BoxController {
     }
 
     @GetMapping("/by-atm/{id_atm}")
-    public ResponseEntity<SuccessMessage> getBoxesByAtm(@PathVariable("id_atm") UUID id_atm) throws NotFoundException {
+    public ResponseEntity<?> getBoxesByAtm(@PathVariable("id_atm") UUID id_atm) throws NotFoundException {
         SuccessMessage<List<BoxDTO>>successMessage = SuccessMessage.<List<BoxDTO>>builder()
                 .status(HttpStatus.OK)
                 .message("La data del box creado:")

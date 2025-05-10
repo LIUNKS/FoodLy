@@ -1,6 +1,5 @@
-package com.example.api_v01.dto.entityLike;
+package com.example.api_v01.dto.response;
 
-import com.example.api_v01.dto.response.ArchingWithBoxAndAtmDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
@@ -10,26 +9,28 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class ArchingDTO {
-    private UUID id_arching;
+public class ArchingResponseDTO {
 
     private LocalDate date;
 
     private LocalTime star_time;
 
-    private LocalTime end_time;
+    @Builder.Default
+    private LocalTime end_time=null;
 
     private Double init_amount;
 
-    private Double final_amount;
+    @Builder.Default
+    private Double final_amount=null;
 
-    private Double total_amount;
+    @Builder.Default
+    private Double total_amount=null;
 
-    private ArchingWithBoxAndAtmDTO arching_with_box_and_atm;
+    @Builder.Default
+    private BoxResponseDTO box=null;
 }

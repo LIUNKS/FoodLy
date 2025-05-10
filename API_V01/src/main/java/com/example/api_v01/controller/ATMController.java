@@ -27,7 +27,9 @@ public class ATMController {
     //En los Servicios de ATM:
     //Los que guardar,cambiar o actualizan tiene que devolver un AtmResponseDTO = No trae el Id (saveATM,assignUserATM,updateATM)
     //Los que son de busqueda o Traen un lista tienen que Devolver un AtmDTO = Trae el Id (getAtmById,getAllATMs)
-    //Tambien añadir un nuevo endponit para buscar al Atm por nombre (Deve devolve un AtmDTO)
+    //Tambien añadir un nuevo endponit para buscar al Atm por nombre (Debe devolve un AtmDTO)
+    //Agregarle URI a saveATM (Faltante) para sabe donde esta ubicado (Esto hazlo despues de haber cambiado la sintaxis)
+    //(Usar UriGenric es un utils del proyecto propio)
 
     @PostMapping("/{adminId}")
     public ResponseEntity<ATM> saveATM(@PathVariable("adminId") UUID adminId, @RequestBody AtmDTO atmDTO) {

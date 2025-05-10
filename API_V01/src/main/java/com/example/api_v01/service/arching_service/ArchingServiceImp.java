@@ -1,6 +1,10 @@
 package com.example.api_v01.service.arching_service;
 
 import com.example.api_v01.dto.entityLike.ArchingDTO;
+import com.example.api_v01.dto.response.ArchingInitDTO;
+import com.example.api_v01.dto.response.ArchingResponseDTO;
+import com.example.api_v01.dto.response.ArchingWithAtmDTO;
+import com.example.api_v01.dto.response.ArchingWithBoxDTO;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.Arching;
 import com.example.api_v01.model.Box;
@@ -22,58 +26,79 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
 
     private final BoxService boxService;
 
+    //Se usa en un servicio auxiliar para la logica no borrar
     @Override
-    public Arching saveArching(UUID id_box,ArchingDTO archingDTO) throws NotFoundException {
-        Box box = boxService.getBox(id_box);
-        Arching arching = ArchingMovement.CreateArching(box,archingDTO);
+    public Arching saveArching(Arching arching) {
         return archingRepository.save(arching);
     }
 
+    //Servicio para guardar el arqueo
     @Override
-    public Arching closeArching( UUID id_arching) throws NotFoundException {
-
-        Arching arching = archingRepository.findById(id_arching)
-                .orElseThrow( () -> new NotFoundException(ARCHING_NOT_FOUND));
-
-        Arching archingClose = ArchingMovement.CloseArchingBox(arching,null); //Falta implementar el Monto Final, Ya te calcula el final
-        return archingRepository.save(archingClose);
-
+    public ArchingResponseDTO saveArchingResponseDTO(UUID id_box, ArchingInitDTO archingInitDTO) throws NotFoundException {
+        Box box = boxService.getBox(id_box);
+        Arching arching = archingRepository.save(ArchingMovement.CreateArchingInit(box,archingInitDTO)) ;
+        return ArchingMovement.CreateArchingResponseDTO(arching);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    //Falta ver si se implementar (debatible si implementar o no)
     @Override
-    public Arching updateArching(UUID id_arching, ArchingDTO archingDTO) throws NotFoundException {
+    public ArchingResponseDTO updateArching(UUID id_arching, ArchingInitDTO archingInitDTO) throws NotFoundException {
         return null;
     }
 
+    //Me trae todos los arqueos
     @Override
-    public List<Arching> getAllArching() {
-        return archingRepository.findAll();
+    public List<ArchingDTO> getAllArching() {
+        return ArchingMovement.CreateListArchingDTO(archingRepository.findAll());
     }
 
-
-    //aprueba lo que hace el buscar todos los arqueos por cajeros
+    //Me traen el arqueo por su id
     @Override
-    public List<Arching> getAllArchingByATM(UUID id_atm) throws NotFoundException {
-        return archingRepository.findArchingByATM(id_atm)
-                .orElseThrow( () -> new NotFoundException(ATM_ARCHING_NOT_FOUND));
+    public ArchingDTO getArchingDTOById(UUID id_arching) throws NotFoundException {
+        return ArchingMovement
+                .TransformArchingDTO(
+                        archingRepository.findById(id_arching)
+                                .orElseThrow( () -> new NotFoundException(ExceptionMessage.ARCHING_NOT_FOUND) )
+                );
     }
 
+    //Me traer todos los arqueos por el id del ATM
+    @Override
+    public List<ArchingWithAtmDTO> getArchingByATM(UUID id_atm) throws NotFoundException {
+        List<Arching>archingList=archingRepository.findArchingByIdAtm(id_atm)
+                .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
+        return ArchingMovement.CreateListArchingWithAtmDTO(archingList);
+    }
+
+    //Me traer todos los arqueos por el nombre del ATM
+    @Override
+    public List<ArchingWithAtmDTO> getArchingByNameATM(String name_ATM) throws NotFoundException {
+        List<Arching>archingList=archingRepository.findArchingByNameAtm(name_ATM)
+                .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
+        return ArchingMovement.CreateListArchingWithAtmDTO(archingList);
+    }
+
+    //Me traer todos los arqueos por el id del box
+    @Override
+    public List<ArchingWithBoxDTO> getArchingByBox(UUID id_box) throws NotFoundException {
+        List<Arching>archingList=archingRepository.findArchingByIdBox(id_box)
+                .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
+        return ArchingMovement.CreateListArchingWithBoxDTO(archingList);
+    }
+
+    //Me traer todos los arqueos por el nombre del box
+    @Override
+    public List<ArchingWithBoxDTO> getArchingByNameBox(String name_BOX) throws NotFoundException {
+        List<Arching>archingList=archingRepository.findArchingByNameBox(name_BOX)
+                .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
+        return ArchingMovement.CreateListArchingWithBoxDTO(archingList);
+    }
+
+    //Lo utiliza otro servicio,!!! NO BORRAR
     @Override
     public Arching getArchingById(UUID id_arching) throws NotFoundException {
         return archingRepository.findById(id_arching)
                 .orElseThrow(()-> new NotFoundException(ARCHING_NOT_FOUND));
     }
+
 }
