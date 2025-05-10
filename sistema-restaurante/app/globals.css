@@ -24,20 +24,102 @@ body {
 .app-container {
   display: flex;
   width: 100%;
+  min-height: 100vh;
+  position: relative;
 }
 
 #sidebar {
   background-color: var(--primary, #ff7a00);
-  width: 250px;
+  width: 280px;
   height: 100vh;
   padding: 20px;
   position: fixed;
   top: 0;
   left: 0;
-  transition: width 0.3s;
+  transition: all 0.3s;
   overflow: auto;
   z-index: 1000;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+#sidebar .nav-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+#sidebar .nav-item {
+  margin-bottom: 5px;
+}
+
+#sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+#sidebar .nav-link:hover, 
+#sidebar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+#sidebar .submenu {
+  list-style-type: none;
+  padding-left: 20px;
+  margin-top: 5px;
+  overflow: hidden;
+}
+
+#sidebar .submenu-link {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 0.95em;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+#sidebar .submenu-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+#sidebar .nav-text {
+  margin-left: 10px;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+/* Estilos para el sidebar responsivo */
+@media (max-width: 991px) {
+  #sidebar.sidebar-closed {
+    transform: translateX(-100%);
+    box-shadow: none;
+  }
+  
+  #sidebar.sidebar-open {
+    transform: translateX(0);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  body.sidebar-open {
+    overflow: hidden;
+  }
 }
 
 #sidebar .brand-link {
@@ -106,9 +188,13 @@ body {
 }
 
 #main {
-  margin-left: 250px;
+  margin-left: 280px;
   padding: 20px;
-  width: 100%;
+  width: calc(100% - 280px);
+  transition: all 0.3s ease;
+  flex: 1;
+  overflow-x: hidden;
+  min-height: 100vh;
 }
 
 .new-badge {
@@ -537,6 +623,25 @@ body {
   opacity: 0;
 }
 
+/* Clases de utilidad para responsividad */
+.fs-sm {
+  font-size: 0.875rem !important;
+}
+
+.w-100-sm {
+  width: 100% !important;
+}
+
+/* Ocultar en móvil pero mostrar en dispositivos más grandes */
+.d-none-sm {
+  display: none !important;
+}
+
+/* Utilidad para espaciado adaptable */
+.p-responsive {
+  padding: 0.75rem !important;
+}
+
 /* Media queries */
 @media (max-width: 480px) {
   .login-body {
@@ -550,16 +655,144 @@ body {
   .login-header {
     padding: 20px;
   }
+  
+  .foodly-card {
+    padding: 10px;
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  .btn {
+    padding: 0.375rem 0.5rem;
+  }
+  
+  .foodly-section {
+    padding: 15px !important;
+  }
+  
+  /* Fuentes más pequeñas en móvil */
+  h1 {
+    font-size: 1.75rem !important;
+  }
+  
+  h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  h3 {
+    font-size: 1.35rem !important;
+  }
+  
+  h4, h5 {
+    font-size: 1.15rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .order-card {
+    padding: 10px;
+  }
+  
+  h1, h2, h3 {
+    font-size: calc(1rem + 0.6vw);
+  }
+  
+  .pedido-form {
+    padding: 10px;
+  }
+  
+  .btn {
+    white-space: nowrap;
+    padding: 0.375rem 0.5rem;
+  }
 }
 
 @media (max-width: 768px) {
+  #main {
+    margin-left: 0;
+    width: 100%;
+    padding-top: 70px; /* Añadimos espacio para el botón de toggle en móvil */
+  }
+  
   #sidebar {
+    z-index: 1050;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .chart-container {
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .table td, .table th {
+    font-size: 0.85rem;
+    padding: 0.3rem;
+  }
+  
+  .card-caja {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 20px;
+  }
+}
+
+/* Estilos adicionales para mejorar el comportamiento de los submenús */
+#sidebar .submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+#sidebar .nav-item button:focus {
+  outline: none;
+}
+
+#sidebar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+#sidebar .submenu-link {
+  padding-left: 30px;
+  display: flex;
+  align-items: center;
+}
+
+#sidebar .submenu-link span {
+  margin-left: 8px;
+}
+
+/* Fix para móviles */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+  
+  #main {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  #sidebar.sidebar-closed {
+    transform: translateX(-100%);
+  }
+  
+  #sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 992px) {
+  #sidebar.sidebar-closed {
     width: 0;
     padding: 0;
     overflow: hidden;
   }
-
-  #main {
-    margin-left: 0;
+  
+  #sidebar.sidebar-open {
+    width: 250px;
+    padding: 20px;
+    overflow: auto;
   }
 }
