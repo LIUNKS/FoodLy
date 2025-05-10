@@ -1,4 +1,4 @@
-package com.example.api_v01.dto;
+package com.example.api_v01.dto.entityLike;
 
 import com.example.api_v01.model.enums.Rol;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,7 @@
 package com.example.api_v01.service.atm_service;
 
-import com.example.api_v01.dto.AtmDTO;
-import com.example.api_v01.dto.RegisterATMDTO;
+import com.example.api_v01.dto.entityLike.AtmDTO;
+import com.example.api_v01.dto.response.RegisterAtmDTO;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.ATM;
 import com.example.api_v01.model.Admin;
@@ -31,7 +31,7 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
     }
 
     @Override
-    public ATM assingUserATM(UUID id_atm, RegisterATMDTO atm) throws NotFoundException {
+    public ATM assingUserATM(UUID id_atm, RegisterAtmDTO atm) throws NotFoundException {
         ATM atmOptional = atmRepository.findById(id_atm)
                 .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
         ATM AtmUser = ATMMovement.AssignUser(atmOptional,atm);

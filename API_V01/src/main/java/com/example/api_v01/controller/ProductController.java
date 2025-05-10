@@ -4,21 +4,18 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-import com.example.api_v01.dto.SuccessMessage;
-import com.example.api_v01.handler.BadRequestException;
+import com.example.api_v01.dto.response.SuccessMessage;
 import com.example.api_v01.handler.NotFoundException;
+import com.example.api_v01.model.enums.Category;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.example.api_v01.dto.ProductDTO;
-import com.example.api_v01.model.Product;
+import com.example.api_v01.dto.entityLike.ProductDTO;
 import com.example.api_v01.service.product_service.ProductService;
-
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("/api/product")
+@RequestMapping("product")
 public class ProductController {
 
     private final ProductService productService;
@@ -27,10 +24,30 @@ public class ProductController {
         this.productService = productService;
     }
 
+    @GetMapping("/list/category")
+    public ResponseEntity<?> getAllProductsByCategory(@RequestParam Category category) throws NotFoundException{
+        SuccessMessage <List<ProductDTO>> successMessage = SuccessMessage.<List<ProductDTO>>builder()
+                .status(HttpStatus.OK)
+                .message("Lista de productos por categoria")
+                .data(productService.getProductByCategory(category))
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(successMessage);
+    }
+
+    @GetMapping("/list/name")
+    public ResponseEntity<?> getAllProductsByName(@RequestParam String name) throws NotFoundException {
+        SuccessMessage <List<ProductDTO>> successMessage = SuccessMessage.<List<ProductDTO>>builder()
+                .status(HttpStatus.OK)
+                .message("Lista de productos por nombre")
+                .data(productService.getProductByName(name))
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(successMessage);
+    }
+
     // Me devuelve la lista entera de productos
     @GetMapping("/list")
     public ResponseEntity<?> getAllProducts() {
-        SuccessMessage<List<Product>> successMessage = SuccessMessage.<List<Product>>builder()
+        SuccessMessage<List<ProductDTO>> successMessage = SuccessMessage.<List<ProductDTO>>builder()
                 .status(HttpStatus.OK)
                 .message("La lista de productos")
                 .data(productService.getProducts())
@@ -41,10 +58,10 @@ public class ProductController {
     // Me devuelve un producto buscado por su id
     @GetMapping("/{id_product}")
     public ResponseEntity<?> getProduct(@PathVariable UUID id_product) throws NotFoundException {
-        SuccessMessage<Product> successMessage = SuccessMessage.<Product>builder()
+        SuccessMessage<ProductDTO> successMessage = SuccessMessage.<ProductDTO>builder()
                 .status(HttpStatus.OK)
                 .message("Producto encontrado!!")
-                .data(productService.getProduct(id_product))
+                .data(productService.getProductDTO(id_product))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(successMessage);
     }
@@ -59,8 +76,8 @@ public class ProductController {
     //actualiza el producto
     @PatchMapping("/{id_product}")
     public ResponseEntity<?> updateProduct(@PathVariable UUID id_product, @RequestBody ProductDTO productDTO) throws NotFoundException {
-        Product updateProduct = productService.updateProduct(id_product, productDTO);
-        SuccessMessage<Product> successMessage = SuccessMessage.<Product>builder()
+        ProductDTO updateProduct = productService.updateProduct(id_product, productDTO);
+        SuccessMessage<ProductDTO> successMessage = SuccessMessage.<ProductDTO>builder()
                 .status(HttpStatus.OK)
                 .message("Producto Actualizado correctamente!!")
                 .data(updateProduct)
@@ -71,14 +88,14 @@ public class ProductController {
     //agrega un producto,necesita el id del admin que lo va agregar
     @PostMapping("/{id_admin}")
     public ResponseEntity<?> CreateProduct(@PathVariable UUID id_admin,@RequestBody ProductDTO productDTO) throws NotFoundException {
-        Product product = productService.saveProduct(id_admin,productDTO);
+        ProductDTO product = productService.saveProduct(id_admin,productDTO);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(product.getId_Product())
+                .buildAndExpand(product.getId_product())
                 .toUri();
 
-        SuccessMessage<Product> successMessage = SuccessMessage.<Product>builder()
+        SuccessMessage<ProductDTO> successMessage = SuccessMessage.<ProductDTO>builder()
                 .status(HttpStatus.CREATED)
                 .message("Producto creado correctamente!!")
                 .data(product)
@@ -86,20 +103,4 @@ public class ProductController {
 
         return ResponseEntity.created(location).body(successMessage);
     }
-
-    @GetMapping("/")
-    public ResponseEntity<?> getProductId() throws BadRequestException {
-        throw new BadRequestException("Se necesita el ID del producto para buscarlo");
-    }
-
-    @PutMapping("/")
-    public ResponseEntity<?> updateProductId() throws BadRequestException {
-        throw new BadRequestException("Se necesita el ID del producto para actualizarlo");
-    }
-
-    @DeleteMapping("/")
-    public ResponseEntity<?> deleteProductId() throws BadRequestException {
-        throw new BadRequestException("Se necesita el ID del producto para eliminarlo");
-    }
-
 }

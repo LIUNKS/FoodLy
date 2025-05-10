@@ -1,4 +1,4 @@
-package com.example.api_v01.dto;
+package com.example.api_v01.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,12 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class ProductStockDTO {
-
-    private Integer ini_stock;
-
-    private Integer current_stock;
-
-    private Integer total_sold;
-
+public class BoxResponseDTO {
+    private String name_box;
+    private Boolean is_open = false;
 }

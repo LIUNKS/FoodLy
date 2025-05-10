@@ -1,6 +1,6 @@
 package com.example.api_v01.handler;
 
-import com.example.api_v01.dto.ErrorMassage;
+import com.example.api_v01.dto.response.ErrorMassage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

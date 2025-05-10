@@ -1,12 +1,38 @@
 package com.example.api_v01.utils;
 
-import com.example.api_v01.dto.ProductStockDTO;
+import com.example.api_v01.dto.entityLike.ProductStockDTO;
+import com.example.api_v01.dto.response.ProductWithStockDTO;
+import com.example.api_v01.model.Product;
 import com.example.api_v01.model.ProductStock;
+
+import java.util.List;
 
 public class InventoryMovement {
 
-    public static ProductStock discountStock(ProductStock stock,Integer count) {
-        if(stock.getCurrent_stock() >= count) {
+
+    public static List<ProductWithStockDTO> getListProductWithStock(List<Product> products) {
+        return products.stream()
+                .map(InventoryMovement::getProductWithStockDTO)
+                .toList();
+    }
+
+    public static ProductWithStockDTO getProductWithStockDTO(Product product) {
+        return ProductWithStockDTO.builder()
+                .product_name(product.getName_product())
+                .product_stock(
+                        ProductStockDTO.builder()
+                                .id_productStock(product.getStock().getId_product_stock())
+                                .ini_stock(product.getStock().getIni_stock())
+                                .current_stock(product.getStock().getCurrent_stock())
+                                .total_sold(product.getStock().getTotal_sold())
+                                .build()
+                )
+                .build();
+    }
+
+    public static ProductStock discountStock(Product product,Integer count) {
+        ProductStock stock = product.getStock();
+        if(stock.getCurrent_stock() >= count) {;
             stock.setCurrent_stock( stock.getCurrent_stock() - count );
             stock.setTotal_sold( stock.getTotal_sold() + count );
             return stock;
@@ -14,7 +40,8 @@ public class InventoryMovement {
         return null;
     }
 
-    public static ProductStock increaseStock(ProductStock stock ,Integer count) {
+    public static ProductStock increaseStock(Product product ,Integer count) {
+        ProductStock stock = product.getStock();
         stock.setIni_stock( stock.getIni_stock() + count );
         stock.setCurrent_stock( stock.getCurrent_stock() + count );
         return stock;
@@ -33,7 +60,8 @@ public class InventoryMovement {
         return stock;
     }
 
-    public static ProductStock CleanStock(ProductStock stock){
+    public static ProductStock CleanStock(Product product){
+        ProductStock stock = product.getStock();
         stock.setIni_stock(0);
         stock.setCurrent_stock(0);
         stock.setTotal_sold(0);

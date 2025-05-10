@@ -1,19 +1,20 @@
-package com.example.api_v01.dto;
+package com.example.api_v01.dto.entityLike;
 
-import com.example.api_v01.model.Admin;
-import com.example.api_v01.model.ProductStock;
 import com.example.api_v01.model.enums.Category;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDTO {
+
+    private UUID id_product;
 
     private String name_product;
 

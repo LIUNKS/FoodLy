@@ -1,6 +1,6 @@
 package com.example.api_v01.service.user_service;
 
-import com.example.api_v01.dto.UserDTO;
+import com.example.api_v01.dto.entityLike.UserDTO;
 import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.User;

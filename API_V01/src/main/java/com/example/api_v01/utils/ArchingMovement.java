@@ -1,12 +1,11 @@
 package com.example.api_v01.utils;
 
-import com.example.api_v01.dto.ArchingDTO;
+import com.example.api_v01.dto.entityLike.ArchingDTO;
 import com.example.api_v01.model.Arching;
 import com.example.api_v01.model.Box;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.UUID;
 
 public class ArchingMovement {
     public static Arching CreateArching(Box box, ArchingDTO archingDTO) {

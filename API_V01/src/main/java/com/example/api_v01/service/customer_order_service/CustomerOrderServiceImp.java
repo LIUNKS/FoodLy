@@ -25,42 +25,11 @@ public class CustomerOrderServiceImp implements CustomerOrderService {
 
     private final OrderSetService orderSetService;
 
-    private final ProductRepository productRepository;
-
     private final ProductService productService;
 
     private final ProductStockService productStockService;
 
-    //Servico para crear el customerOrder
 
-    @Override
-    public CustomerOrder IncrementStockCustomerOrder(UUID id_CustomerOrder, Integer count) throws BadRequestException {
-        return null;
-    }
-
-    @Override
-    public CustomerOrder AssignCustomerOrderAOderSET(UUID id_CustomerOrder, UUID id_OrderSet) throws NotFoundException, BadRequestException {
-        return null;
-    }
-
-    //Se usar para pruebas
-    @Override
-    public CustomerOrder saveCustomerOrder(UUID id_product, Integer count) throws NotFoundException, BadRequestException {
-
-        Product product = productService.getProduct(id_product);
-
-        CustomerOrder customerOrder = CustomerOrderMovement.createCustomerOrder(product,count);
-
-        if(customerOrder==null){
-            throw new BadRequestException("No se puede quitar mas del stock actual del producto");
-        }
-
-        productStockService.discountStockById(product.getStock().getId_product_stock(),count);
-
-        return customerOrderRepository.save(customerOrder);
-    }
-
-    //Preliminar de agregar (Aun no esta en uso)
     @Override
     public CustomerOrder saveCustomerOrder(UUID id_product,UUID id_orderSet,Integer count) throws NotFoundException, BadRequestException {
         Product product = productService.getProduct(id_product);
@@ -73,41 +42,13 @@ public class CustomerOrderServiceImp implements CustomerOrderService {
         return customerOrderRepository.save(customerOrder);
     }
 
-    //Servicio que elimina el costomerOrder
+    //Poner en el controlador un adverticia en caso de que salva el valor 0.0 (la lista esta vacia)
     @Override
-    public void DeleteCustomerOrder(UUID id_CustomerOrder) throws NotFoundException {
-
-        CustomerOrder customerOrder = customerOrderRepository.findById(id_CustomerOrder)
-                .orElseThrow(()-> new NotFoundException("No se encontro la orden del cliente"));
-
-        Product product = CustomerOrderMovement.rectificationStockCustomerOrder(customerOrder);
-
-        productRepository.save(product);
-
-        customerOrder.setProduct(null);
-
-        customerOrder.setOrder(null);
-
-        customerOrderRepository.delete(customerOrder);
-
-    }
-
-    @Override
-    public CustomerOrder DiscountStockCustomerOrder(UUID id_CustomerOrder, Integer count) throws NotFoundException, BadRequestException {
-
-        CustomerOrder customerOrder = customerOrderRepository.findById(id_CustomerOrder)
-                .orElseThrow( () -> new NotFoundException("No se encontro la orden del cliente"));
-
-        Tuple<CustomerOrder,Product>tuple = CustomerOrderMovement.discountStockCustomerOrder(customerOrder,count);
-
-        if(tuple == null){
-            throw new BadRequestException("No se pudo descontar la cantidad del producto en la orden del cliente");
-        }
-
-        Product product = tuple.getSecond();
-        productRepository.save(product);
-
-        return customerOrderRepository.save(tuple.getFirst());
+    public Double TotalAmountOrderSet(UUID id_OrderSet) {
+        return customerOrderRepository.findByOrderSetId(id_OrderSet)
+                .stream()
+                .map( customerOrder -> customerOrder.getTotal_rice())
+                .reduce(0.0,Double::sum);
     }
 
 }

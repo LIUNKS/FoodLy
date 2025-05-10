@@ -1,7 +1,7 @@
 package com.example.api_v01.utils;
 
-import com.example.api_v01.dto.AtmDTO;
-import com.example.api_v01.dto.RegisterATMDTO;
+import com.example.api_v01.dto.entityLike.AtmDTO;
+import com.example.api_v01.dto.response.RegisterAtmDTO;
 import com.example.api_v01.model.ATM;
 import com.example.api_v01.model.Admin;
 import com.example.api_v01.model.User;
@@ -23,7 +23,7 @@ public class ATMMovement {
                 .build();
     }
 
-    public static ATM AssignUser(ATM atm,RegisterATMDTO register){
+    public static ATM AssignUser(ATM atm, RegisterAtmDTO register){
         User user = User.builder()
                 .username(register.getUsername())
                 .password(register.getPassword())

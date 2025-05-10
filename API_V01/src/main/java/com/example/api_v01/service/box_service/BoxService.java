@@ -1,6 +1,9 @@
 package com.example.api_v01.service.box_service;
 
-import com.example.api_v01.dto.BoxDTO;
+import com.example.api_v01.dto.entityLike.BoxDTO;
+import com.example.api_v01.dto.response.BoxResponseDTO;
+import com.example.api_v01.dto.response.BoxWithAtmDTO;
+import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.Box;
 
@@ -10,15 +13,19 @@ import java.util.UUID;
 public interface BoxService {
 
 
-    Box saveBox(UUID id_admin,BoxDTO box) throws NotFoundException;
+    BoxResponseDTO saveBox(UUID id_admin, BoxResponseDTO box) throws NotFoundException;
 
-    Box toggleBoxStatus(UUID id_box) throws NotFoundException;
+    BoxResponseDTO toggleBoxActiveStatus (UUID id_box) throws NotFoundException, BadRequestException;
 
-    Box assignAtmToBox(UUID id_box, UUID id_atm) throws NotFoundException;
+    BoxResponseDTO toggleBoxDeactivationStatus (UUID id_box) throws NotFoundException, BadRequestException;
 
-    Box getBoxInfo(UUID boxId) throws NotFoundException;
+    BoxWithAtmDTO assignAtmToBox(UUID id_box, UUID id_atm) throws NotFoundException;
 
-    List<Box> getBoxes();
+    BoxDTO getBoxInfo(UUID boxId) throws NotFoundException;
 
-    List<Box> getBoxesByAtm(UUID id_atm) throws NotFoundException;
+    Box getBox(UUID boxId) throws NotFoundException;
+
+    List<BoxDTO> getBoxes();
+
+    List<BoxDTO> getBoxesByAtm(UUID id_atm) throws NotFoundException;
 }

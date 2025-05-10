@@ -14,4 +14,7 @@ public interface OrderSetRepository extends JpaRepository<OrderSet, UUID> {
     @Query("SELECT o FROM OrderSet o WHERE o.name_client=?1")
     List<OrderSet> findByNameClient(String name_client);
 
+    @Query("SELECT o FROM OrderSet o WHERE o.arching.id_arching=?1 ")
+    List<OrderSet> findByArching(UUID id_arching);
+
 }

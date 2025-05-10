@@ -1,4 +1,4 @@
-package com.example.api_v01.dto;
+package com.example.api_v01.dto.response;
 
 import lombok.*;
 

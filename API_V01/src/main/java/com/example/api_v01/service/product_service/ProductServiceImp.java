@@ -1,10 +1,11 @@
 package com.example.api_v01.service.product_service;
 
-import com.example.api_v01.dto.ProductDTO;
-import com.example.api_v01.dto.ProductStockDTO;
+import com.example.api_v01.dto.entityLike.ProductDTO;
+
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.Admin;
 import com.example.api_v01.model.Product;
+import com.example.api_v01.model.enums.Category;
 import com.example.api_v01.repository.ProductRepository;
 import com.example.api_v01.service.admin_service.AdminService;
 import com.example.api_v01.utils.ExceptionMessage;
@@ -24,11 +25,12 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
 
     private final ProductRepository productRepository;
     private final AdminService adminService;
+
     @Override
-    public Product saveProduct(UUID id_admin,ProductDTO productDTO) throws NotFoundException {
+    public ProductDTO saveProduct(UUID id_admin,ProductDTO productDTO) throws NotFoundException {
         Admin admin = adminService.findById(id_admin);
-        Product product = ProductMovement.createProductAndStock(admin,productDTO);
-        return productRepository.save(product);
+        Product productAdd = productRepository.save(ProductMovement.createProductAndStock(admin,productDTO));
+        return ProductMovement.moveProductDTO(productAdd);
     }
 
     @Override
@@ -40,45 +42,51 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
     }
 
     @Override
-    public List<Product> getProducts() {
-        return  productRepository.findAll();
+    public List<ProductDTO> getProducts() {
+        return ProductMovement.ListProductDTO(productRepository.findAll());
     }
 
     @Override
-    public Product getProduct(UUID id) throws NotFoundException{
+    public ProductDTO getProductDTO(UUID id) throws NotFoundException{
+        Optional<Product> product = productRepository.findById(id);
+        if(!product.isPresent()){
+            throw new NotFoundException(PRODUCT_NOT_FOUND);
+        }
+        return ProductMovement.moveProductDTO(product.get());
+    }
+
+    @Override
+    public Product getProduct(UUID id) throws NotFoundException {
         Optional<Product> product = productRepository.findById(id);
         if(!product.isPresent()){
             throw new NotFoundException(PRODUCT_NOT_FOUND);
         }
         return product.get();
-    }
+    };
 
     @Override
-    public Product updateProduct(UUID id, ProductDTO productDTO) throws NotFoundException {
+    public ProductDTO updateProduct(UUID id, ProductDTO productDTO) throws NotFoundException {
         Optional<Product> product = productRepository.findById(id);
         if(!product.isPresent()){
             throw new NotFoundException(PRODUCT_NOT_FOUND);
         }
         Product existingProduct = product.get();
-        Product ProductValidation = ProductMovement.ValidateProduct(existingProduct,productDTO);
-        return productRepository.save(ProductValidation);
-    }
-
-    //Esto es un metodo que se utiliza en ProductServiceImp
-    @Override
-    public void product_stockDelete(UUID id_stock) throws NotFoundException {
-        Optional<Product>Optional=productRepository.findProductById_Stock(id_stock);
-        if(!Optional.isPresent()){
-            throw new NotFoundException(PRODUCT_NOT_FOUND);
-        }
-        Product product=Optional.get();
-        product.setStock(null);
-        productRepository.save(product);
+        Product ProductValidation =  productRepository.save(ProductMovement.ValidateProduct(existingProduct,productDTO)) ;
+        return ProductMovement.moveProductDTO(ProductValidation);
     }
 
     @Override
-    public List<ProductStockDTO> getProductByCategory(String categoria) throws NotFoundException {
-        return List.of();
+    public List<ProductDTO> getProductByCategory(Category categoria) throws NotFoundException {
+        List<Product> ListProduct= productRepository.findProductsByCategory(categoria)
+                .orElseThrow(() -> new NotFoundException("La categoria buscada no exite"));
+        return ProductMovement.ListProductDTO(ListProduct);
+    }
+
+    @Override
+    public List<ProductDTO> getProductByName(String name) throws NotFoundException {
+        List<Product> ListProduct= productRepository.findProductByName(name)
+                .orElseThrow(() -> new NotFoundException("La categoria buscada no exite"));
+        return ProductMovement.ListProductDTO(ListProduct);
     }
 
 }

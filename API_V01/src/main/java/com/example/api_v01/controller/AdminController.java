@@ -1,7 +1,7 @@
 package com.example.api_v01.controller;
 
 
-import com.example.api_v01.dto.SuccessMessage;
+import com.example.api_v01.dto.response.SuccessMessage;
 import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.service.admin_service.AdminService;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("admin")
 @RequiredArgsConstructor
 public class AdminController {
 

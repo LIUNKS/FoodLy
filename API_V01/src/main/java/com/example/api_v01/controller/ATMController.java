@@ -1,7 +1,8 @@
 package com.example.api_v01.controller;
 
-import com.example.api_v01.dto.AtmDTO;
-import com.example.api_v01.dto.RegisterATMDTO;
+import com.example.api_v01.dto.entityLike.AtmDTO;
+import com.example.api_v01.dto.response.RegisterAtmDTO;
+import com.example.api_v01.dto.response.SuccessMessage;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.ATM;
 import com.example.api_v01.service.atm_service.ATMService;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/atm")
+@RequestMapping("atm")
 public class ATMController {
 
     private final ATMService atmservice;
@@ -21,7 +22,12 @@ public class ATMController {
         this.atmservice = atmservice;
     }
 
-    //Corregir el envio de la data: Usar SuccessMessage plis.
+    //Tareas:
+    //Cambiar la sintaxis del controlador usando SuccessMessage
+    //En los Servicios de ATM:
+    //Los que guardar,cambiar o actualizan tiene que devolver un AtmResponseDTO = No trae el Id (saveATM,assignUserATM,updateATM)
+    //Los que son de busqueda o Traen un lista tienen que Devolver un AtmDTO = Trae el Id (getAtmById,getAllATMs)
+    //Tambien añadir un nuevo endponit para buscar al Atm por nombre (Deve devolve un AtmDTO)
 
     @PostMapping("/{adminId}")
     public ResponseEntity<ATM> saveATM(@PathVariable("adminId") UUID adminId, @RequestBody AtmDTO atmDTO) {
@@ -34,7 +40,7 @@ public class ATMController {
     }
 
     @PutMapping("/{atmId}/assign-user")
-    public ResponseEntity<ATM> assignUserATM(@PathVariable("atmId") UUID atmId, @RequestBody RegisterATMDTO registerATMDTO) {
+    public ResponseEntity<ATM> assignUserATM(@PathVariable("atmId") UUID atmId, @RequestBody RegisterAtmDTO registerATMDTO) {
         try {
             ATM updatedATM = atmservice.assingUserATM(atmId, registerATMDTO);
             return ResponseEntity.ok(updatedATM);

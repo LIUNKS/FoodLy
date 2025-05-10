@@ -1,17 +1,19 @@
-package com.example.api_v01.dto;
+package com.example.api_v01.dto.entityLike;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class BoxDTO {
-    private String name_box;
+public class OrderSetDTO {
+
+    private String name_client;
+
+    private Double total_order;
+
 }

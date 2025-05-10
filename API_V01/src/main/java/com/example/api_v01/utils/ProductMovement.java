@@ -1,12 +1,32 @@
 package com.example.api_v01.utils;
 
-import com.example.api_v01.dto.ProductDTO;
+import com.example.api_v01.dto.entityLike.ProductDTO;
+import com.example.api_v01.dto.entityLike.ProductStockDTO;
+import com.example.api_v01.dto.response.ProductWithStockDTO;
 import com.example.api_v01.model.Admin;
 import com.example.api_v01.model.Product;
 import com.example.api_v01.model.ProductStock;
 
+import java.util.List;
 
 public class ProductMovement {
+
+    public static List<ProductDTO> ListProductDTO(List<Product> products) {
+        return products.stream()
+                .map(ProductMovement::moveProductDTO)
+                .toList();
+    }
+
+    public static ProductDTO moveProductDTO(Product product) {
+        return ProductDTO.builder()
+                .id_product(product.getId_Product())
+                .name_product(product.getName_product())
+                .price(product.getPrice())
+                .category(product.getCategory())
+                .additional_observation(product.getAdditional_observation())
+                .build();
+    }
+
     public static Product createProductAndStock (Admin admin,ProductDTO productDTO) {
         ProductStock stock = ProductStock.builder()
                 .ini_stock(0)

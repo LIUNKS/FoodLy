@@ -1,4 +1,4 @@
-package com.example.api_v01.dto;
+package com.example.api_v01.dto.response;
 
 import com.example.api_v01.model.enums.Rol;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class RegisterATMDTO {
+public class RegisterAtmDTO {
     private String username;
     private String password;
     private Rol role;
