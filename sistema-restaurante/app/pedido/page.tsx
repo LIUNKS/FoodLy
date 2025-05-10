@@ -10,24 +10,23 @@ import "@/styles/common.css"                                  // Estilos comunes
  * Componente principal para la página de gestión de pedidos
  * Permite a los usuarios crear nuevos pedidos y ver los existentes
  */
-export default function PedidoPage() {
-  return (
+export default function PedidoPage() {  return (
     <MainLayout>
       {/* Encabezado de página con título e icono */}
       <PageHeader title="Pedido" icon="fas fa-shopping-cart" />
       
       {/* Estructura de dos columnas: formulario y panel lateral */}
-      <div className="row pedido-form">
-        {/* Columna principal (8/12) con el formulario de pedido */}
-        <div className="col-md-8">
+      <div className="row pedido-form g-3">
+        {/* Columna principal con el formulario de pedido - primero en móvil, segundo en escritorio */}
+        <div className="col-12 col-lg-8 order-2 order-lg-1">
           <PedidoForm />
         </div>
 
-        {/* Columna lateral (4/12) con filtros y pedidos recientes */}
-        <div className="col-md-4 fade-in-up" style={{ animationDelay: "0.2s" }}>
+        {/* Columna lateral con filtros y pedidos recientes - primero en escritorio, segundo en móvil */}
+        <div className="col-12 col-lg-4 order-1 order-lg-2 fade-in-up" style={{ animationDelay: "0.2s" }}>
           {/* Sección de filtros para búsqueda avanzada */}
           <div className="foodly-section mb-4">
-            <h5 style={{ color: 'var(--primary)', fontWeight: 600, marginBottom: '1rem' }}>
+            <h5 className="fs-5 text-primary fw-semibold mb-3">
               <i className="fas fa-filter me-2"></i>Filtros
             </h5>
             <FilterDateRange />
