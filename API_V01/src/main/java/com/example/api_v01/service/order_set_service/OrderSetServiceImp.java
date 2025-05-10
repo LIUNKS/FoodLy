@@ -1,15 +1,12 @@
 package com.example.api_v01.service.order_set_service;
 
 
-import com.example.api_v01.dto.entityLike.CustomerOrderDTO;
 import com.example.api_v01.dto.entityLike.OrderSetDTO;
-import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.Arching;
 import com.example.api_v01.model.OrderSet;
 import com.example.api_v01.repository.OrderSetRepository;
 import com.example.api_v01.service.arching_service.ArchingService;
-import com.example.api_v01.service.customer_order_service.CustomerOrderService;
 import com.example.api_v01.utils.OrderSetMovement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

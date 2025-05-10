@@ -2,7 +2,6 @@ package com.example.api_v01.controller;
 
 import com.example.api_v01.dto.entityLike.AtmDTO;
 import com.example.api_v01.dto.response.RegisterAtmDTO;
-import com.example.api_v01.dto.response.SuccessMessage;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.ATM;
 import com.example.api_v01.service.atm_service.ATMService;

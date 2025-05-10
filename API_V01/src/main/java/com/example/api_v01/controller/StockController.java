@@ -26,7 +26,6 @@ public class StockController {
     }
 
     //Hubieron algunos cambios aqui
-
     @GetMapping("/list")
     public ResponseEntity<?> getAllStocks() {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()

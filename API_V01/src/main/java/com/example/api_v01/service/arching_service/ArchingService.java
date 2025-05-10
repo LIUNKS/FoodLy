@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ArchingService {
-
+    //Este no se usa
     Arching saveArching(Arching arching);
     ArchingResponseDTO saveArchingResponseDTO(UUID id_box, ArchingInitDTO archingInitDTO) throws NotFoundException;
     List<ArchingDTO> getAllArching();
@@ -23,8 +23,6 @@ public interface ArchingService {
     List<ArchingWithBoxDTO> getArchingByBox(UUID id_box) throws NotFoundException;
     List<ArchingWithAtmDTO> getArchingByNameATM(String name_ATM) throws NotFoundException;
     List<ArchingWithBoxDTO> getArchingByNameBox(String name_BOX) throws NotFoundException;
-
-
     //No se sabe si se implementara
     ArchingResponseDTO updateArching(UUID id_arching, ArchingInitDTO archingInitDTO) throws NotFoundException;
 }
