@@ -1,5 +1,6 @@
 package com.example.api_v01.service.box_service;
 
+import com.example.api_v01.dto.entityLike.AtmDTO;
 import com.example.api_v01.dto.entityLike.BoxDTO;
 import com.example.api_v01.dto.response.BoxResponseDTO;
 import com.example.api_v01.dto.response.BoxWithAtmDTO;
@@ -11,6 +12,7 @@ import com.example.api_v01.model.Box;
 import com.example.api_v01.repository.BoxRepository;
 import com.example.api_v01.service.admin_service.AdminService;
 import com.example.api_v01.service.atm_service.ATMService;
+import com.example.api_v01.utils.ATMMovement;
 import com.example.api_v01.utils.BoxMovement;
 import com.example.api_v01.utils.ExceptionMessage;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +64,8 @@ public class BoxServiceImp implements BoxService, ExceptionMessage {
     @Override
     public BoxWithAtmDTO assignAtmToBox(UUID id_box, UUID id_atm) throws NotFoundException {
 
-        ATM atm = atmService.getAtmById(id_atm);
+        AtmDTO atmDTO = atmService.getAtmById(id_atm);
+        ATM atm = ATMMovement.convertDTOToATM(atmDTO); //CONVERSION CENTRALIZADA
 
         Box box = boxRepository.findById(id_box)
                 .orElseThrow( () -> new NotFoundException(BOX_NOT_FOUND));

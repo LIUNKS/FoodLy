@@ -1,6 +1,7 @@
 package com.example.api_v01.utils;
 
 import com.example.api_v01.dto.entityLike.AtmDTO;
+import com.example.api_v01.dto.response.AtmResponseDTO;
 import com.example.api_v01.dto.response.RegisterAtmDTO;
 import com.example.api_v01.model.ATM;
 import com.example.api_v01.model.Admin;
@@ -54,4 +55,38 @@ public class ATMMovement {
         }
         return atm;
     }
+
+    public static AtmResponseDTO convertToResponseDTO(ATM atm){
+        return AtmResponseDTO.builder()
+                .name_atm(atm.getName_atm())
+                .alias(atm.getAlias())
+                .email(atm.getEmail())
+                .phone(atm.getPhone())
+                .dni(atm.getDni())
+                .build();
+    }
+
+    public static AtmDTO convertToDTO(ATM atm){
+        return AtmDTO.builder()
+                .id_atm(atm.getId_atm())
+                .name_atm(atm.getName_atm())
+                .alias(atm.getAlias())
+                .email(atm.getEmail())
+                .phone(atm.getPhone())
+                .dni(atm.getDni())
+                .build();
+    }
+
+    public static ATM convertDTOToATM(AtmDTO atmDTO) {
+        return ATM.builder()
+                .id_atm(atmDTO.getId_atm()) // Mapea los campos relevantes
+                .name_atm(atmDTO.getName_atm())
+                .alias(atmDTO.getAlias())
+                .email(atmDTO.getEmail())
+                .phone(atmDTO.getPhone())
+                .dni(atmDTO.getDni())
+                .build();
+    }
+
+
 }
