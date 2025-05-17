@@ -2,11 +2,14 @@ package com.example.api_v01.service.service_aux;
 
 import com.example.api_v01.dto.entityLike.CustomerOrderDTO;
 import com.example.api_v01.dto.entityLike.OrderSetDTO;
+import com.example.api_v01.dto.response.OrderSetWithListCustomerOrderDTO;
 import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
+import com.example.api_v01.model.CustomerOrder;
 import com.example.api_v01.model.OrderSet;
 import com.example.api_v01.service.customer_order_service.CustomerOrderService;
 import com.example.api_v01.service.order_set_service.OrderSetService;
+import com.example.api_v01.utils.OrderSetMovement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +37,13 @@ public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorServi
         Double totalAmount = customerOrderService.TotalAmountOrderSet(orderSet.getId_order_set());
         orderSet.setTotal_order(totalAmount);
         return orderSet;
+    }
+
+    @Override
+    public OrderSetWithListCustomerOrderDTO getOrderSetDTO(UUID id_orderSet) throws NotFoundException {
+        OrderSet orderSet = orderSetService.getOrderSet(id_orderSet);
+        List<CustomerOrder>customerOrders=customerOrderService.listCustomerOrdersByOrderSet(id_orderSet);
+        return OrderSetMovement.createOrderSetWithListCustomerOrderDTO(orderSet, customerOrders);
     }
 
 }

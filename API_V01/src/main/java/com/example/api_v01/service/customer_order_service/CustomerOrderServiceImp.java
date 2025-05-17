@@ -15,6 +15,7 @@ import com.example.api_v01.utils.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -50,5 +51,12 @@ public class CustomerOrderServiceImp implements CustomerOrderService {
                 .map( customerOrder -> customerOrder.getTotal_rice())
                 .reduce(0.0,Double::sum);
     }
+
+    @Override
+    public List<CustomerOrder> listCustomerOrdersByOrderSet(UUID id_OrderSet) {
+        return customerOrderRepository
+                .findByOrderSetId(id_OrderSet);
+    }
+
 
 }

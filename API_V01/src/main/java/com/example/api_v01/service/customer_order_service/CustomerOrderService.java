@@ -12,4 +12,6 @@ public interface CustomerOrderService {
     CustomerOrder saveCustomerOrder(UUID id_product,UUID id_orderSet,Integer count) throws NotFoundException, BadRequestException;
 
     Double TotalAmountOrderSet(UUID id_OrderSet);
+
+    List<CustomerOrder>listCustomerOrdersByOrderSet(UUID id_OrderSet);
 }
