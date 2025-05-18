@@ -45,18 +45,6 @@ public class ArchingController {
 
 
 
-    // Endpoint para actualizar un Arching              Aun no esta funcional
-    @PutMapping("/{id_arching}")
-    public ResponseEntity<?> updateArching(
-            @PathVariable UUID id_arching,
-            @RequestBody ArchingInitDTO archingInitDTO
-    ) throws NotFoundException {
-        ArchingResponseDTO response = archingService.updateArching(id_arching, archingInitDTO);
-        return ResponseEntity.ok(
-                new SuccessMessage<>(HttpStatus.OK, "Arching actualizado correctamente", response)
-        );
-    }
-
 
 
 

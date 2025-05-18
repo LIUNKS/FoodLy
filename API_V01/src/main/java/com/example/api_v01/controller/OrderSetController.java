@@ -50,7 +50,7 @@ public class OrderSetController {
         return ResponseEntity.ok(successMessage);
     }
 
-    @GetMapping("/{id_orderSet}")
+    @GetMapping("/{id_arching}")
     public ResponseEntity<?> getListOrderSetByArching(@PathVariable UUID id_arching) throws NotFoundException {
         SuccessMessage<?>successMessage=SuccessMessage.builder()
                 .status(HttpStatus.OK)
@@ -60,7 +60,7 @@ public class OrderSetController {
         return ResponseEntity.ok(successMessage);
     }
 
-    @GetMapping("/{id_orderSet}")
+    @GetMapping("/{name_client}")
     public ResponseEntity<?> getListOrderSetByCustomer(@PathVariable String name_client) throws NotFoundException {
         SuccessMessage<?>successMessage=SuccessMessage.builder()
                 .status(HttpStatus.OK)

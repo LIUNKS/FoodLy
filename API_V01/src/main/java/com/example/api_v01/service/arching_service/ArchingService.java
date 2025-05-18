@@ -23,6 +23,4 @@ public interface ArchingService {
     List<ArchingWithBoxDTO> getArchingByBox(UUID id_box) throws NotFoundException;
     List<ArchingWithAtmDTO> getArchingByNameATM(String name_ATM) throws NotFoundException;
     List<ArchingWithBoxDTO> getArchingByNameBox(String name_BOX) throws NotFoundException;
-    //No se sabe si se implementara
-    ArchingResponseDTO updateArching(UUID id_arching, ArchingInitDTO archingInitDTO) throws NotFoundException;
 }

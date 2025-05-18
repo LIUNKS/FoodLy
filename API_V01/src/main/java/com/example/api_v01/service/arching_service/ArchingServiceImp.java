@@ -32,21 +32,22 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
         return archingRepository.save(arching);
     }
 
+    //Lo utiliza otro servicio,!!! NO BORRAR
+    @Override
+    public Arching getArchingById(UUID id_arching) throws NotFoundException {
+        return archingRepository.findById(id_arching)
+                .orElseThrow(()-> new NotFoundException(ARCHING_NOT_FOUND));
+    }
+
+
+
+
     //Servicio para guardar el arqueo
     @Override
     public ArchingResponseDTO saveArchingResponseDTO(UUID id_box, ArchingInitDTO archingInitDTO) throws NotFoundException {
         Box box = boxService.getBox(id_box);
         Arching arching = archingRepository.save(ArchingMovement.CreateArchingInit(box,archingInitDTO)) ;
         return ArchingMovement.CreateArchingResponseDTO(arching);
-    }
-
-
-
-
-    //Falta ver si se implementar (debatible si implementar o no)
-    @Override
-    public ArchingResponseDTO updateArching(UUID id_arching, ArchingInitDTO archingInitDTO) throws NotFoundException {
-        return null;
     }
 
 
@@ -102,11 +103,6 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
         return ArchingMovement.CreateListArchingWithBoxDTO(archingList);
     }
 
-    //Lo utiliza otro servicio,!!! NO BORRAR
-    @Override
-    public Arching getArchingById(UUID id_arching) throws NotFoundException {
-        return archingRepository.findById(id_arching)
-                .orElseThrow(()-> new NotFoundException(ARCHING_NOT_FOUND));
-    }
+
 
 }
