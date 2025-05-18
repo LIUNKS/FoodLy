@@ -2,7 +2,7 @@ package com.example.api_v01.service.atm_service;
 
 import com.example.api_v01.dto.entityLike.AtmDTO;
 import com.example.api_v01.dto.response.AtmResponseDTO;
-import com.example.api_v01.dto.response.RegisterAtmDTO;
+import com.example.api_v01.dto.response.RegisterAtmUserDTO;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.ATM;
 import com.example.api_v01.model.Admin;
@@ -25,60 +25,53 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
     private final AdminService adminService;
 
     @Override
-    public AtmResponseDTO saveATM(UUID id_admin, AtmDTO atm) throws NotFoundException {
+    public AtmResponseDTO saveATM(UUID id_admin, AtmResponseDTO atm) throws NotFoundException { //Funciona Bien
         Admin admin = adminService.findById(id_admin);
-        ATM newATM = ATMMovement.saveATM(atm,admin);
-        ATM savedATM = atmRepository.save(newATM);
+        ATM savedATM = atmRepository.save(ATMMovement.saveATM(atm,admin));
         return ATMMovement.convertToResponseDTO(savedATM);
     }
 
     @Override
-    public AtmResponseDTO assingUserATM(UUID id_atm, RegisterAtmDTO atm) throws NotFoundException {
+    public AtmResponseDTO assingUserATM(UUID id_atm, RegisterAtmUserDTO atm) throws NotFoundException { //Funciona bien
         ATM atmOptional = atmRepository.findById(id_atm)
                 .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
-        ATM AtmUser = ATMMovement.AssignUser(atmOptional,atm);
-        ATM savedATM = atmRepository.save(AtmUser);
+        ATM savedATM = atmRepository.save(ATMMovement.AssignUser(atmOptional,atm));
         return ATMMovement.convertToResponseDTO(savedATM); //transform
     }
 
     @Override
-    public AtmResponseDTO updateATM(UUID id_atm, AtmDTO atm) throws NotFoundException {
+    public void deleteATM(UUID id_atm) throws NotFoundException { //Funciona bien
+        Optional<ATM>ATMOptional = atmRepository.findById(id_atm);
+        if(!ATMOptional.isPresent()){
+            throw new NotFoundException(ATM_NOT_FOUND);
+        }
+        ATMOptional.get().setAdmin(null);
+        atmRepository.delete(ATMOptional.get());
+    }
+
+    @Override
+    public AtmResponseDTO updateATM(UUID id_atm, AtmResponseDTO atm) throws NotFoundException {
         Optional<ATM>ATMOptional = atmRepository.findById(id_atm);
         if (!ATMOptional.isPresent()) {
             throw new NotFoundException(ATM_NOT_FOUND);
         }
         ATM ATM = ATMMovement.validateATM(ATMOptional.get(), atm);
         ATM savedATM = atmRepository.save(ATM);
-        return ATMMovement.convertToResponseDTO(savedATM); //transform
+        return ATMMovement.convertToResponseDTO(savedATM);
     }
 
-    @Override
-    public void deleteATM(UUID id_atm) throws NotFoundException {
 
-        Optional<ATM>ATMOptional = atmRepository.findById(id_atm);
 
-        if(!ATMOptional.isPresent()){
-            throw new NotFoundException(ATM_NOT_FOUND);
-        }
 
-        ATMOptional.get().setAdmin(null);
 
-        atmRepository.delete(ATMOptional.get());
-    }
 
-    //Implementar para buscar el atm por nombre,apellido o dni para eliminarlo
-    @Override
-    public void deleteATMByNameOrAliasOrDni(String name, String alias, String dni) throws NotFoundException {
-        ATM atm = atmRepository.findByNameAtmOrAliasOrDni(name, alias, dni)
-                .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
 
-        // quitar admin (en caso de ser necesario no)
-        atm.setAdmin(null);
 
-        // eliminar atm
-        atmRepository.delete(atm);
 
-    }
+
+
+
+
 
     @Override
     public AtmDTO getAtmById(UUID id_atm) throws NotFoundException {
@@ -97,9 +90,6 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
     @Override
     public List<AtmDTO> getAllATMs() {
         List<ATM> atms = atmRepository.findAll();
-        return atms.stream()
-                .map(ATMMovement::convertToDTO) //transform c/u ATM a AtmDTO
-                .toList();
+        return ATMMovement.convertToDTO(atms);
     }
-
 }

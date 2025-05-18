@@ -37,8 +37,4 @@ public class AdminController {
         return ResponseEntity.ok(adminservice.findAll());
     }
 
-    @GetMapping("/")
-    public ResponseEntity<?> ErrorFindAdmin() throws BadRequestException {
-        throw new BadRequestException("Necesitad ingresar el id del admin para buscar");
-    }
 }

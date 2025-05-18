@@ -31,7 +31,7 @@ public class ArchingController {
 
     // Endpoint para guardar un nuevo Arching
     @PostMapping
-    public ResponseEntity<SuccessMessage<ArchingResponseDTO>> saveArching(
+    public ResponseEntity<?> saveArching(
             @RequestParam UUID id_box,
             @RequestBody ArchingInitDTO archingInitDTO
     ) throws NotFoundException {
@@ -41,9 +41,13 @@ public class ArchingController {
         );
     }
 
-    // Endpoint para actualizar un Arching
+
+
+
+
+    // Endpoint para actualizar un Arching              Aun no esta funcional
     @PutMapping("/{id_arching}")
-    public ResponseEntity<SuccessMessage<ArchingResponseDTO>> updateArching(
+    public ResponseEntity<?> updateArching(
             @PathVariable UUID id_arching,
             @RequestBody ArchingInitDTO archingInitDTO
     ) throws NotFoundException {
@@ -53,9 +57,14 @@ public class ArchingController {
         );
     }
 
+
+
+
+
+
     // Retorna todos los Arching
     @GetMapping
-    public ResponseEntity<SuccessMessage<List<ArchingDTO>>> getAllArching() {
+    public ResponseEntity<?> getAllArching() {
         List<ArchingDTO> response = archingService.getAllArching();
         return ResponseEntity.ok(
                 new SuccessMessage<>(HttpStatus.OK, "Listado de Arching obtenido correctamente", response)
@@ -64,7 +73,7 @@ public class ArchingController {
 
     // Traer Arching por su ID
     @GetMapping("/{id_arching}")
-    public ResponseEntity<SuccessMessage<ArchingDTO>> getArchingById(
+    public ResponseEntity<?> getArchingById(
             @PathVariable UUID id_arching
     ) throws NotFoundException {
         ArchingDTO response = archingService.getArchingDTOById(id_arching);
@@ -75,7 +84,7 @@ public class ArchingController {
 
     // Traer Arching por el ID del ATM
     @GetMapping("/ATM/{id_atm}")
-    public ResponseEntity<SuccessMessage<List<ArchingWithAtmDTO>>> getArchingByATM(
+    public ResponseEntity<?> getArchingByATM(
             @PathVariable UUID id_atm
     ) throws NotFoundException {
         List<ArchingWithAtmDTO> response = archingService.getArchingByATM(id_atm);
@@ -86,7 +95,7 @@ public class ArchingController {
 
     // Traer Arching por el nombre del ATM
     @GetMapping("/ATM/name/{name_atm}")
-    public ResponseEntity<SuccessMessage<List<ArchingWithAtmDTO>>> getArchingByNameATM(
+    public ResponseEntity<?> getArchingByNameATM(
             @PathVariable String name_atm
     ) throws NotFoundException {
         List<ArchingWithAtmDTO> response = archingService.getArchingByNameATM(name_atm);
@@ -97,7 +106,7 @@ public class ArchingController {
 
     // Traer Arching por el ID del Box
     @GetMapping("/Box/{id_box}")
-    public ResponseEntity<SuccessMessage<List<ArchingWithBoxDTO>>> getArchingByBox(
+    public ResponseEntity<?> getArchingByBox(
             @PathVariable UUID id_box
     ) throws NotFoundException {
         List<ArchingWithBoxDTO> response = archingService.getArchingByBox(id_box);
@@ -108,7 +117,7 @@ public class ArchingController {
 
     // Traer Arching por el nombre del Box
     @GetMapping("/Box/name/{name_box}")
-    public ResponseEntity<SuccessMessage<List<ArchingWithBoxDTO>>> getArchingByNameBox(
+    public ResponseEntity<?> getArchingByNameBox(
             @PathVariable String name_box
     ) throws NotFoundException {
         List<ArchingWithBoxDTO> response = archingService.getArchingByNameBox(name_box);
@@ -119,7 +128,7 @@ public class ArchingController {
 
     // Endpoint del servicio auxiliar para cerrar un Arching
     @PostMapping("/{id_arching}/close")
-    public ResponseEntity<SuccessMessage<ArchingResponseDTO>> closeArching(
+    public ResponseEntity<?> closeArching(
             @PathVariable UUID id_arching
     ) throws NotFoundException {
         ArchingResponseDTO response = archingProcessOrderSet.closeArching(id_arching);

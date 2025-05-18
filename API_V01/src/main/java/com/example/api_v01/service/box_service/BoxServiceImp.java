@@ -65,6 +65,7 @@ public class BoxServiceImp implements BoxService, ExceptionMessage {
     public BoxWithAtmDTO assignAtmToBox(UUID id_box, UUID id_atm) throws NotFoundException {
 
         AtmDTO atmDTO = atmService.getAtmById(id_atm);
+
         ATM atm = ATMMovement.convertDTOToATM(atmDTO); //CONVERSION CENTRALIZADA
 
         Box box = boxRepository.findById(id_box)

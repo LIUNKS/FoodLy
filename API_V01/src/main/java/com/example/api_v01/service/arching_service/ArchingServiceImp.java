@@ -40,11 +40,19 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
         return ArchingMovement.CreateArchingResponseDTO(arching);
     }
 
+
+
+
     //Falta ver si se implementar (debatible si implementar o no)
     @Override
     public ArchingResponseDTO updateArching(UUID id_arching, ArchingInitDTO archingInitDTO) throws NotFoundException {
         return null;
     }
+
+
+
+
+
 
     //Me trae todos los arqueos
     @Override

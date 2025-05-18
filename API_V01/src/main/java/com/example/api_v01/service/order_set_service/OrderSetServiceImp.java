@@ -2,7 +2,6 @@ package com.example.api_v01.service.order_set_service;
 
 
 import com.example.api_v01.dto.entityLike.OrderSetDTO;
-import com.example.api_v01.dto.response.OrderSetWithListCustomerOrderDTO;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.Arching;
 import com.example.api_v01.model.OrderSet;
@@ -26,9 +25,9 @@ public class OrderSetServiceImp implements  OrderSetService {
     //Lo utiliza para guardar el OrderSet junto con sus ordenes, es usado en un servicio aux
     //Se utiliza para un servicio no para controlador NO USAR EN CONTROLADOR
     @Override
-    public OrderSet saveBaseOrderSet(UUID id_arching, OrderSetDTO orderSetDTO) throws NotFoundException {
+    public OrderSet saveBaseOrderSet(UUID id_arching, String name_client) throws NotFoundException {
         Arching arching = archingService.getArchingById(id_arching);
-        return orderSetRepository.save(OrderSetMovement.CreateOrderSet(arching, orderSetDTO));
+        return orderSetRepository.save(OrderSetMovement.CreateOrderSet(arching, name_client));
     }
 
     //Se utiliza para un servicio no para un controlador NO USAR EN CONTROLADOR
@@ -41,6 +40,14 @@ public class OrderSetServiceImp implements  OrderSetService {
                 .reduce(0.0, Double::sum);
     }
 
+    //SE USA EN UN SERVICIO ,NO PARA CONTROLADOR
+    @Override
+    public OrderSet getOrderSet(UUID id_orderSet) throws NotFoundException {
+        OrderSet orderSet = orderSetRepository.findById(id_orderSet)
+                .orElseThrow(()-> new NotFoundException("Lista de ordenes no encontrada"));
+        return orderSet;
+    }
+
     //OrderSet sin su lista
     @Override
     public List<OrderSetDTO> getOrderSetsByArching(UUID id_arching) throws NotFoundException {
@@ -49,20 +56,9 @@ public class OrderSetServiceImp implements  OrderSetService {
     }
 
     @Override
-    public OrderSet getOrderSet(UUID id_orderSet) throws NotFoundException {
-        OrderSet orderSet = orderSetRepository.findById(id_orderSet)
-                .orElseThrow(()-> new NotFoundException("Lista de ordenes no encontrada"));
-        return orderSet;
-    }
-
-    @Override
     public List<OrderSetDTO> getOrderSetByNameCustomer(String name) throws NotFoundException {
         List<OrderSet> list = orderSetRepository.findByNameClient(name);
         return OrderSetMovement.CrearListOrderSetDTO(list);
     }
-
-    //Debate sobre implementarla o no (Si se borra tambien se debe borrar todos los CustonOrden afileados a este)
-    @Override
-    public void deleteOrderSet(UUID id_orderSet) throws NotFoundException {}
 
 }

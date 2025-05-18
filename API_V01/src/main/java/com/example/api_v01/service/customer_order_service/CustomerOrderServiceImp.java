@@ -31,8 +31,10 @@ public class CustomerOrderServiceImp implements CustomerOrderService {
     private final ProductStockService productStockService;
 
 
+    //Se usa en un servicio aux, NO USAR EN CONTROLADOR
     @Override
     public CustomerOrder saveCustomerOrder(UUID id_product,UUID id_orderSet,Integer count) throws NotFoundException, BadRequestException {
+
         Product product = productService.getProduct(id_product);
         OrderSet orderSet = orderSetService.getOrderSet(id_orderSet);
         CustomerOrder customerOrder = CustomerOrderMovement.createCustomerOrder(orderSet,product,count);
@@ -41,9 +43,11 @@ public class CustomerOrderServiceImp implements CustomerOrderService {
         }
         productStockService.discountStockById(product.getStock().getId_product_stock(),count);
         return customerOrderRepository.save(customerOrder);
+
     }
 
     //Poner en el controlador un adverticia en caso de que salva el valor 0.0 (la lista esta vacia)
+    //Se usa en un servicio aux, NO USAR EN CONTROLADOR
     @Override
     public Double TotalAmountOrderSet(UUID id_OrderSet) {
         return customerOrderRepository.findByOrderSetId(id_OrderSet)
@@ -52,6 +56,7 @@ public class CustomerOrderServiceImp implements CustomerOrderService {
                 .reduce(0.0,Double::sum);
     }
 
+    //Se usa en un servicio aux, NO USAR EN CONTROLADOR
     @Override
     public List<CustomerOrder> listCustomerOrdersByOrderSet(UUID id_OrderSet) {
         return customerOrderRepository

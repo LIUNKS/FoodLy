@@ -5,8 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+
 @Data
+@RequiredArgsConstructor
 public class Tuple<A,B>{
     private final A first;
     private final B second;

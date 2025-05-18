@@ -2,17 +2,19 @@ package com.example.api_v01.utils;
 
 import com.example.api_v01.dto.entityLike.AtmDTO;
 import com.example.api_v01.dto.response.AtmResponseDTO;
-import com.example.api_v01.dto.response.RegisterAtmDTO;
+import com.example.api_v01.dto.response.RegisterAtmUserDTO;
 import com.example.api_v01.model.ATM;
 import com.example.api_v01.model.Admin;
 import com.example.api_v01.model.User;
+import com.example.api_v01.model.enums.Rol;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 public class ATMMovement {
 
-    public static ATM saveATM(AtmDTO atm, Admin admin)  {
+    public static ATM saveATM(AtmResponseDTO atm, Admin admin)  {
         return ATM.builder()
                 .name_atm(atm.getName_atm())
                 .date(LocalDate.now())
@@ -24,17 +26,17 @@ public class ATMMovement {
                 .build();
     }
 
-    public static ATM AssignUser(ATM atm, RegisterAtmDTO register){
+    public static ATM AssignUser(ATM atm, RegisterAtmUserDTO register){
         User user = User.builder()
                 .username(register.getUsername())
                 .password(register.getPassword())
-                .role(register.getRole())
+                .role(Rol.ATM)
                 .build();
         atm.setUser_atm(user);
         return atm;
     }
 
-    public static ATM validateATM(ATM atm,AtmDTO atmDTO) {
+    public static ATM validateATM(ATM atm,AtmResponseDTO atmDTO) {
         if(atmDTO.getName_atm() != null){
             atm.setName_atm(atmDTO.getName_atm());
         }
@@ -88,5 +90,10 @@ public class ATMMovement {
                 .build();
     }
 
+    public static List<AtmDTO> convertToDTO(List<ATM> atms){
+        return atms.stream()
+                .map(ATMMovement::convertToDTO)
+                .toList();
+    }
 
 }
