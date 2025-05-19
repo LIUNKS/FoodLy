@@ -60,19 +60,6 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
         return ATMMovement.convertToResponseDTO(savedATM);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     @Override
     public AtmDTO getAtmById(UUID id_atm) throws NotFoundException {
         ATM atm = atmRepository.findById(id_atm)

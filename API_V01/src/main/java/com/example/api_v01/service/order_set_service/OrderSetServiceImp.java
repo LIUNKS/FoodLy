@@ -7,6 +7,7 @@ import com.example.api_v01.model.Arching;
 import com.example.api_v01.model.OrderSet;
 import com.example.api_v01.repository.OrderSetRepository;
 import com.example.api_v01.service.arching_service.ArchingService;
+import com.example.api_v01.utils.ExceptionMessage;
 import com.example.api_v01.utils.OrderSetMovement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class OrderSetServiceImp implements  OrderSetService {
+public class OrderSetServiceImp implements  OrderSetService, ExceptionMessage {
 
     private final OrderSetRepository orderSetRepository;
     private final ArchingService archingService;
@@ -44,7 +45,7 @@ public class OrderSetServiceImp implements  OrderSetService {
     @Override
     public OrderSet getOrderSet(UUID id_orderSet) throws NotFoundException {
         OrderSet orderSet = orderSetRepository.findById(id_orderSet)
-                .orElseThrow(()-> new NotFoundException("Lista de ordenes no encontrada"));
+                .orElseThrow(()-> new NotFoundException(ORDER_SET_NOT_FOUND));
         return orderSet;
     }
 

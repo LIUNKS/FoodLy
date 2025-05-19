@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("atm")
-public class ATMController {
+public class ATMController { //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     private final ATMService atmservice;
 
@@ -43,7 +43,7 @@ public class ATMController {
         return ResponseEntity.status(HttpStatus.CREATED).body(successMessage);
     }
 
-    @PutMapping("/{atmId}/assign-user")
+    @PostMapping("/{atmId}/assign-user")
     public ResponseEntity<?> assignUserATM(@PathVariable("atmId") UUID atmId, @RequestBody RegisterAtmUserDTO registerATMDTOUser) throws NotFoundException {
         AtmResponseDTO updatedATM = atmservice.assingUserATM(atmId, registerATMDTOUser);
         SuccessMessage<AtmResponseDTO> successMessage = SuccessMessage.<AtmResponseDTO>builder()
@@ -54,13 +54,35 @@ public class ATMController {
         return ResponseEntity.ok(successMessage);
     }
 
-    @PutMapping("/{atmId}")
-    public ResponseEntity<?> updateATM(@PathVariable("atmId") UUID atmId, @RequestBody AtmResponseDTO atmDTO) throws NotFoundException {
-        AtmResponseDTO updatedATM = atmservice.updateATM(atmId, atmDTO);
-        SuccessMessage<AtmResponseDTO> successMessage = SuccessMessage.<AtmResponseDTO>builder()
+    @GetMapping("/list")
+    public ResponseEntity<?> getAllATMs() {
+        List<AtmDTO> atmList = atmservice.getAllATMs();
+        SuccessMessage<List<AtmDTO>> successMessage = SuccessMessage.<List<AtmDTO>>builder()
                 .status(HttpStatus.OK)
-                .message("ATM actualizado exitosamente")
-                .data(updatedATM)
+                .message("Todos los ATMs recuperados exitosamente")
+                .data(atmList)
+                .build();
+        return ResponseEntity.ok(successMessage);
+    }
+
+    @GetMapping("/{atmId}")
+    public ResponseEntity<?> getAtmById(@PathVariable("atmId") UUID atmId) throws NotFoundException {
+        AtmDTO atmDTO = atmservice.getAtmById(atmId);
+        SuccessMessage<AtmDTO> successMessage = SuccessMessage.<AtmDTO>builder()
+                .status(HttpStatus.OK)
+                .message("ATM recuperado exitosamente")
+                .data(atmDTO)
+                .build();
+        return ResponseEntity.ok(successMessage);
+    }
+
+    @GetMapping("/searchByName")
+    public ResponseEntity<?> getAtmByName(@RequestParam String name) throws NotFoundException {
+        AtmDTO atmDTO = atmservice.getAtmByName(name);
+        SuccessMessage<AtmDTO> successMessage = SuccessMessage.<AtmDTO>builder()
+                .status(HttpStatus.OK)
+                .message("ATM recuperado exitosamente")
+                .data(atmDTO)
                 .build();
         return ResponseEntity.ok(successMessage);
     }
@@ -76,50 +98,15 @@ public class ATMController {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    @GetMapping("/{atmId}")
-    public ResponseEntity<?> getAtmById(@PathVariable("atmId") UUID atmId) throws NotFoundException {
-            AtmDTO atmDTO = atmservice.getAtmById(atmId);
-            SuccessMessage<AtmDTO> successMessage = SuccessMessage.<AtmDTO>builder()
-                    .status(HttpStatus.OK)
-                    .message("ATM recuperado exitosamente")
-                    .data(atmDTO)
-                    .build();
-            return ResponseEntity.ok(successMessage);
-    }
-
-
-
-    @GetMapping("/search")
-    public ResponseEntity<?> getAtmByName(@RequestParam String name) throws NotFoundException {
-            AtmDTO atmDTO = atmservice.getAtmByName(name);
-            SuccessMessage<AtmDTO> successMessage = SuccessMessage.<AtmDTO>builder()
-                    .status(HttpStatus.OK)
-                    .message("ATM recuperado exitosamente")
-                    .data(atmDTO)
-                    .build();
-            return ResponseEntity.ok(successMessage);
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAllATMs() {
-        List<AtmDTO> atmList = atmservice.getAllATMs();
-        SuccessMessage<List<AtmDTO>> successMessage = SuccessMessage.<List<AtmDTO>>builder()
+    @PatchMapping("/{atmId}")
+    public ResponseEntity<?> updateATM(@PathVariable("atmId") UUID atmId, @RequestBody AtmResponseDTO atmDTO) throws NotFoundException {
+        AtmResponseDTO updatedATM = atmservice.updateATM(atmId, atmDTO);
+        SuccessMessage<AtmResponseDTO> successMessage = SuccessMessage.<AtmResponseDTO>builder()
                 .status(HttpStatus.OK)
-                .message("Todos los ATMs recuperados exitosamente")
-                .data(atmList)
+                .message("ATM actualizado exitosamente")
+                .data(updatedATM)
                 .build();
         return ResponseEntity.ok(successMessage);
     }
+
 }

@@ -4,20 +4,21 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
+import com.example.api_v01.dto.response.ProductResponseDTO;
 import com.example.api_v01.dto.response.SuccessMessage;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.enums.Category;
+import com.example.api_v01.utils.Tuple;
 import com.example.api_v01.utils.UriGeneric;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.api_v01.dto.entityLike.ProductDTO;
 import com.example.api_v01.service.product_service.ProductService;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("product")
-public class ProductController {
+public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     private final ProductService productService;
 
@@ -75,11 +76,14 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // respuesta 204 exito
     }
 
+
+
+    //Cambiar el tipo de DTO (No deberia tener ID)
     //actualiza el producto
     @PatchMapping("/{id_product}")
     public ResponseEntity<?> updateProduct(@PathVariable UUID id_product, @RequestBody ProductDTO productDTO) throws NotFoundException {
-        ProductDTO updateProduct = productService.updateProduct(id_product, productDTO);
-        SuccessMessage<ProductDTO> successMessage = SuccessMessage.<ProductDTO>builder()
+        ProductResponseDTO updateProduct = productService.updateProduct(id_product, productDTO);
+        SuccessMessage<ProductResponseDTO> successMessage = SuccessMessage.<ProductResponseDTO>builder()
                 .status(HttpStatus.OK)
                 .message("Producto Actualizado correctamente!!")
                 .data(updateProduct)
@@ -87,22 +91,20 @@ public class ProductController {
         return ResponseEntity.ok(successMessage);
     }
 
+    //Cambiar el tipo de DTO (No deberia tener ID)
     //agrega un producto, necesita el ID del admin que lo va a agregar
     @PostMapping("/{id_admin}")
     public ResponseEntity<?> CreateProduct(@PathVariable UUID id_admin,@RequestBody ProductDTO productDTO) throws NotFoundException {
-        ProductDTO product = productService.saveProduct(id_admin,productDTO);
-
+        Tuple<ProductResponseDTO,UUID> product = productService.saveProduct(id_admin,productDTO);
         URI location = UriGeneric.GenereURI(
-                "/{id}",
-                product.getId_product()
+                "/product/{id_product}",
+                product.getSecond()
         );
-
-        SuccessMessage<ProductDTO> successMessage = SuccessMessage.<ProductDTO>builder()
+        SuccessMessage<ProductResponseDTO> successMessage = SuccessMessage.<ProductResponseDTO>builder()
                 .status(HttpStatus.CREATED)
                 .message("Producto creado correctamente!!")
-                .data(product)
+                .data(product.getFirst())
                 .build();
-
         return ResponseEntity.created(location).body(successMessage);
     }
 }

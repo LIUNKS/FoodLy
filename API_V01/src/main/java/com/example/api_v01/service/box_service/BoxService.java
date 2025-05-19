@@ -1,6 +1,7 @@
 package com.example.api_v01.service.box_service;
 
 import com.example.api_v01.dto.entityLike.BoxDTO;
+import com.example.api_v01.dto.response.BoxNameDTO;
 import com.example.api_v01.dto.response.BoxResponseDTO;
 import com.example.api_v01.dto.response.BoxWithAtmDTO;
 import com.example.api_v01.handler.BadRequestException;
@@ -13,7 +14,7 @@ import java.util.UUID;
 public interface BoxService {
 
 
-    BoxResponseDTO saveBox(UUID id_admin, BoxResponseDTO box) throws NotFoundException;
+    BoxResponseDTO saveBox(UUID id_admin, BoxNameDTO box) throws NotFoundException;
 
     BoxResponseDTO toggleBoxActiveStatus (UUID id_box) throws NotFoundException, BadRequestException;
 

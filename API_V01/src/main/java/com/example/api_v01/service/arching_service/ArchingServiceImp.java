@@ -39,9 +39,6 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
                 .orElseThrow(()-> new NotFoundException(ARCHING_NOT_FOUND));
     }
 
-
-
-
     //Servicio para guardar el arqueo
     @Override
     public ArchingResponseDTO saveArchingResponseDTO(UUID id_box, ArchingInitDTO archingInitDTO) throws NotFoundException {
@@ -49,11 +46,6 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
         Arching arching = archingRepository.save(ArchingMovement.CreateArchingInit(box,archingInitDTO)) ;
         return ArchingMovement.CreateArchingResponseDTO(arching);
     }
-
-
-
-
-
 
     //Me trae todos los arqueos
     @Override
@@ -75,7 +67,7 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
     @Override
     public List<ArchingWithAtmDTO> getArchingByATM(UUID id_atm) throws NotFoundException {
         List<Arching>archingList=archingRepository.findArchingByIdAtm(id_atm)
-                .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ATM_NOT_FOUND));
         return ArchingMovement.CreateListArchingWithAtmDTO(archingList);
     }
 
@@ -83,7 +75,7 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
     @Override
     public List<ArchingWithAtmDTO> getArchingByNameATM(String name_ATM) throws NotFoundException {
         List<Arching>archingList=archingRepository.findArchingByNameAtm(name_ATM)
-                .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ATM_NOT_FOUND));
         return ArchingMovement.CreateListArchingWithAtmDTO(archingList);
     }
 
@@ -91,7 +83,7 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
     @Override
     public List<ArchingWithBoxDTO> getArchingByBox(UUID id_box) throws NotFoundException {
         List<Arching>archingList=archingRepository.findArchingByIdBox(id_box)
-                .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(BOX_NOT_FOUND));
         return ArchingMovement.CreateListArchingWithBoxDTO(archingList);
     }
 
@@ -99,7 +91,7 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
     @Override
     public List<ArchingWithBoxDTO> getArchingByNameBox(String name_BOX) throws NotFoundException {
         List<Arching>archingList=archingRepository.findArchingByNameBox(name_BOX)
-                .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(BOX_NOT_FOUND));
         return ArchingMovement.CreateListArchingWithBoxDTO(archingList);
     }
 

@@ -1,5 +1,6 @@
 package com.example.api_v01.controller;
 
+import com.example.api_v01.dto.entityLike.ProductStockDTO;
 import com.example.api_v01.dto.response.ProductWithStockDTO;
 import com.example.api_v01.dto.response.StockChangeRequestDTO;
 import com.example.api_v01.dto.response.SuccessMessage;
@@ -17,7 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("stock")
-public class StockController {
+public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     private final ProductStockService productStockService;
 
@@ -47,11 +48,11 @@ public class StockController {
     }
 
     @GetMapping("/list/nameProduct")
-    public ResponseEntity<?> getAllStocksNameProduct(@RequestParam String name) throws NotFoundException {
+    public ResponseEntity<?> getAllStocksNameProduct(@RequestParam String nameProduct) throws NotFoundException {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()
                 .status(HttpStatus.OK)
                 .message("La lista de stock (!puede que la lista este vacia)")
-                .data(productStockService.getAllProductStockByNameProduct(name))
+                .data(productStockService.getAllProductStockByNameProduct(nameProduct))
                 .build();
         return ResponseEntity.ok(successMessage);
     }
@@ -79,7 +80,7 @@ public class StockController {
     }
 
     @PostMapping("/discount")
-    public ResponseEntity<?> discountStock(StockChangeRequestDTO stockChangeRequestDTO) throws NotFoundException,BadRequestException {
+    public ResponseEntity<?> discountStock(@RequestBody StockChangeRequestDTO stockChangeRequestDTO) throws NotFoundException,BadRequestException {
         ProductWithStockDTO stock = productStockService.discountStockById(stockChangeRequestDTO);
         SuccessMessage<ProductWithStockDTO>successMessage = SuccessMessage.<ProductWithStockDTO>builder()
                 .status(HttpStatus.OK)
@@ -90,7 +91,7 @@ public class StockController {
     }
 
     @PostMapping("/increase")
-    public ResponseEntity<?> increaseStock(StockChangeRequestDTO stockChangeRequestDTO) throws NotFoundException{
+    public ResponseEntity<?> increaseStock(@RequestBody StockChangeRequestDTO stockChangeRequestDTO) throws NotFoundException{
         ProductWithStockDTO stock = productStockService.increaseStockById(stockChangeRequestDTO);
         SuccessMessage<ProductWithStockDTO>successMessage = SuccessMessage.<ProductWithStockDTO>builder()
                 .status(HttpStatus.OK)
@@ -102,7 +103,7 @@ public class StockController {
 
     //MANDA UN JSON JUNTO CON EL ID DEL PRODUCTO PARA ACTUALIZAR
     @PatchMapping("/")
-    public ResponseEntity<?> updateProduct(@RequestBody ProductWithStockDTO stockDTO) throws NotFoundException,BadRequestException {
+    public ResponseEntity<?> updateProduct(@RequestBody ProductStockDTO stockDTO) throws NotFoundException,BadRequestException {
         ProductWithStockDTO stock = productStockService.updateStockById(stockDTO);
         SuccessMessage<ProductWithStockDTO>successMessage= SuccessMessage.<ProductWithStockDTO>builder()
                 .status(HttpStatus.OK)

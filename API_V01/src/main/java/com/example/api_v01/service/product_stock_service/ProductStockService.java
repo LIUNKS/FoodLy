@@ -20,5 +20,5 @@ public interface ProductStockService {
     ProductWithStockDTO increaseStockById(StockChangeRequestDTO stockChangeRequestDTO) throws NotFoundException;
     ProductWithStockDTO discountStockById(StockChangeRequestDTO stockChangeRequestDTO) throws NotFoundException , BadRequestException;
     ProductWithStockDTO discountStockById(UUID id_productStock, Integer count) throws NotFoundException , BadRequestException;
-    ProductWithStockDTO updateStockById(ProductWithStockDTO productWithStockDTO) throws NotFoundException , BadRequestException;
+    ProductWithStockDTO updateStockById(ProductStockDTO productWithStockDTO) throws NotFoundException , BadRequestException;
 }

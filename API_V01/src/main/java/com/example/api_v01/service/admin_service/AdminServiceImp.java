@@ -3,6 +3,7 @@ package com.example.api_v01.service.admin_service;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.Admin;
 import com.example.api_v01.repository.AdminRepository;
+import com.example.api_v01.utils.ExceptionMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AdminServiceImp implements AdminService {
+public class AdminServiceImp implements AdminService , ExceptionMessage {
 
     private final AdminRepository adminRepository;
 
@@ -23,7 +24,7 @@ public class AdminServiceImp implements AdminService {
 
     @Override
     public Admin findById(UUID id) throws NotFoundException {
-        return adminRepository.findById(id).orElseThrow( () -> new NotFoundException("No se encontro al admin"));
+        return adminRepository.findById(id).orElseThrow( () -> new NotFoundException(ADMIN_NOT_FOUND));
     }
 
     @Override

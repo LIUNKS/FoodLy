@@ -11,6 +11,7 @@ import com.example.api_v01.service.order_set_service.OrderSetService;
 import com.example.api_v01.service.product_service.ProductService;
 import com.example.api_v01.service.product_stock_service.ProductStockService;
 import com.example.api_v01.utils.CustomerOrderMovement;
+import com.example.api_v01.utils.ExceptionMessage;
 import com.example.api_v01.utils.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class CustomerOrderServiceImp implements CustomerOrderService {
+public class CustomerOrderServiceImp implements CustomerOrderService, ExceptionMessage {
 
     private final CustomerOrderRepository customerOrderRepository;
 
@@ -39,7 +40,7 @@ public class CustomerOrderServiceImp implements CustomerOrderService {
         OrderSet orderSet = orderSetService.getOrderSet(id_orderSet);
         CustomerOrder customerOrder = CustomerOrderMovement.createCustomerOrder(orderSet,product,count);
         if(customerOrder==null){
-            throw new BadRequestException("No se puede quitar mas del stock actual del producto");
+            throw new BadRequestException(STOCK_DISCOUNT);
         }
         productStockService.discountStockById(product.getStock().getId_product_stock(),count);
         return customerOrderRepository.save(customerOrder);

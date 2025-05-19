@@ -1,7 +1,6 @@
 package com.example.api_v01.controller;
 
 import com.example.api_v01.dto.entityLike.CustomerOrderDTO;
-import com.example.api_v01.dto.response.CustomerOrderResponseDTO;
 import com.example.api_v01.dto.response.OrderSetResponseDTO;
 import com.example.api_v01.dto.response.SaveOrderSetListCustomerDTO;
 import com.example.api_v01.dto.response.SuccessMessage;
@@ -28,10 +27,15 @@ public class OrderSetController {
 
     @PostMapping("/{id_arching}")
     public ResponseEntity<?> saveOrderSet(@PathVariable UUID id_arching, SaveOrderSetListCustomerDTO NameClientWithListOrdes) throws NotFoundException, BadRequestException {
+
         String nameClient = NameClientWithListOrdes.getName_cliente();
+
         List<CustomerOrderDTO> orders = NameClientWithListOrdes.getOrders();
+
         Tuple<OrderSetResponseDTO, UUID>tuple = orderSetOrchestratorService.saveCompleteOrderSet(id_arching,nameClient,orders);
-        URI location = UriGeneric.GenereURI("/{id_orderSet}",tuple.getSecond());
+
+        URI location = UriGeneric.GenereURI("/orderSet/{id_orderSet}",tuple.getSecond());
+
         SuccessMessage<?>successMessage=SuccessMessage.builder()
                 .status(HttpStatus.OK)
                 .message("Se guardo la lista de ordenes correctamente")

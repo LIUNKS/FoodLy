@@ -1,6 +1,7 @@
 package com.example.api_v01.controller;
 
 import com.example.api_v01.dto.entityLike.BoxDTO;
+import com.example.api_v01.dto.response.BoxNameDTO;
 import com.example.api_v01.dto.response.BoxResponseDTO;
 import com.example.api_v01.dto.response.BoxWithAtmDTO;
 import com.example.api_v01.dto.response.SuccessMessage;
@@ -27,7 +28,7 @@ public class BoxController {
     //Agregarle URI a saveBox (Faltante) para sabe donde esta ubicado (Usar UriGenric es un utils del proyecto propio)
 
     @PostMapping("/{id_admin}")
-    public ResponseEntity<?> saveBox(@PathVariable("id_admin") UUID id_admin, @RequestBody BoxResponseDTO boxDTO) throws NotFoundException {
+    public ResponseEntity<?> saveBox(@PathVariable("id_admin") UUID id_admin, @RequestBody BoxNameDTO boxDTO) throws NotFoundException {
         SuccessMessage<BoxResponseDTO>successMessage = SuccessMessage.<BoxResponseDTO>builder()
                 .status(HttpStatus.OK)
                 .message("La data del box creado")

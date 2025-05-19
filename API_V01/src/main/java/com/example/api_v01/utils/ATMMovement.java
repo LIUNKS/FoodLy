@@ -40,20 +40,17 @@ public class ATMMovement {
         if(atmDTO.getName_atm() != null){
             atm.setName_atm(atmDTO.getName_atm());
         }
-        if(atm.getDate() != null){
-            atm.setDate(atm.getDate());
+        if(atmDTO.getAlias() != null){
+            atm.setAlias(atmDTO.getAlias());
         }
-        if(atm.getAlias() != null){
-            atm.setAlias(atm.getAlias());
+        if(atmDTO.getEmail() != null){
+            atm.setEmail(atmDTO.getEmail());
         }
-        if(atm.getEmail() != null){
-            atm.setEmail(atm.getEmail());
+        if(atmDTO.getPhone() != null){
+            atm.setPhone(atmDTO.getPhone());
         }
-        if(atm.getPhone() != null){
-            atm.setPhone(atm.getPhone());
-        }
-        if(atm.getDni() != null){
-            atm.setDni(atm.getDni());
+        if(atmDTO.getDni() != null){
+            atm.setDni(atmDTO.getDni());
         }
         return atm;
     }

@@ -42,14 +42,14 @@ public class ProductStockServiceImp implements ProductStockService, ExceptionMes
     @Override
     public List<ProductWithStockDTO> getAllProductStockByCategory(Category category) throws NotFoundException {
         List<Product>ListProductByCategory=productRepository.findProductsByCategory(category)
-                .orElseThrow( ( ) -> new NotFoundException("Categoria no encontrada") );
+                .orElseThrow( ( ) -> new NotFoundException(CATEGORY_NOT_FOUND) );
         return InventoryMovement.getListProductWithStock(ListProductByCategory);
     }
 
     @Override
     public List<ProductWithStockDTO> getAllProductStockByNameProduct(String product) throws NotFoundException {
         List<Product>ListProductByName=productRepository.findProductByName(product)
-                .orElseThrow( ( ) -> new NotFoundException("producto no encontrada") );
+                .orElseThrow( ( ) -> new NotFoundException(NAME_PRODUCT_NOT_FOUND) );
         return InventoryMovement.getListProductWithStock(ListProductByName);
     }
 
@@ -101,14 +101,15 @@ public class ProductStockServiceImp implements ProductStockService, ExceptionMes
     }
 
     @Override
-    public ProductWithStockDTO updateStockById(ProductWithStockDTO productWithStockDTO) throws NotFoundException {
+    public ProductWithStockDTO updateStockById(ProductStockDTO productWithStockDTO) throws NotFoundException {
 
-        Product product = productRepository.findProductStockById(productWithStockDTO.getProduct_stock().getId_productStock())
+        ProductStock stock = productStockRepository.findById(productWithStockDTO.getId_Stock())
                 .orElseThrow( () -> new NotFoundException(STOCK_NOT_FOUND));
 
-        ProductStock stock = product.getStock();
+        Product product = productRepository.findProductStockById(productWithStockDTO.getId_Stock())
+                .orElseThrow( () -> new NotFoundException(PRODUCT_NOT_FOUND));
 
-        ProductStock stockValidation = productStockRepository.save(InventoryMovement.ValidationStock(stock,productWithStockDTO.getProduct_stock()));
+        ProductStock stockValidation = productStockRepository.save(InventoryMovement.ValidationStock(stock,productWithStockDTO));
 
         product.setStock(stockValidation);
 

@@ -2,9 +2,11 @@ package com.example.api_v01.service.product_service;
 
 import com.example.api_v01.dto.entityLike.ProductDTO;
 import com.example.api_v01.dto.entityLike.ProductStockDTO;
+import com.example.api_v01.dto.response.ProductResponseDTO;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.Product;
 import com.example.api_v01.model.enums.Category;
+import com.example.api_v01.utils.Tuple;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +14,7 @@ import java.util.UUID;
 
 public interface ProductService {
 
-    ProductDTO saveProduct(UUID id_admin,ProductDTO product) throws NotFoundException;
+    Tuple saveProduct(UUID id_admin, ProductDTO product) throws NotFoundException;
 
     void deleteProduct(UUID id) throws NotFoundException;
 
@@ -22,7 +24,7 @@ public interface ProductService {
 
     Product getProduct(UUID id) throws NotFoundException;
 
-    ProductDTO updateProduct(UUID id, ProductDTO productDTO) throws NotFoundException;
+    ProductResponseDTO updateProduct(UUID id, ProductDTO productDTO) throws NotFoundException;
 
     List<ProductDTO> getProductByCategory(Category categoria) throws NotFoundException;
 

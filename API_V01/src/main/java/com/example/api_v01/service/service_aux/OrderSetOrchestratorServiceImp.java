@@ -10,6 +10,7 @@ import com.example.api_v01.model.CustomerOrder;
 import com.example.api_v01.model.OrderSet;
 import com.example.api_v01.service.customer_order_service.CustomerOrderService;
 import com.example.api_v01.service.order_set_service.OrderSetService;
+import com.example.api_v01.utils.ExceptionMessage;
 import com.example.api_v01.utils.OrderSetMovement;
 import com.example.api_v01.utils.Tuple;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorService {
+public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorService, ExceptionMessage {
 
     private final OrderSetService orderSetService;
     private final CustomerOrderService customerOrderService;
@@ -34,7 +35,7 @@ public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorServi
     ) throws NotFoundException, BadRequestException {
 
         if(listCustomer.isEmpty()){
-            throw new BadRequestException("No se puede guardar el orderSet si su lista de productos a ordenar esta vacia");
+            throw new BadRequestException(IS_EMPTY_LIST_ORDER_SET);
         }
 
         OrderSet orderSet = orderSetService.saveBaseOrderSet(id_arching, name_client);

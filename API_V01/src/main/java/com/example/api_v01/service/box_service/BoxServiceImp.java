@@ -2,6 +2,7 @@ package com.example.api_v01.service.box_service;
 
 import com.example.api_v01.dto.entityLike.AtmDTO;
 import com.example.api_v01.dto.entityLike.BoxDTO;
+import com.example.api_v01.dto.response.BoxNameDTO;
 import com.example.api_v01.dto.response.BoxResponseDTO;
 import com.example.api_v01.dto.response.BoxWithAtmDTO;
 import com.example.api_v01.handler.BadRequestException;
@@ -31,7 +32,7 @@ public class BoxServiceImp implements BoxService, ExceptionMessage {
     private final AdminService adminService;
 
     @Override
-    public BoxResponseDTO saveBox(UUID id_admin, BoxResponseDTO box) throws NotFoundException {
+    public BoxResponseDTO saveBox(UUID id_admin, BoxNameDTO box) throws NotFoundException {
         Admin admin = adminService.findById(id_admin);
         Box newBox = boxRepository.save(BoxMovement.CreateBox(admin,box));
         return BoxMovement.CreateBoxResponseDTO(newBox);
@@ -42,7 +43,7 @@ public class BoxServiceImp implements BoxService, ExceptionMessage {
         Box box = boxRepository.findById(id_box)
                 .orElseThrow( () -> new NotFoundException(BOX_NOT_FOUND));
         if(box.getIs_open() == true) {
-            throw new BadRequestException("La caja ya esta abierta");
+            throw new BadRequestException(BOX_OPEN);
         }
         box.setIs_open(true);
         boxRepository.save(box);
@@ -54,7 +55,7 @@ public class BoxServiceImp implements BoxService, ExceptionMessage {
         Box box = boxRepository.findById(id_box)
                 .orElseThrow( () -> new NotFoundException(BOX_NOT_FOUND));
         if(box.getIs_open() == false) {
-            throw new BadRequestException("La caja ya esta cerrada");
+            throw new BadRequestException(BOX_CLOSE);
         }
         box.setIs_open(false);
         boxRepository.save(box);

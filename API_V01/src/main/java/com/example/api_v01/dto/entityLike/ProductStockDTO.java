@@ -13,7 +13,7 @@ import java.util.UUID;
 @Builder
 public class ProductStockDTO {
 
-    private UUID id_productStock;
+    private UUID id_Stock;
 
     private Integer ini_stock;
 

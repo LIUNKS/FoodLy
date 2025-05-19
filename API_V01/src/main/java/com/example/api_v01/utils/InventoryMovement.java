@@ -21,7 +21,7 @@ public class InventoryMovement {
                 .product_name(product.getName_product())
                 .product_stock(
                         ProductStockDTO.builder()
-                                .id_productStock(product.getStock().getId_product_stock())
+                                .id_Stock(product.getStock().getId_product_stock())
                                 .ini_stock(product.getStock().getIni_stock())
                                 .current_stock(product.getStock().getCurrent_stock())
                                 .total_sold(product.getStock().getTotal_sold())

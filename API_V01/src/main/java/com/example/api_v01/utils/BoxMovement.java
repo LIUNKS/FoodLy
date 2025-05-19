@@ -2,6 +2,7 @@ package com.example.api_v01.utils;
 
 import com.example.api_v01.dto.entityLike.AtmDTO;
 import com.example.api_v01.dto.entityLike.BoxDTO;
+import com.example.api_v01.dto.response.BoxNameDTO;
 import com.example.api_v01.dto.response.BoxResponseDTO;
 import com.example.api_v01.dto.response.BoxWithAtmDTO;
 import com.example.api_v01.model.Admin;
@@ -24,7 +25,7 @@ public class BoxMovement {
                 .is_open(box.getIs_open())
                 .build();
     }
-    public static Box CreateBox(Admin admin, BoxResponseDTO boxDTO) {
+    public static Box CreateBox(Admin admin, BoxNameDTO boxDTO) {
         return Box.builder()
                 .name_box(boxDTO.getName_box())
                 .date(LocalDate.now())

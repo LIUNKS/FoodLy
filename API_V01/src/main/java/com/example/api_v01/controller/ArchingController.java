@@ -5,7 +5,6 @@ import com.example.api_v01.dto.response.*;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.service.arching_service.ArchingService;
 import com.example.api_v01.service.service_aux.ArchingProcessOrderSet;
-import com.example.api_v01.utils.UriGeneric;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
