@@ -6,6 +6,9 @@ import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.service.arching_service.ArchingService;
 import com.example.api_v01.service.service_aux.ArchingProcessOrderSet;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,14 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
 
 
     private final ArchingService archingService;
+
+    @Operation(
+            summary = "Obtener todos los Arching",
+            description = "Retorna una lista de todos los registros de Arching almacenados en el sistema."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listado de Arching obtenido correctamente")
+    })
     // Retorna todos los Arching
     @GetMapping("/list")
     public ResponseEntity<?> getAllArching() {
@@ -31,6 +42,15 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
         );
     }
 
+    @Operation(
+            summary = "Obtener Arching por ID",
+            description = "Devuelve los detalles de un registro de Arching utilizando su identificador único."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Arching encontrado correctamente"),
+            @ApiResponse(responseCode = "404", description = "Arching no encontrado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+    })
     // Traer Arching por su ID
     @GetMapping("/{id_arching}")
     public ResponseEntity<?> getArchingById(
@@ -42,6 +62,15 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
         );
     }
 
+    @Operation(
+            summary = "Obtener Arching por ID del ATM",
+            description = "Devuelve una lista de registros de Arching asociados a un cajero automático específico."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listado de Arching por ATM obtenido correctamente"),
+            @ApiResponse(responseCode = "404", description = "ATM no encontrado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+    })
     // Traer Arching por el ID del ATM
     @GetMapping("/ATM/{id_atm}")
     public ResponseEntity<?> getArchingByATM(
@@ -53,6 +82,15 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
         );
     }
 
+    @Operation(
+            summary = "Obtener Arching por nombre del ATM",
+            description = "Devuelve una lista de registros de Arching asociados a un cajero automático especificado por nombre."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listado de Arching por nombre de ATM obtenido correctamente"),
+            @ApiResponse(responseCode = "404", description = "ATM no encontrado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+    })
     // Traer Arching por el nombre del ATM
     @GetMapping("/ATM/name/{name_atm}")
     public ResponseEntity<?> getArchingByNameATM(
@@ -64,6 +102,15 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
         );
     }
 
+    @Operation(
+            summary = "Obtener Arching por ID de la caja (Box)",
+            description = "Devuelve una lista de registros de Arching asociados a una caja específica (Box)."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listado de Arching por Box obtenido correctamente"),
+            @ApiResponse(responseCode = "404", description = "Box no encontrado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+    })
     // Traer Arching por el ID del Box
     @GetMapping("/Box/{id_box}")
     public ResponseEntity<?> getArchingByBox(
@@ -75,6 +122,15 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
         );
     }
 
+    @Operation(
+            summary = "Obtener Arching por nombre de la caja (Box)",
+            description = "Devuelve una lista de registros de Arching asociados a una caja especificada por nombre."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listado de Arching por nombre de Box obtenido correctamente"),
+            @ApiResponse(responseCode = "404", description = "Box no encontrado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
+    })
     // Traer Arching por el nombre del Box
     @GetMapping("/Box/name/{name_box}")
     public ResponseEntity<?> getArchingByNameBox(

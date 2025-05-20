@@ -28,7 +28,8 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserService userService;
 
-    private final String [] EndpointsFree = {"/auth/login"};
+    //agregar swagger
+    private final String [] EndpointsFree = {"/auth/login", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html"};
 
     private final String [] EndpointsAdmin = {
             "/arching/*","/atm/*","/box/*",
