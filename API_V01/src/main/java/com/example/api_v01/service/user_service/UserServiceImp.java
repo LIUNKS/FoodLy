@@ -8,6 +8,10 @@ import com.example.api_v01.repository.UserRepository;
 import com.example.api_v01.utils.ExceptionMessage;
 import com.example.api_v01.utils.UserMovement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +20,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImp implements UserService, ExceptionMessage {
+public class UserServiceImp implements UserService, ExceptionMessage, UserDetailsService {
 
     private final UserRepository userRepository;
 
@@ -73,4 +77,17 @@ public class UserServiceImp implements UserService, ExceptionMessage {
         return user;
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND));
+
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                List.of(authority)
+        );
+    }
 }
