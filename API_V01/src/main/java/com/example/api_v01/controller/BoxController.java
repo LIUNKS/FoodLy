@@ -26,7 +26,7 @@ public class BoxController { //CONTROLADOR LISTO PARA USAR
     @PostMapping("/{id_admin}")
     public ResponseEntity<?> saveBox(@PathVariable("id_admin") UUID id_admin, @RequestBody BoxNameDTO boxDTO) throws NotFoundException {
         SuccessMessage<BoxResponseDTO>successMessage = SuccessMessage.<BoxResponseDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("La data del box creado")
                 .data(boxservice.saveBox(id_admin,boxDTO))
                 .build();
@@ -36,7 +36,7 @@ public class BoxController { //CONTROLADOR LISTO PARA USAR
     @PostMapping("/{id_box}/assign-atm/{id_atm}")
     public ResponseEntity<?> assignAtmToBox(@PathVariable("id_box") UUID id_box, @PathVariable("id_atm") UUID id_atm) throws NotFoundException {
         SuccessMessage<BoxWithAtmDTO>successMessage = SuccessMessage.<BoxWithAtmDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("La data del box creado:")
                 .data(boxservice.assignAtmToBox(id_box,id_atm))
                 .build();
@@ -46,7 +46,7 @@ public class BoxController { //CONTROLADOR LISTO PARA USAR
     @GetMapping("/{id_box}")
     public ResponseEntity<?> getBoxInfo(@PathVariable("id_box") UUID id_box) throws NotFoundException {
         SuccessMessage<BoxDTO>successMessage = SuccessMessage.<BoxDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("La data del box creado:")
                 .data(boxservice.getBoxInfo(id_box))
                 .build();
@@ -56,7 +56,7 @@ public class BoxController { //CONTROLADOR LISTO PARA USAR
     @PostMapping("off-box/{id_box}/arching/{id_arching}")
     public ResponseEntity<?> OffBox(@PathVariable("id_box") UUID id_box,@PathVariable UUID id_arching) throws NotFoundException, BadRequestException {
         SuccessMessage<BoxWithArchingDTO>successMessage = SuccessMessage.<BoxWithArchingDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("La caja se ha cerrado")
                 .data(boxservice.toggleBoxDeactivationStatus(id_box,id_arching))
                 .build();
@@ -66,7 +66,7 @@ public class BoxController { //CONTROLADOR LISTO PARA USAR
     @PostMapping("on-box/{id_box}")
     public ResponseEntity<?> OnBox(@PathVariable("id_box") UUID id_box,@RequestBody ArchingInitDTO archingInitDTO) throws NotFoundException, BadRequestException {
         SuccessMessage<BoxResponseWithArchingDTO>successMessage = SuccessMessage.<BoxResponseWithArchingDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("La caja se ha abierto")
                 .data(boxservice.toggleBoxActiveStatus(id_box,archingInitDTO))
                 .build();
@@ -76,7 +76,7 @@ public class BoxController { //CONTROLADOR LISTO PARA USAR
     @GetMapping("/list")
     public ResponseEntity<?> getBoxes() {
         SuccessMessage<List<BoxDTO>>successMessage = SuccessMessage.<List<BoxDTO>>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("La data del box creado:")
                 .data(boxservice.getBoxes())
                 .build();
@@ -87,7 +87,7 @@ public class BoxController { //CONTROLADOR LISTO PARA USAR
     @GetMapping("/by-atm/{id_atm}")
     public ResponseEntity<?> getBoxesByAtm(@PathVariable("id_atm") UUID id_atm) throws NotFoundException {
         SuccessMessage<List<BoxDTO>>successMessage = SuccessMessage.<List<BoxDTO>>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("La data del box creado:")
                 .data(boxservice.getBoxesByAtm(id_atm))
                 .build();

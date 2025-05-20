@@ -28,7 +28,7 @@ public class ATMController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> saveATM(@PathVariable("adminId") UUID adminId, @RequestBody AtmResponseDTO atmDTO) throws NotFoundException {
         AtmResponseDTO createdATM = atmservice.saveATM(adminId, atmDTO);
         SuccessMessage<AtmResponseDTO> successMessage = SuccessMessage.<AtmResponseDTO>builder()
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.CREATED.value())
                 .message("ATM creado exitosamente")
                 .data(createdATM)
                 .build();
@@ -39,7 +39,7 @@ public class ATMController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> assignUserATM(@PathVariable("atmId") UUID atmId, @RequestBody RegisterAtmUserDTO registerATMDTOUser) throws NotFoundException {
         AtmResponseDTO updatedATM = atmservice.assingUserATM(atmId, registerATMDTOUser);
         SuccessMessage<AtmResponseDTO> successMessage = SuccessMessage.<AtmResponseDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Usuario asignado exitosamente al ATM")
                 .data(updatedATM)
                 .build();
@@ -50,7 +50,7 @@ public class ATMController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> getAllATMs() {
         List<AtmDTO> atmList = atmservice.getAllATMs();
         SuccessMessage<List<AtmDTO>> successMessage = SuccessMessage.<List<AtmDTO>>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Todos los ATMs recuperados exitosamente")
                 .data(atmList)
                 .build();
@@ -61,7 +61,7 @@ public class ATMController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> getAtmById(@PathVariable("atmId") UUID atmId) throws NotFoundException {
         AtmDTO atmDTO = atmservice.getAtmById(atmId);
         SuccessMessage<AtmDTO> successMessage = SuccessMessage.<AtmDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("ATM recuperado exitosamente")
                 .data(atmDTO)
                 .build();
@@ -72,7 +72,7 @@ public class ATMController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> getAtmByName(@RequestParam String name) throws NotFoundException {
         AtmDTO atmDTO = atmservice.getAtmByName(name);
         SuccessMessage<AtmDTO> successMessage = SuccessMessage.<AtmDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("ATM recuperado exitosamente")
                 .data(atmDTO)
                 .build();
@@ -83,7 +83,7 @@ public class ATMController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> deleteATM(@PathVariable("atmId") UUID atmId) throws NotFoundException {
         atmservice.deleteATM(atmId);
         SuccessMessage<Void> successMessage = SuccessMessage.<Void>builder()
-                .status(HttpStatus.NO_CONTENT)
+                .status(HttpStatus.NO_CONTENT.value())
                 .message("ATM eliminado exitosamente")
                 .build();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(successMessage);
@@ -94,7 +94,7 @@ public class ATMController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> updateATM(@PathVariable("atmId") UUID atmId, @RequestBody AtmResponseDTO atmDTO) throws NotFoundException {
         AtmResponseDTO updatedATM = atmservice.updateATM(atmId, atmDTO);
         SuccessMessage<AtmResponseDTO> successMessage = SuccessMessage.<AtmResponseDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("ATM actualizado exitosamente")
                 .data(updatedATM)
                 .build();

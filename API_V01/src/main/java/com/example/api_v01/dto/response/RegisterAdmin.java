@@ -4,14 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class SuccessMessage <T> {
-    private int status;
-    private String message;
-    private T data;
+public class RegisterAdmin {
+    private String name;
+    private String dni;
+    private String email;
+    private String username;
+    private String password;
 }

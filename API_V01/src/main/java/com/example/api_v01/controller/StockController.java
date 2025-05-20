@@ -30,7 +30,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     @GetMapping("/list")
     public ResponseEntity<?> getAllStocks() {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("La lista de stock (!puede que la lista este vacia)")
                 .data(productStockService.getAllProductStock())
                 .build();
@@ -40,7 +40,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     @GetMapping("/list/category")
     public ResponseEntity<?> getAllStocksCategory(@RequestParam Category category) throws NotFoundException {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("La lista de stock (!puede que la lista este vacia)")
                 .data(productStockService.getAllProductStockByCategory(category))
                 .build();
@@ -50,7 +50,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     @GetMapping("/list/nameProduct")
     public ResponseEntity<?> getAllStocksNameProduct(@RequestParam String nameProduct) throws NotFoundException {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("La lista de stock (!puede que la lista este vacia)")
                 .data(productStockService.getAllProductStockByNameProduct(nameProduct))
                 .build();
@@ -61,7 +61,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> getStock(@PathVariable UUID id_stock) throws NotFoundException {
         ProductWithStockDTO productStock = productStockService.getProductStockById(id_stock);
         SuccessMessage<ProductWithStockDTO>successMessage = SuccessMessage.<ProductWithStockDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Stock encontrado!!")
                 .data(productStock)
                 .build();
@@ -72,7 +72,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> cleanStock(@PathVariable UUID id_stock) throws NotFoundException {
         ProductWithStockDTO stock = productStockService.cleanStockById(id_stock);
         SuccessMessage<ProductWithStockDTO>successMessage = SuccessMessage.<ProductWithStockDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Stock encontrado!!")
                 .data(stock)
                 .build();
@@ -83,7 +83,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> discountStock(@RequestBody StockChangeRequestDTO stockChangeRequestDTO) throws NotFoundException,BadRequestException {
         ProductWithStockDTO stock = productStockService.discountStockById(stockChangeRequestDTO);
         SuccessMessage<ProductWithStockDTO>successMessage = SuccessMessage.<ProductWithStockDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Se desconto el monto del stock")
                 .data(stock)
                 .build();
@@ -94,7 +94,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> increaseStock(@RequestBody StockChangeRequestDTO stockChangeRequestDTO) throws NotFoundException{
         ProductWithStockDTO stock = productStockService.increaseStockById(stockChangeRequestDTO);
         SuccessMessage<ProductWithStockDTO>successMessage = SuccessMessage.<ProductWithStockDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Se aumento el monto del stock")
                 .data(stock)
                 .build();
@@ -106,7 +106,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> updateProduct(@RequestBody ProductStockDTO stockDTO) throws NotFoundException,BadRequestException {
         ProductWithStockDTO stock = productStockService.updateStockById(stockDTO);
         SuccessMessage<ProductWithStockDTO>successMessage= SuccessMessage.<ProductWithStockDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Se actualizo el producto correctamente")
                 .data(stock)
                 .build();

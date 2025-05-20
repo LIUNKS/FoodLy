@@ -26,16 +26,6 @@ public class ATMMovement {
                 .build();
     }
 
-    public static ATM AssignUser(ATM atm, RegisterAtmUserDTO register){
-        User user = User.builder()
-                .username(register.getUsername())
-                .password(register.getPassword())
-                .role(Rol.ATM)
-                .build();
-        atm.setUser_atm(user);
-        return atm;
-    }
-
     public static ATM validateATM(ATM atm,AtmResponseDTO atmDTO) {
         if(atmDTO.getName_atm() != null){
             atm.setName_atm(atmDTO.getName_atm());

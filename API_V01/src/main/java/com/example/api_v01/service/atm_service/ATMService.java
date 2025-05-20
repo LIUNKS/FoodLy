@@ -17,5 +17,6 @@ public interface ATMService {
     AtmDTO getAtmById(UUID id_atm) throws NotFoundException;
     ATM getAtmEntityById(UUID id_atm) throws NotFoundException;
     AtmDTO getAtmByName(String name) throws NotFoundException;
+    AtmDTO getAtmByUser(UUID id_user) throws NotFoundException;
     List<AtmDTO> getAllATMs();
 }

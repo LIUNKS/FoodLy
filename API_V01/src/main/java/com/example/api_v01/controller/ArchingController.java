@@ -29,7 +29,7 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> getAllArching() {
         List<ArchingDTO> response = archingService.getAllArching();
         return ResponseEntity.ok(
-                new SuccessMessage<>(HttpStatus.OK, "Listado de Arching obtenido correctamente", response)
+                new SuccessMessage<>(HttpStatus.OK.value(), "Listado de Arching obtenido correctamente", response)
         );
     }
 
@@ -40,7 +40,7 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     ) throws NotFoundException {
         ArchingDTO response = archingService.getArchingDTOById(id_arching);
         return ResponseEntity.ok(
-                new SuccessMessage<>(HttpStatus.OK, "Arching obtenido correctamente", response)
+                new SuccessMessage<>(HttpStatus.OK.value(), "Arching obtenido correctamente", response)
         );
     }
 
@@ -51,7 +51,7 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     ) throws NotFoundException {
         List<ArchingWithAtmDTO> response = archingService.getArchingByATM(id_atm);
         return ResponseEntity.ok(
-                new SuccessMessage<>(HttpStatus.OK, "Listado de Arching por ATM obtenido correctamente", response)
+                new SuccessMessage<>(HttpStatus.OK.value(), "Listado de Arching por ATM obtenido correctamente", response)
         );
     }
 
@@ -62,7 +62,7 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     ) throws NotFoundException {
         List<ArchingWithAtmDTO> response = archingService.getArchingByNameATM(name_atm);
         return ResponseEntity.ok(
-                new SuccessMessage<>(HttpStatus.OK, "Listado de Arching por nombre de ATM obtenido correctamente", response)
+                new SuccessMessage<>(HttpStatus.OK.value(), "Listado de Arching por nombre de ATM obtenido correctamente", response)
         );
     }
 
@@ -73,7 +73,7 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     ) throws NotFoundException {
         List<ArchingWithBoxDTO> response = archingService.getArchingByBox(id_box);
         return ResponseEntity.ok(
-                new SuccessMessage<>(HttpStatus.OK, "Listado de Arching por Box obtenido correctamente", response)
+                new SuccessMessage<>(HttpStatus.OK.value(), "Listado de Arching por Box obtenido correctamente", response)
         );
     }
 
@@ -84,7 +84,7 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     ) throws NotFoundException {
         List<ArchingWithBoxDTO> response = archingService.getArchingByNameBox(name_box);
         return ResponseEntity.ok(
-                new SuccessMessage<>(HttpStatus.OK, "Listado de Arching por nombre de Box obtenido correctamente", response)
+                new SuccessMessage<>(HttpStatus.OK.value(), "Listado de Arching por nombre de Box obtenido correctamente", response)
         );
     }
 

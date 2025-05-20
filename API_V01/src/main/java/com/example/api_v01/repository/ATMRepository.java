@@ -16,4 +16,7 @@ public interface ATMRepository extends JpaRepository<ATM, UUID> {
     @Query("SELECT a FROM ATM a WHERE a.name_atm=?1")
     Optional<ATM> findByNameAtm(String nameAtm);
 
+
+    @Query("SELECT a FROM ATM a WHERE a.user_atm.id_user=?1")
+    Optional<ATM> findByIdUser(UUID id_user);
 }

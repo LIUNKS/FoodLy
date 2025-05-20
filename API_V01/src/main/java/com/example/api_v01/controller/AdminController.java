@@ -25,7 +25,7 @@ public class AdminController {
     @GetMapping("/{id_admin}")
     public ResponseEntity<?> getAdmin(@PathVariable UUID id_admin) throws NotFoundException {
         SuccessMessage<?> successMessage = SuccessMessage.builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Se encontro el admin")
                 .data(adminservice.findById(id_admin))
                 .build();

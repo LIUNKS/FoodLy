@@ -6,11 +6,15 @@ import com.example.api_v01.dto.response.RegisterAtmUserDTO;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.ATM;
 import com.example.api_v01.model.Admin;
+import com.example.api_v01.model.User;
+import com.example.api_v01.model.enums.Rol;
 import com.example.api_v01.repository.ATMRepository;
 import com.example.api_v01.service.admin_service.AdminService;
+import com.example.api_v01.service.user_service.UserService;
 import com.example.api_v01.utils.ATMMovement;
 import com.example.api_v01.utils.ExceptionMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +27,7 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
 
     private final ATMRepository atmRepository;
     private final AdminService adminService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public AtmResponseDTO saveATM(UUID id_admin, AtmResponseDTO atm) throws NotFoundException { //Funciona Bien
@@ -33,9 +38,20 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
 
     @Override
     public AtmResponseDTO assingUserATM(UUID id_atm, RegisterAtmUserDTO atm) throws NotFoundException { //Funciona bien
+
         ATM atmOptional = atmRepository.findById(id_atm)
                 .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
-        ATM savedATM = atmRepository.save(ATMMovement.AssignUser(atmOptional,atm));
+
+        User user = User.builder()
+                .role(Rol.ATM)
+                .username(atm.getUsername())
+                .password(passwordEncoder.encode(atm.getPassword()))
+                .build();
+
+        atmOptional.setUser_atm(user);
+
+        ATM savedATM = atmRepository.save(atmOptional);
+
         return ATMMovement.convertToResponseDTO(savedATM); //transform
     }
 
@@ -76,6 +92,13 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
     @Override
     public AtmDTO getAtmByName(String name) throws NotFoundException {
         ATM atm = atmRepository.findByNameAtm(name)
+                .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
+        return ATMMovement.convertToDTO(atm);
+    }
+
+    @Override
+    public AtmDTO getAtmByUser(UUID id_user) throws NotFoundException {
+        ATM atm = atmRepository.findByIdUser(id_user)
                 .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
         return ATMMovement.convertToDTO(atm);
     }

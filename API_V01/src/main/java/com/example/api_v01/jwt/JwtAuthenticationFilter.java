@@ -1,6 +1,6 @@
 package com.example.api_v01.jwt;
 
-import com.example.api_v01.service.user_service.UserServiceImp;
+import com.example.api_v01.service.user_service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,12 +20,12 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
-    private final UserServiceImp userServiceImp;
+    private final UserService userService;
 
     @Autowired
-    public JwtAuthenticationFilter(JwtUtils jwtUtils, UserServiceImp userServiceImp) {
+    public JwtAuthenticationFilter(JwtUtils jwtUtils, UserService userService) {
         this.jwtUtils = jwtUtils;
-        this.userServiceImp = userServiceImp;
+        this.userService = userService;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            UserDetails userDetails = userServiceImp.loadUserByUsername(username);
+            UserDetails userDetails = userService.loadUserByUsername(username);
 
             if(jwtUtils.validateToken(jwtToken, userDetails)){
                 //Extrae rol del token

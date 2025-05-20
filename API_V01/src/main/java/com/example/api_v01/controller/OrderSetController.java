@@ -33,7 +33,7 @@ public class OrderSetController { //CONTROLADOR TESTEADO, LISTO PARA USAR
         Tuple<OrderSetResponseDTO, UUID>tuple = orderSetOrchestratorService.saveCompleteOrderSet(id_arching,nameClient,orders);
         URI location = UriGeneric.GenereURI("/orderSet/{id_orderSet}",tuple.getSecond());
         SuccessMessage<?>successMessage=SuccessMessage.builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Se guardo la lista de ordenes correctamente")
                 .data(tuple.getFirst())
                 .build();
@@ -44,7 +44,7 @@ public class OrderSetController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     @GetMapping("/{id_orderSet}")
     public ResponseEntity<?> getOrderSet(@PathVariable UUID id_orderSet) throws NotFoundException {
         SuccessMessage<?>successMessage=SuccessMessage.builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Lista de cliente encontrada")
                 .data(orderSetOrchestratorService.getOrderSetDTO(id_orderSet))
                 .build();
@@ -55,7 +55,7 @@ public class OrderSetController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     @GetMapping("/list/ByArching/{id_arching}")
     public ResponseEntity<?> getListOrderSetByArching(@PathVariable UUID id_arching) throws NotFoundException {
         SuccessMessage<?>successMessage=SuccessMessage.builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Lista de cliente encontrada")
                 .data(orderSetOrchestratorService.findOrderSetByArching(id_arching))
                 .build();
@@ -66,7 +66,7 @@ public class OrderSetController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     @GetMapping("/list/ByNameCustomer/{name_client}")
     public ResponseEntity<?> getListOrderSetByCustomer(@PathVariable String name_client) throws NotFoundException {
         SuccessMessage<?>successMessage=SuccessMessage.builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Lista de cliente encontrada")
                 .data(orderSetOrchestratorService.findOrderSetByCustomer(name_client))
                 .build();

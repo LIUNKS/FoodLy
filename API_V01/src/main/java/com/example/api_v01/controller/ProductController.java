@@ -30,7 +30,7 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
     @GetMapping("/list/category")
     public ResponseEntity<?> getAllProductsByCategory(@RequestParam Category category) throws NotFoundException{
         SuccessMessage <List<ProductDTO>> successMessage = SuccessMessage.<List<ProductDTO>>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Lista de productos por categoria")
                 .data(productService.getProductByCategory(category))
                 .build();
@@ -40,7 +40,7 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
     @GetMapping("/list/name")
     public ResponseEntity<?> getAllProductsByName(@RequestParam String name) throws NotFoundException {
         SuccessMessage <List<ProductDTO>> successMessage = SuccessMessage.<List<ProductDTO>>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Lista de productos por nombre")
                 .data(productService.getProductByName(name))
                 .build();
@@ -51,7 +51,7 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
     @GetMapping("/list")
     public ResponseEntity<?> getAllProducts() {
         SuccessMessage<List<ProductDTO>> successMessage = SuccessMessage.<List<ProductDTO>>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("La lista de productos")
                 .data(productService.getProducts())
                 .build();
@@ -62,7 +62,7 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
     @GetMapping("/{id_product}")
     public ResponseEntity<?> getProduct(@PathVariable UUID id_product) throws NotFoundException {
         SuccessMessage<ProductDTO> successMessage = SuccessMessage.<ProductDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Producto encontrado!!")
                 .data(productService.getProductDTO(id_product))
                 .build();
@@ -82,7 +82,7 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
     public ResponseEntity<?> updateProduct(@PathVariable UUID id_product, @RequestBody ProductResponseDTO productDTO) throws NotFoundException {
         ProductResponseDTO updateProduct = productService.updateProduct(id_product, productDTO);
         SuccessMessage<ProductResponseDTO> successMessage = SuccessMessage.<ProductResponseDTO>builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.OK.value())
                 .message("Producto Actualizado correctamente!!")
                 .data(updateProduct)
                 .build();
@@ -98,7 +98,7 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
                 product.getSecond()
         );
         SuccessMessage<ProductResponseDTO> successMessage = SuccessMessage.<ProductResponseDTO>builder()
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.CREATED.value())
                 .message("Producto creado correctamente!!")
                 .data(product.getFirst())
                 .build();
