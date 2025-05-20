@@ -93,9 +93,13 @@ public class BoxServiceImp implements BoxService, ExceptionMessage {
 
 
     @Override
-    public BoxWithAtmDTO assignAtmToBox(UUID id_box, UUID id_atm) throws NotFoundException {
+    public BoxWithAtmDTO assignAtmToBox(UUID id_box, UUID id_atm) throws NotFoundException,BadRequestException {
 
         ATM atm = atmService.getAtmEntityById(id_atm);
+
+        if(atm.getUser_atm()==null){
+            throw new BadRequestException("El atm necesita un user para ser asignado a una caja");
+        }
 
         Box box = boxRepository.findById(id_box)
                 .orElseThrow( () -> new NotFoundException(BOX_NOT_FOUND));

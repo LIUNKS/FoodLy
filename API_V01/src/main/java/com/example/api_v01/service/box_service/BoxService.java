@@ -18,7 +18,7 @@ public interface BoxService {
 
     BoxWithArchingDTO toggleBoxDeactivationStatus (UUID id_box, UUID id_arching) throws NotFoundException, BadRequestException;
 
-    BoxWithAtmDTO assignAtmToBox(UUID id_box, UUID id_atm) throws NotFoundException;
+    BoxWithAtmDTO assignAtmToBox(UUID id_box, UUID id_atm) throws NotFoundException,BadRequestException;
 
     BoxDTO getBoxInfo(UUID boxId) throws NotFoundException;
 

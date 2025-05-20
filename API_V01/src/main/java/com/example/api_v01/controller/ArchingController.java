@@ -22,8 +22,6 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
 
 
     private final ArchingService archingService;
-    private final ArchingProcessOrderSet archingProcessOrderSet;
-
     // Retorna todos los Arching
     @GetMapping("/list")
     public ResponseEntity<?> getAllArching() {

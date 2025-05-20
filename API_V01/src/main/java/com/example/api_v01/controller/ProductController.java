@@ -10,6 +10,7 @@ import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.enums.Category;
 import com.example.api_v01.utils.Tuple;
 import com.example.api_v01.utils.UriGeneric;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +19,10 @@ import com.example.api_v01.service.product_service.ProductService;
 
 @RestController
 @RequestMapping("product")
+@RequiredArgsConstructor
 public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     private final ProductService productService;
-
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
 
     //Busca todos los productos por categoria
     @GetMapping("/list/category")

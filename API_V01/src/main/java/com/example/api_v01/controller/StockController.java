@@ -9,6 +9,7 @@ import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.enums.Category;
 import com.example.api_v01.service.product_stock_service.ProductStockService;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,15 +19,12 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("stock")
+@RequiredArgsConstructor
 public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     private final ProductStockService productStockService;
 
-    public StockController(ProductStockService productStockService) {
-        this.productStockService = productStockService;
-    }
-
-    //Hubieron algunos cambios aqui
+    //Me devulve la lista de stock con los nombre del producto al que pertenecen
     @GetMapping("/list")
     public ResponseEntity<?> getAllStocks() {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()
@@ -37,6 +35,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
         return ResponseEntity.ok(successMessage);
     }
 
+    //Me devulve la lista de stock con los nombre del producto al que pertenecen por la categoria del producto
     @GetMapping("/list/category")
     public ResponseEntity<?> getAllStocksCategory(@RequestParam Category category) throws NotFoundException {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()
@@ -47,6 +46,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
         return ResponseEntity.ok(successMessage);
     }
 
+    //Me devulve la lista de stock con los nombre del producto al que pertenecen por el nombre del producto
     @GetMapping("/list/nameProduct")
     public ResponseEntity<?> getAllStocksNameProduct(@RequestParam String nameProduct) throws NotFoundException {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()
@@ -57,6 +57,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
         return ResponseEntity.ok(successMessage);
     }
 
+    //me devulve un stock con el nombre del producto al que pertenecen mediante el ID del stock
     @GetMapping("/{id_stock}")
     public ResponseEntity<?> getStock(@PathVariable UUID id_stock) throws NotFoundException {
         ProductWithStockDTO productStock = productStockService.getProductStockById(id_stock);
@@ -68,6 +69,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
         return ResponseEntity.ok(successMessage);
     }
 
+    //limpia el stock a 0 pasandole el id del stock
     @PostMapping("/clean/{id_stock}")
     public ResponseEntity<?> cleanStock(@PathVariable UUID id_stock) throws NotFoundException {
         ProductWithStockDTO stock = productStockService.cleanStockById(id_stock);
@@ -79,6 +81,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
         return ResponseEntity.ok().body(successMessage);
     }
 
+    //me descuenta cierta cantidad de un producto pasandole un dto
     @PostMapping("/discount")
     public ResponseEntity<?> discountStock(@RequestBody StockChangeRequestDTO stockChangeRequestDTO) throws NotFoundException,BadRequestException {
         ProductWithStockDTO stock = productStockService.discountStockById(stockChangeRequestDTO);
@@ -90,6 +93,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
         return ResponseEntity.ok().body(successMessage);
     }
 
+    //me aumenta una cierta cantidad de un producto pasandole un dto
     @PostMapping("/increase")
     public ResponseEntity<?> increaseStock(@RequestBody StockChangeRequestDTO stockChangeRequestDTO) throws NotFoundException{
         ProductWithStockDTO stock = productStockService.increaseStockById(stockChangeRequestDTO);
