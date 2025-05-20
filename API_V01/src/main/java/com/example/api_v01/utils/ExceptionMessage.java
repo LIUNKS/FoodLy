@@ -18,4 +18,5 @@ public interface ExceptionMessage {
     final String CATEGORY_NOT_FOUND = "El categoria no encontrado";
     final String NAME_PRODUCT_NOT_FOUND = "Ninguno producto coincide con este nombre";
     final String IS_EMPTY_LIST_ORDER_SET = "No se puede guardar el orderSet si su lista de productos a ordenar esta vacia";
+    final String ARCHING_FINISHED = "El arqueo que quiere asignar dejo de estar activo,Ya no puede ser usado";
 }

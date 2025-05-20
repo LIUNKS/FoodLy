@@ -78,6 +78,8 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
 
 
 
+
+
     //Cambiar el tipo de DTO (No deberia tener ID)
     //actualiza el producto
     @PatchMapping("/{id_product}")

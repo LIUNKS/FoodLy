@@ -10,6 +10,8 @@ import java.util.UUID;
 
 public interface OrderSetService {
 
+    OrderSet save(OrderSet orderSet);
+
     //Se utiliza para un servico,No para controlador
     OrderSet saveBaseOrderSet(UUID id_arching, String name_cliente) throws NotFoundException, BadRequestException;
 

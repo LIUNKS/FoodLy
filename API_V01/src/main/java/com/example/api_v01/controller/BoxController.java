@@ -1,12 +1,9 @@
 package com.example.api_v01.controller;
 
 import com.example.api_v01.dto.entityLike.BoxDTO;
-import com.example.api_v01.dto.response.BoxNameDTO;
-import com.example.api_v01.dto.response.BoxResponseDTO;
-import com.example.api_v01.dto.response.BoxWithAtmDTO;
-import com.example.api_v01.dto.response.SuccessMessage;
+import com.example.api_v01.dto.response.*;
+import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
-import com.example.api_v01.model.Box;
 import com.example.api_v01.service.box_service.BoxService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +14,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("box")
-public class BoxController {
+public class BoxController { //CONTROLADOR LISTO PARA USAR
 
     private final BoxService boxservice;
 
@@ -25,7 +22,6 @@ public class BoxController {
         this.boxservice = boxservice;
     }
 
-    //Agregarle URI a saveBox (Faltante) para sabe donde esta ubicado (Usar UriGenric es un utils del proyecto propio)
 
     @PostMapping("/{id_admin}")
     public ResponseEntity<?> saveBox(@PathVariable("id_admin") UUID id_admin, @RequestBody BoxNameDTO boxDTO) throws NotFoundException {
@@ -37,7 +33,7 @@ public class BoxController {
         return ResponseEntity.ok().body(successMessage);
     }
 
-    @PutMapping("/{id_box}/assign-atm/{id_atm}")
+    @PostMapping("/{id_box}/assign-atm/{id_atm}")
     public ResponseEntity<?> assignAtmToBox(@PathVariable("id_box") UUID id_box, @PathVariable("id_atm") UUID id_atm) throws NotFoundException {
         SuccessMessage<BoxWithAtmDTO>successMessage = SuccessMessage.<BoxWithAtmDTO>builder()
                 .status(HttpStatus.OK)
@@ -57,6 +53,26 @@ public class BoxController {
         return ResponseEntity.ok().body(successMessage);
     }
 
+    @PostMapping("off-box/{id_box}/arching/{id_arching}")
+    public ResponseEntity<?> OffBox(@PathVariable("id_box") UUID id_box,@PathVariable UUID id_arching) throws NotFoundException, BadRequestException {
+        SuccessMessage<BoxWithArchingDTO>successMessage = SuccessMessage.<BoxWithArchingDTO>builder()
+                .status(HttpStatus.OK)
+                .message("La caja se ha cerrado")
+                .data(boxservice.toggleBoxDeactivationStatus(id_box,id_arching))
+                .build();
+        return ResponseEntity.ok().body(successMessage);
+    }
+
+    @PostMapping("on-box/{id_box}")
+    public ResponseEntity<?> OnBox(@PathVariable("id_box") UUID id_box,@RequestBody ArchingInitDTO archingInitDTO) throws NotFoundException, BadRequestException {
+        SuccessMessage<BoxResponseWithArchingDTO>successMessage = SuccessMessage.<BoxResponseWithArchingDTO>builder()
+                .status(HttpStatus.OK)
+                .message("La caja se ha abierto")
+                .data(boxservice.toggleBoxActiveStatus(id_box,archingInitDTO))
+                .build();
+        return ResponseEntity.ok().body(successMessage);
+    }
+
     @GetMapping("/list")
     public ResponseEntity<?> getBoxes() {
         SuccessMessage<List<BoxDTO>>successMessage = SuccessMessage.<List<BoxDTO>>builder()
@@ -67,6 +83,7 @@ public class BoxController {
         return ResponseEntity.ok().body(successMessage);
     }
 
+
     @GetMapping("/by-atm/{id_atm}")
     public ResponseEntity<?> getBoxesByAtm(@PathVariable("id_atm") UUID id_atm) throws NotFoundException {
         SuccessMessage<List<BoxDTO>>successMessage = SuccessMessage.<List<BoxDTO>>builder()
@@ -76,4 +93,6 @@ public class BoxController {
                 .build();
         return ResponseEntity.ok().body(successMessage);
     }
+
+
 }

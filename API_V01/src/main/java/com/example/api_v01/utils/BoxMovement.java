@@ -2,14 +2,13 @@ package com.example.api_v01.utils;
 
 import com.example.api_v01.dto.entityLike.AtmDTO;
 import com.example.api_v01.dto.entityLike.BoxDTO;
-import com.example.api_v01.dto.response.BoxNameDTO;
-import com.example.api_v01.dto.response.BoxResponseDTO;
-import com.example.api_v01.dto.response.BoxWithAtmDTO;
+import com.example.api_v01.dto.response.*;
 import com.example.api_v01.model.Admin;
 import com.example.api_v01.model.Box;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public class BoxMovement {
     public static List<BoxDTO>CreateListBoxDTO(List<Box> boxes){
@@ -38,6 +37,34 @@ public class BoxMovement {
                 .is_open(box.getIs_open())
                 .build();
     }
+
+
+    public static BoxResponseWithArchingDTO CreateBoxResponseDTO(Box box, UUID id_arching) {
+        return BoxResponseWithArchingDTO.builder()
+                .name_box(box.getName_box())
+                .is_open(box.getIs_open())
+                .id_arching(id_arching)
+                .build();
+    }
+
+    public static BoxWithArchingDTO CreateBoxWithArchingDTO(Box box, ArchingResponseDTO archingResponseDTO) {
+        return BoxWithArchingDTO.builder()
+                .box_name(box.getName_box())
+                .is_open(box.getIs_open())
+                .arching(
+                        ArchingTwoDTO.builder()
+                                .date(archingResponseDTO.getDate())
+                                .star_time(archingResponseDTO.getStar_time())
+                                .end_time(archingResponseDTO.getEnd_time())
+                                .init_amount(archingResponseDTO.getInit_amount())
+                                .final_amount(archingResponseDTO.getFinal_amount())
+                                .total_amount(archingResponseDTO.getTotal_amount())
+                                .build()
+                )
+                .build();
+    }
+
+
     public static BoxWithAtmDTO BoxAndATM(Box box) {
         return BoxWithAtmDTO.builder()
                 .name_box(box.getName_box())
