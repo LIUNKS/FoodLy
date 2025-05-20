@@ -2,6 +2,7 @@ package com.example.api_v01.service.order_set_service;
 
 
 import com.example.api_v01.dto.entityLike.OrderSetDTO;
+import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.Arching;
 import com.example.api_v01.model.OrderSet;
@@ -25,9 +26,19 @@ public class OrderSetServiceImp implements  OrderSetService, ExceptionMessage {
 
     //Lo utiliza para guardar el OrderSet junto con sus ordenes, es usado en un servicio aux
     //Se utiliza para un servicio no para controlador NO USAR EN CONTROLADOR
+
+
     @Override
-    public OrderSet saveBaseOrderSet(UUID id_arching, String name_client) throws NotFoundException {
+    public OrderSet save(OrderSet orderSet) {
+        return orderSetRepository.save(orderSet);
+    }
+
+    @Override
+    public OrderSet saveBaseOrderSet(UUID id_arching, String name_client) throws NotFoundException, BadRequestException {
         Arching arching = archingService.getArchingById(id_arching);
+        if(arching.getEnd_time()!=null){
+            throw new BadRequestException(ARCHING_FINISHED);
+        }
         return orderSetRepository.save(OrderSetMovement.CreateOrderSet(arching, name_client));
     }
 

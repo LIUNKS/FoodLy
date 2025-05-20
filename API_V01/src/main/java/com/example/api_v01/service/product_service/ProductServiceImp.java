@@ -31,7 +31,7 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
     @Override
     public Tuple<ProductResponseDTO,UUID> saveProduct(
             UUID id_admin,
-            ProductDTO productDTO
+            ProductResponseDTO productDTO
     ) throws NotFoundException {
         Admin admin = adminService.findById(id_admin);
         Product productAdd = productRepository.save(ProductMovement.createProductAndStock(admin,productDTO));
@@ -70,7 +70,7 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
     };
 
     @Override
-    public ProductResponseDTO updateProduct(UUID id, ProductDTO productDTO) throws NotFoundException {
+    public ProductResponseDTO updateProduct(UUID id, ProductResponseDTO productDTO) throws NotFoundException {
         Optional<Product> product = productRepository.findById(id);
         if(!product.isPresent()){
             throw new NotFoundException(PRODUCT_NOT_FOUND);

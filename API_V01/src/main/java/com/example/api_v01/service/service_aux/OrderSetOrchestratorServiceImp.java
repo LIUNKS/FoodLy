@@ -47,9 +47,15 @@ public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorServi
                     customerOrderDTO.getCount()
             );
         }
+
         Double totalAmount = customerOrderService.TotalAmountOrderSet(orderSet.getId_order_set());
+
         orderSet.setTotal_order(totalAmount);
+
+        orderSet = orderSetService.save(orderSet);
+
         OrderSetResponseDTO responseDTO = OrderSetMovement.CreateOrderSetResponseDTO(orderSet);
+
         return new Tuple<>(responseDTO, orderSet.getId_order_set());
     }
 

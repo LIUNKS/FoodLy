@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public interface ProductService {
 
-    Tuple saveProduct(UUID id_admin, ProductDTO product) throws NotFoundException;
+    Tuple saveProduct(UUID id_admin, ProductResponseDTO product) throws NotFoundException;
 
     void deleteProduct(UUID id) throws NotFoundException;
 
@@ -24,7 +24,7 @@ public interface ProductService {
 
     Product getProduct(UUID id) throws NotFoundException;
 
-    ProductResponseDTO updateProduct(UUID id, ProductDTO productDTO) throws NotFoundException;
+    ProductResponseDTO updateProduct(UUID id, ProductResponseDTO productDTO) throws NotFoundException;
 
     List<ProductDTO> getProductByCategory(Category categoria) throws NotFoundException;
 

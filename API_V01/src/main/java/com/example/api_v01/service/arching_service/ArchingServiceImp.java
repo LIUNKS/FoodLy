@@ -5,13 +5,16 @@ import com.example.api_v01.dto.response.ArchingInitDTO;
 import com.example.api_v01.dto.response.ArchingResponseDTO;
 import com.example.api_v01.dto.response.ArchingWithAtmDTO;
 import com.example.api_v01.dto.response.ArchingWithBoxDTO;
+import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.Arching;
 import com.example.api_v01.model.Box;
 import com.example.api_v01.repository.ArchingRepository;
+import com.example.api_v01.repository.BoxRepository;
 import com.example.api_v01.service.box_service.BoxService;
 import com.example.api_v01.utils.ArchingMovement;
 import com.example.api_v01.utils.ExceptionMessage;
+import com.example.api_v01.utils.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +27,7 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
 
     private final ArchingRepository archingRepository;
 
-    private final BoxService boxService;
+    private final BoxRepository boxRepository;
 
     //Se usa en un servicio auxiliar para la logica no borrar
     @Override
@@ -39,13 +42,25 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
                 .orElseThrow(()-> new NotFoundException(ARCHING_NOT_FOUND));
     }
 
+
+
+
+
+
     //Servicio para guardar el arqueo
     @Override
-    public ArchingResponseDTO saveArchingResponseDTO(UUID id_box, ArchingInitDTO archingInitDTO) throws NotFoundException {
-        Box box = boxService.getBox(id_box);
+    public Tuple<ArchingResponseDTO,UUID> saveArchingResponseDTO(UUID id_box, ArchingInitDTO archingInitDTO) throws NotFoundException, BadRequestException {
+        Box box = boxRepository.findById(id_box).orElseThrow(()-> new NotFoundException(BOX_NOT_FOUND));
+        if(!box.getIs_open()){
+            throw new BadRequestException("La caja debe estar abierta antes de asignarle un arqueo");
+        }
         Arching arching = archingRepository.save(ArchingMovement.CreateArchingInit(box,archingInitDTO)) ;
-        return ArchingMovement.CreateArchingResponseDTO(arching);
+        return new Tuple<>(ArchingMovement.CreateArchingResponseDTO(arching),arching.getId_arching());
     }
+
+
+
+
 
     //Me trae todos los arqueos
     @Override

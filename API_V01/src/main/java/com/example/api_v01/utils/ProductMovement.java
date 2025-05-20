@@ -35,7 +35,7 @@ public class ProductMovement {
                 .build();
     }
 
-    public static Product createProductAndStock (Admin admin,ProductDTO productDTO) {
+    public static Product createProductAndStock (Admin admin,ProductResponseDTO productDTO) {
         ProductStock stock = ProductStock.builder()
                 .ini_stock(0)
                 .current_stock(0)
@@ -51,7 +51,7 @@ public class ProductMovement {
                 .build();
     }
 
-    public static Product ValidateProduct(Product existingProduct,ProductDTO productDTO) {
+    public static Product ValidateProduct(Product existingProduct,ProductResponseDTO productDTO) {
         if (productDTO.getName_product() != null) {existingProduct.setName_product(productDTO.getName_product());}
         if (productDTO.getPrice() != null) {existingProduct.setPrice(productDTO.getPrice());}
         if (productDTO.getAdditional_observation() != null) {existingProduct.setAdditional_observation(productDTO.getAdditional_observation());}

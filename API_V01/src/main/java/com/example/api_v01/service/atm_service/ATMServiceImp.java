@@ -68,6 +68,12 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
     }
 
     @Override
+    public ATM getAtmEntityById(UUID id_atm) throws NotFoundException {
+        return atmRepository.findById(id_atm)
+                .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
+    }
+
+    @Override
     public AtmDTO getAtmByName(String name) throws NotFoundException {
         ATM atm = atmRepository.findByNameAtm(name)
                 .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));

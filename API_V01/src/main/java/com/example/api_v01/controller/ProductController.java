@@ -77,11 +77,9 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
     }
 
 
-
-    //Cambiar el tipo de DTO (No deberia tener ID)
     //actualiza el producto
     @PatchMapping("/{id_product}")
-    public ResponseEntity<?> updateProduct(@PathVariable UUID id_product, @RequestBody ProductDTO productDTO) throws NotFoundException {
+    public ResponseEntity<?> updateProduct(@PathVariable UUID id_product, @RequestBody ProductResponseDTO productDTO) throws NotFoundException {
         ProductResponseDTO updateProduct = productService.updateProduct(id_product, productDTO);
         SuccessMessage<ProductResponseDTO> successMessage = SuccessMessage.<ProductResponseDTO>builder()
                 .status(HttpStatus.OK)
@@ -91,10 +89,9 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
         return ResponseEntity.ok(successMessage);
     }
 
-    //Cambiar el tipo de DTO (No deberia tener ID)
     //agrega un producto, necesita el ID del admin que lo va a agregar
     @PostMapping("/{id_admin}")
-    public ResponseEntity<?> CreateProduct(@PathVariable UUID id_admin,@RequestBody ProductDTO productDTO) throws NotFoundException {
+    public ResponseEntity<?> CreateProduct(@PathVariable UUID id_admin,@RequestBody ProductResponseDTO productDTO) throws NotFoundException {
         Tuple<ProductResponseDTO,UUID> product = productService.saveProduct(id_admin,productDTO);
         URI location = UriGeneric.GenereURI(
                 "/product/{id_product}",
@@ -107,4 +104,6 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
                 .build();
         return ResponseEntity.created(location).body(successMessage);
     }
+
+
 }

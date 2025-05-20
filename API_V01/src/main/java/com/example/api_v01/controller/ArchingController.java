@@ -2,6 +2,7 @@ package com.example.api_v01.controller;
 
 import com.example.api_v01.dto.entityLike.ArchingDTO;
 import com.example.api_v01.dto.response.*;
+import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.service.arching_service.ArchingService;
 import com.example.api_v01.service.service_aux.ArchingProcessOrderSet;
@@ -15,42 +16,16 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("Arching")
+@RequestMapping("arching")
 @RequiredArgsConstructor
-public class ArchingController {
+public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
 
-    //Implementar todos los servicios del aqueo.
-    //¡También del servicio auxiliar ArchingProcessOrderSet su metodo closeArching es importante!!!
-    //Seguir la sintaxis requeridad de para todos los controladores usando SuccessMessage para cada EndPoint
-    //No olvidar agregarle el URI al metodo que guarda el arching,es para saber donde esta ubicado
-    //(Usar UriGenric es un utils del proyecto propio)
 
     private final ArchingService archingService;
     private final ArchingProcessOrderSet archingProcessOrderSet;
 
-    // Endpoint para guardar un nuevo Arching
-    @PostMapping
-    public ResponseEntity<?> saveArching(
-            @RequestParam UUID id_box,
-            @RequestBody ArchingInitDTO archingInitDTO
-    ) throws NotFoundException {
-        ArchingResponseDTO response = archingService.saveArchingResponseDTO(id_box, archingInitDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                new SuccessMessage<>(HttpStatus.CREATED, "Arching guardado correctamente", response)
-        );
-    }
-
-
-
-
-
-
-
-
-
-
     // Retorna todos los Arching
-    @GetMapping
+    @GetMapping("/list")
     public ResponseEntity<?> getAllArching() {
         List<ArchingDTO> response = archingService.getAllArching();
         return ResponseEntity.ok(
@@ -112,18 +87,5 @@ public class ArchingController {
                 new SuccessMessage<>(HttpStatus.OK, "Listado de Arching por nombre de Box obtenido correctamente", response)
         );
     }
-
-    // Endpoint del servicio auxiliar para cerrar un Arching
-    @PostMapping("/{id_arching}/close")
-    public ResponseEntity<?> closeArching(
-            @PathVariable UUID id_arching
-    ) throws NotFoundException {
-        ArchingResponseDTO response = archingProcessOrderSet.closeArching(id_arching);
-        return ResponseEntity.ok(
-                new SuccessMessage<>(HttpStatus.OK, "Arching cerrado correctamente", response)
-        );
-    }
-
-
 
 }

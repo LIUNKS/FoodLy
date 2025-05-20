@@ -2,9 +2,7 @@ package com.example.api_v01.service.box_service;
 
 import com.example.api_v01.dto.entityLike.AtmDTO;
 import com.example.api_v01.dto.entityLike.BoxDTO;
-import com.example.api_v01.dto.response.BoxNameDTO;
-import com.example.api_v01.dto.response.BoxResponseDTO;
-import com.example.api_v01.dto.response.BoxWithAtmDTO;
+import com.example.api_v01.dto.response.*;
 import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.ATM;
@@ -12,10 +10,13 @@ import com.example.api_v01.model.Admin;
 import com.example.api_v01.model.Box;
 import com.example.api_v01.repository.BoxRepository;
 import com.example.api_v01.service.admin_service.AdminService;
+import com.example.api_v01.service.arching_service.ArchingService;
 import com.example.api_v01.service.atm_service.ATMService;
+import com.example.api_v01.service.service_aux.ArchingProcessOrderSet;
 import com.example.api_v01.utils.ATMMovement;
 import com.example.api_v01.utils.BoxMovement;
 import com.example.api_v01.utils.ExceptionMessage;
+import com.example.api_v01.utils.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,8 @@ public class BoxServiceImp implements BoxService, ExceptionMessage {
     private final ATMService atmService;
     private final AdminService adminService;
 
+    private final ArchingProcessOrderSet archingProcessOrderSet;
+
     @Override
     public BoxResponseDTO saveBox(UUID id_admin, BoxNameDTO box) throws NotFoundException {
         Admin admin = adminService.findById(id_admin);
@@ -39,35 +42,60 @@ public class BoxServiceImp implements BoxService, ExceptionMessage {
     }
 
     @Override
-    public BoxResponseDTO toggleBoxActiveStatus(UUID id_box) throws NotFoundException, BadRequestException {
+    public BoxResponseWithArchingDTO toggleBoxActiveStatus(UUID id_box, ArchingInitDTO archingInitDTO) throws NotFoundException, BadRequestException {
+
         Box box = boxRepository.findById(id_box)
                 .orElseThrow( () -> new NotFoundException(BOX_NOT_FOUND));
+
         if(box.getIs_open() == true) {
             throw new BadRequestException(BOX_OPEN);
         }
+
         box.setIs_open(true);
+
         boxRepository.save(box);
-        return BoxMovement.CreateBoxResponseDTO(box);
+
+        Tuple <ArchingResponseDTO,UUID> tuple = archingProcessOrderSet.saveArchingResponseDTO(id_box,archingInitDTO);
+
+        return BoxMovement.CreateBoxResponseDTO(box,tuple.getSecond());
+
     }
 
+
+
     @Override
-    public BoxResponseDTO toggleBoxDeactivationStatus(UUID id_box) throws NotFoundException, BadRequestException {
+    public BoxWithArchingDTO toggleBoxDeactivationStatus(UUID id_box,UUID id_arching) throws NotFoundException, BadRequestException {
+
         Box box = boxRepository.findById(id_box)
                 .orElseThrow( () -> new NotFoundException(BOX_NOT_FOUND));
+
         if(box.getIs_open() == false) {
             throw new BadRequestException(BOX_CLOSE);
         }
+
         box.setIs_open(false);
-        boxRepository.save(box);
-        return BoxMovement.CreateBoxResponseDTO(box);
+
+        box = boxRepository.save(box);
+
+        ArchingResponseDTO archingResponseDTO = archingProcessOrderSet.closeArching(id_arching);
+
+        return BoxMovement.CreateBoxWithArchingDTO(box,archingResponseDTO);
     }
+
+
+
+
+
+
+
+
+
+
 
     @Override
     public BoxWithAtmDTO assignAtmToBox(UUID id_box, UUID id_atm) throws NotFoundException {
 
-        AtmDTO atmDTO = atmService.getAtmById(id_atm);
-
-        ATM atm = ATMMovement.convertDTOToATM(atmDTO); //CONVERSION CENTRALIZADA
+        ATM atm = atmService.getAtmEntityById(id_atm);
 
         Box box = boxRepository.findById(id_box)
                 .orElseThrow( () -> new NotFoundException(BOX_NOT_FOUND));

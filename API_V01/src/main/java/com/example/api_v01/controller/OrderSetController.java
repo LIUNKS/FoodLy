@@ -21,21 +21,17 @@ import java.util.UUID;
 @RestController
 @RequestMapping("orderSet")
 @RequiredArgsConstructor
-public class OrderSetController {
+public class OrderSetController { //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     private final OrderSetOrchestratorService orderSetOrchestratorService;
 
+    //Guardar el nombre del cliente y la lista de pedidos de este en un orderSet pasandole el id del arching y el DTO SaveOrderSetListCustomerDTO
     @PostMapping("/{id_arching}")
-    public ResponseEntity<?> saveOrderSet(@PathVariable UUID id_arching, SaveOrderSetListCustomerDTO NameClientWithListOrdes) throws NotFoundException, BadRequestException {
-
+    public ResponseEntity<?> saveOrderSet(@PathVariable UUID id_arching,@RequestBody SaveOrderSetListCustomerDTO NameClientWithListOrdes) throws NotFoundException, BadRequestException {
         String nameClient = NameClientWithListOrdes.getName_cliente();
-
         List<CustomerOrderDTO> orders = NameClientWithListOrdes.getOrders();
-
         Tuple<OrderSetResponseDTO, UUID>tuple = orderSetOrchestratorService.saveCompleteOrderSet(id_arching,nameClient,orders);
-
         URI location = UriGeneric.GenereURI("/orderSet/{id_orderSet}",tuple.getSecond());
-
         SuccessMessage<?>successMessage=SuccessMessage.builder()
                 .status(HttpStatus.OK)
                 .message("Se guardo la lista de ordenes correctamente")
@@ -44,6 +40,7 @@ public class OrderSetController {
         return ResponseEntity.created(location).body(successMessage);
     }
 
+    //Me devuelve los pedidos mediante el id del OrderSet
     @GetMapping("/{id_orderSet}")
     public ResponseEntity<?> getOrderSet(@PathVariable UUID id_orderSet) throws NotFoundException {
         SuccessMessage<?>successMessage=SuccessMessage.builder()
@@ -54,7 +51,8 @@ public class OrderSetController {
         return ResponseEntity.ok(successMessage);
     }
 
-    @GetMapping("/{id_arching}")
+    //Me devuelve la lista de pedidos mediante el id del arqueo que los registro
+    @GetMapping("/list/ByArching/{id_arching}")
     public ResponseEntity<?> getListOrderSetByArching(@PathVariable UUID id_arching) throws NotFoundException {
         SuccessMessage<?>successMessage=SuccessMessage.builder()
                 .status(HttpStatus.OK)
@@ -64,7 +62,8 @@ public class OrderSetController {
         return ResponseEntity.ok(successMessage);
     }
 
-    @GetMapping("/{name_client}")
+    //Me devuelve la lista de pedidos de un cliente mediante su nombre
+    @GetMapping("/list/ByNameCustomer/{name_client}")
     public ResponseEntity<?> getListOrderSetByCustomer(@PathVariable String name_client) throws NotFoundException {
         SuccessMessage<?>successMessage=SuccessMessage.builder()
                 .status(HttpStatus.OK)
