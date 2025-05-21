@@ -48,6 +48,7 @@ public class AuthService {
             AdminDTO adminDTO = adminService.findAdminByUser(user.getId_user());
             return AuthResponse.<AdminDTO>builder()
                     .token(jwt)
+                    .role(user.getRole())
                     .data(adminDTO)
                     .build();
         }
@@ -56,6 +57,7 @@ public class AuthService {
             AtmDTO atmDTO = atmService.getAtmByUser(user.getId_user());
             return AuthResponse.<AtmDTO>builder()
                     .token(jwt)
+                    .role(user.getRole())
                     .data(atmDTO)
                     .build();
         }
