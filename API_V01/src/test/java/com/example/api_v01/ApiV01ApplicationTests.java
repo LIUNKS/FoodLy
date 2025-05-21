@@ -32,19 +32,6 @@ class ApiV01ApplicationTests {
     //Solo se ejecuta una vez para quedar guardado en tu bd
     @Test
     void CrateAdmin() {
-//        User user = User.builder()
-//                .role(Rol.ADMIN)
-//                .username("admin123")
-//                .password("admin123")
-//                .build();
-//        Admin admin = Admin.builder()
-//                .name_admin("Ash Kechup")
-//                .email_admin("alss@gmail.com")
-//                .dni_admin("alss@gmail.com")
-//                .user_admin(user)
-//                .build();
-//        adminService.saveAdmin(admin);
-
         RegisterAdmin registerAdmin = RegisterAdmin.builder()
                 .username("admin123")
                 .password("admin123")
