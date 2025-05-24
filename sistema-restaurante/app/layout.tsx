@@ -1,7 +1,12 @@
+// app/layout.tsx
 import type React from "react"
 import type { Metadata } from "next"
 import { AuthProvider } from "@/context/AuthContext"
+import 'bootstrap/dist/css/bootstrap.min.css'
+import '@fortawesome/fontawesome-free/css/all.min.css'
 import "./globals.css"
+
+import Script from "next/script"
 
 export const metadata: Metadata = {
   title: {
@@ -18,18 +23,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <head>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-        <script
-          src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
-          async
-        ></script>
-      </head>
+      <head />
       <body>
         <AuthProvider>
           {children}
         </AuthProvider>
+
+        {/* ✅ Bootstrap JS dinámico en cliente */}
+        <Script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" strategy="afterInteractive"
+        />
       </body>
     </html>
   )

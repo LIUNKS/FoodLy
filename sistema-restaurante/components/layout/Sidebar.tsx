@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Sidebar() {
+  const pathname = usePathname(); // Obtener la ruta actual
   const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>(
     {}
   );
@@ -15,18 +17,26 @@ export default function Sidebar() {
     }));
   };
 
+  // Función para verificar si una ruta está activa
+  const isActive = (href: string) => pathname === href;
+
+  // Función para verificar si algún enlace del submenu está activo
+  const isSubmenuActive = (hrefs: string[]) => hrefs.some((href) => isActive(href));
+
   return (
     <div id="sidebar">
+      {/* Enlace de marca */}
       <Link href="/" className="brand-link">
         <i className="fa-2x fas fa-utensils"></i>
         <span>FoodLy</span>
       </Link>
 
       <ul>
+        {/* Menú: Caja */}
         <li>
           <a
             href="#"
-            className="active"
+            className={isSubmenuActive(["/arqueo", "/apertura-cierre"]) ? "active" : ""}
             onClick={(e) => {
               e.preventDefault();
               toggleSubmenu("Caja");
@@ -40,25 +50,30 @@ export default function Sidebar() {
             style={{ display: openSubmenus["Caja"] ? "block" : "none" }}
           >
             <li>
-              <Link href="/arqueo" className="active">
+              <Link href="/arqueo" className={isActive("/arqueo") ? "active" : ""}>
                 <i className="fa-regular fa-clipboard"></i> Arqueo
               </Link>
             </li>
             <li>
-              <Link href="/apertura-cierre">
+              <Link href="/apertura-cierre" className={isActive("/apertura-cierre") ? "active" : ""}>
                 <i className="fa-solid fa-box"></i> Apertura y cierre
               </Link>
             </li>
           </ul>
         </li>
+
+        {/* Menú: Pedido */}
         <li>
-          <Link href="/pedido">
+          <Link href="/pedido" className={isActive("/pedido") ? "active" : ""}>
             <i className="fa-solid fa-cart-shopping"></i> Pedido
           </Link>
         </li>
+
+        {/* Menú: Reportes */}
         <li>
           <a
             href="#"
+            className={isSubmenuActive(["/consolidados", "/graficos"]) ? "active" : ""}
             onClick={(e) => {
               e.preventDefault();
               toggleSubmenu("Reportes");
@@ -72,20 +87,23 @@ export default function Sidebar() {
             style={{ display: openSubmenus["Reportes"] ? "block" : "none" }}
           >
             <li>
-              <Link href="/consolidados">
+              <Link href="/consolidados" className={isActive("/consolidados") ? "active" : ""}>
                 <i className="fa-regular fa-chart-bar"></i> Consolidados
               </Link>
             </li>
             <li>
-              <Link href="/graficos">
+              <Link href="/graficos" className={isActive("/graficos") ? "active" : ""}>
                 <i className="fa-solid fa-chart-pie"></i>Gráficos
               </Link>
             </li>
           </ul>
         </li>
+
+        {/* Menú: Productos */}
         <li>
           <a
             href="#"
+            className={isSubmenuActive(["/productos", "/inventario"]) ? "active" : ""}
             onClick={(e) => {
               e.preventDefault();
               toggleSubmenu("Productos");
@@ -99,34 +117,42 @@ export default function Sidebar() {
             style={{ display: openSubmenus["Productos"] ? "block" : "none" }}
           >
             <li>
-              <Link href="/productos">
-                <i className="fa-regular fa-chart-bar"></i> Poroductos
+              <Link href="/productos" className={isActive("/productos") ? "active" : ""}>
+                <i className="fa-regular fa-chart-bar"></i> Productos
               </Link>
             </li>
             <li>
-              <Link href="/inventario">
+              <Link href="/inventario" className={isActive("/inventario") ? "active" : ""}>
                 <i className="fa-solid fa-chart-pie"></i>Inventario
               </Link>
             </li>
           </ul>
         </li>
+
+        {/* Menú: Empleados */}
         <li>
-          <Link href="/empleados">
+          <Link href="/empleados" className={isActive("/empleados") ? "active" : ""}>
             <i className="fa-solid fa-users"></i> Empleados
           </Link>
         </li>
+
+        {/* Menú: Cocina */}
         <li>
-          <Link href="/cocina">
+          <Link href="/cocina" className={isActive("/cocina") ? "active" : ""}>
             <i className="fa-solid fa-utensils"></i> Cocina
           </Link>
         </li>
+
+        {/* Menú: Logros */}
         <li>
-          <Link href="/logros">
+          <Link href="/logros" className={isActive("/logros") ? "active" : ""}>
             <i className="fa-solid fa-house"></i> Logros
           </Link>
         </li>
+
+        {/* Menú: Salir */}
         <li>
-          <Link href="/">
+          <Link href="/" className={isActive("/") ? "active" : ""}>
             <i className="fa-solid fa-right-from-bracket"></i> Salir
           </Link>
         </li>

@@ -8,6 +8,16 @@ interface LoginResponse {
     role: string;
   };
   redirectUrl: string;
+  
+  role: string;
+  data: {
+    id_admin: string;
+    name_admin: string;
+    email_admin: string;
+    dni_admin: string;
+  
+}
+
 }
 
 interface LoginCredentials {
@@ -20,7 +30,7 @@ export async function login(
 ): Promise<LoginResponse> {
   try {
     // Reemplaza esta URL con la URL real de tu API de Spring Boot
-    const response = await fetch("http://tu-api-spring-boot/api/auth/login", {
+    const response = await fetch("http://localhost:8080/api/v1.5/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -36,6 +46,7 @@ export async function login(
 
     // Parseamos la respuesta exitosa
     const data: LoginResponse = await response.json();
+    console.log("Respuesta del servidor:", data);
     return data;
   } catch (error) {
     console.error("Error en el servicio de autenticación:", error);

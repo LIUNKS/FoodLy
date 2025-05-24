@@ -222,7 +222,7 @@ body {
 }
 
 .table-responsive {
-  max-height: 300px;
+  max-height: 500px; /* 300px*/
   overflow-y: auto;
 }
 
