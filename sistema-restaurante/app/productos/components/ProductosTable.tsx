@@ -54,9 +54,13 @@ export default function ProductosTable() {
             if (formData.id_product) {
                 await updateProducto(formData.id_product, formData, token)
                 toast.success("Producto actualizado")
+                          // Actualizar producto en el estado
+                setProductos(prev => prev.map(p => p.id_product === formData.id_product ? { ...p, ...formData } : p))   
             } else {
                 await createProducto(formData as Producto, idAdmin, token)
                 toast.success("Producto creado")
+            // Agregar nuevo producto al estado
+            setProductos(prev => [...prev, { ...formData, id_product: Date.now() } as Producto])
             }
 
             // Cerrar modal después de guardar
@@ -113,7 +117,8 @@ export default function ProductosTable() {
                             <td>{i + 1}</td>
                             <td>{p.name_product}</td>
                             <td>{p.category}</td>
-                            <td>S/.{p.price?.toFixed(2)}</td>
+                            <td>S/.{Number(p.price)?.toFixed(2) ?? "0.00"}</td>
+
                             <td>
                                 <button className="btn btn-sm btn-outline-primary me-2" onClick={() => openModal(p)}>
                                     <i className="bi bi-pencil" /> Editar

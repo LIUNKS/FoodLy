@@ -15,6 +15,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
@@ -23,6 +24,7 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
+  token: null,
   login: async () => {},
   logout: () => {},
   isLoading: false,
@@ -35,20 +37,24 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const storedUser = Cookies.get("user");
+        const storedToken = localStorage.getItem("authToken"); // <-- cargar token
     if (storedUser) {
       setUser(JSON.parse(storedUser));
+          if (storedToken) setToken(storedToken);
     }
   }, []);
 
   const login = async (username: string, password: string) => {
     setIsLoading(true);
     setError(null);
+  
 
     try {
       const response = await loginService({ username, password });
@@ -63,6 +69,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       Cookies.set("user", JSON.stringify(userData), { expires: 7 });
       localStorage.setItem("authToken", response.token);
+      setToken(response.token);  // <-- guarda el token en el estado también
       setUser(userData);
 
       // Redirigir según el rol
@@ -87,7 +94,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading, error }}>
+    <AuthContext.Provider value={{ user,token, login, logout, isLoading, error }}>
       {children}
     </AuthContext.Provider>
   );
