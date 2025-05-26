@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import Cookies from "js-cookie"
 import useProductos from "../hooks/useProductos"
 import { Producto } from "../types/producto"
-import { createProducto, deleteProducto, updateProducto } from "../services/productoService"
+import { createProducto, deleteProducto, getAllProductos, updateProducto } from "../services/productoService"
 import DataTable from "@/components/common/DataTable"
 import ModalPortal from "@/components/common/ModalPortal"
 import { toast, ToastContainer } from "react-toastify"
@@ -54,18 +54,16 @@ export default function ProductosTable() {
             if (formData.id_product) {
                 await updateProducto(formData.id_product, formData, token)
                 toast.success("Producto actualizado")
-                          // Actualizar producto en el estado
-                setProductos(prev => prev.map(p => p.id_product === formData.id_product ? { ...p, ...formData } : p))   
             } else {
                 await createProducto(formData as Producto, idAdmin, token)
                 toast.success("Producto creado")
-            // Agregar nuevo producto al estado
-            setProductos(prev => [...prev, { ...formData, id_product: Date.now() } as Producto])
             }
 
             // Cerrar modal después de guardar
             const modalEl = document.getElementById("productoModal")
             modalEl && (window as any).bootstrap.Modal.getInstance(modalEl).hide()
+            const response = await getAllProductos(token)
+                setProductos(response.data.data)
         } catch {
             toast.error("Error al guardar producto")
         }
@@ -88,7 +86,8 @@ export default function ProductosTable() {
             try {
                 await deleteProducto(id, token)
                 toast.success("Producto eliminado")
-                setProductos(prev => prev.filter(p => p.id_product !== id))
+                  const response = await getAllProductos(token)
+                setProductos(response.data.data)
             } catch {
                 toast.error("Error al eliminar")
             }

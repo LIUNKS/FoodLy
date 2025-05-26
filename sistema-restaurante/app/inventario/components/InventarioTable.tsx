@@ -3,105 +3,132 @@
 import { useContext, useState } from "react"
 import useProductoStock from "../hooks/useProductoStock"
 import { ProductStock } from "../types/productoStok"
-import {
-  updateIncrementStockProduct,
-  updateDecrementStockProduct
-} from "../services/productStockService"
+import { updateIncrementStockProduct, updateDecrementStockProduct, resetStockProduct, getAllProductStock } from "../services/productStockService"
 import DataTable from "@/components/common/DataTable"
 import { toast, ToastContainer } from "react-toastify"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
 import "react-toastify/dist/ReactToastify.css"
-import StockModalContent from "./modals/StockModalContent"
 import { AuthContext } from "@/context/AuthContext"
 
 const MySwal = withReactContent(Swal)
 
+// Componente principal que muestra y gestiona el inventario de productos
 export default function InventarioTable() {
-  // Obtenemos el token del usuario desde el contexto de autenticación
+  // Obtener token de autenticación desde el contexto
   const { token } = useContext(AuthContext)
 
-  // Estados locales
+  // Estado para almacenar temporalmente los datos del producto en el modal
   const [formData, setFormData] = useState<Partial<ProductStock>>({})
+
+  // Estado para la cantidad a incrementar/decrementar
   const [cantidad, setCantidad] = useState<number>(0)
-  const [observacion, setObservacion] = useState<string>("")
+
+  // Tipo de operación: entrada o salida de stock
   const [modalType, setModalType] = useState<"increment" | "decrement">("increment")
+
+  // Control de visibilidad del modal
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  // Hook personalizado para obtener productos y gestionar estado de carga
+  // Hook personalizado para obtener los productos y su estado de carga
   const { productos, loading, setProductos } = useProductoStock(token)
 
   /**
-   * Abre el modal con los datos del producto y tipo de operación (entrada o salida)
-   * @param producto - Objeto del producto seleccionado
-   * @param type - Tipo de operación: "increment" o "decrement"
+   * Abre el modal con los datos del producto seleccionado y el tipo de operación (entrada o salida).
    */
   const openModal = (producto: ProductStock, type: "increment" | "decrement") => {
     setFormData(producto)
     setModalType(type)
-    setCantidad(0)
-    setObservacion("")
+    setCantidad(0) // Reinicia la cantidad al abrir el modal
     setIsModalOpen(true)
+  }
+  /**
+   * Actualiza la lista de productos después de realizar una operación de stock.
+   * Se llama después de cada operación para reflejar los cambios en la tabla.
+   */
+
+  /**
+   * Maneja la lógica de envío del modal para incrementar o decrementar stock.
+   */
+  const handleModalSubmit = async () => {
+    if (!token || !formData.product_stock?.id_Stock) {
+      toast.error("No se pudo procesar la solicitud. Falta información del producto o el token.")
+      return
+    }
+
+    if (cantidad <= 0) {
+      toast.warn("La cantidad debe ser mayor que cero.")
+      return
+    }
+
+    try {
+      if (modalType === "increment") {
+        await updateIncrementStockProduct(formData.product_stock.id_Stock, cantidad, token)
+        toast.success("Stock incrementado exitosamente.")
+                  // Actualizar tabla inventario con los cambios
+ 
+      } else {
+        // Validación para no decrementar más del stock disponible
+        if (formData.product_stock && cantidad > formData.product_stock.current_stock) {
+          toast.error("No puedes decrementar más stock del disponible.")
+          return
+        }
+        await updateDecrementStockProduct(formData.product_stock.id_Stock, cantidad, token)
+        toast.success("Stock decrementado exitosamente.")
+         // Actualizar tabla inventario con los cambios
+      }
+
+      // Cierra el modal después de la operación
+      setIsModalOpen(false)
+
+      // Actualiza localmente el estado del producto con los nuevos valores de stock
+         // ✅ Trae la lista actualizada desde la API
+    const response = await getAllProductStock(token)
+    setProductos(response.data.data)
+      
+    } catch (error) {
+      console.error("Error actualizando stock:", error)
+      toast.error("Error al actualizar el stock del producto.")
+    }
   }
 
   /**
-   * Maneja la lógica cuando el usuario hace clic en "Guardar" dentro del modal.
-   * Actualiza el stock del producto en base a la operación realizada.
-   * @param id_product_stock - ID del stock del producto
-   * @param cantidad - Cantidad a modificar
+   * Maneja la acción de resetear el stock de un producto después de confirmación del usuario.
    */
-const handleModalSubmit = async ( cantidad: number) => {
-  if (!token || !formData?.id_Stock) return
-console.log("is stock:", formData?.id_Stock);
-console.log("Cantidad ingresada:", cantidad);
-  try {
-    if (modalType === "increment") {
-      await updateIncrementStockProduct(
-        formData.id_Stock,
-        cantidad,
-        token
-      )
-      toast.success("Stock incrementado exitosamente.")
-    } else {
-      await updateDecrementStockProduct(
-        formData.id_Stock,
-        cantidad,
-        token
-      )
-      toast.success("Stock decrementado exitosamente.")
+const handleResetStock = async (id_stock: string) => {
+  if (!token) return
+
+  const confirm = await MySwal.fire({
+    title: "¿Resetear stock del producto?",
+    text: "Esta acción no se puede deshacer.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, resetear",
+    cancelButtonText: "Cancelar",
+  })
+
+  if (confirm.isConfirmed) {
+    try {
+      await resetStockProduct(id_stock, token)
+      toast.success("Stock reseteado correctamente")
+          // ✅ Trae la lista actualizada desde la API
+    const response = await getAllProductStock(token)
+    setProductos(response.data.data)
+    } catch {
+      toast.error("Error al resetear stock")
     }
-
-    setIsModalOpen(false)
-
-    const updatedProductos = productos.map((prod) =>
-      prod.product_stock.id_Stock === formData.id_Stock
-        ? {
-            ...prod,
-            product_stock: {
-              ...prod.product_stock,
-              current_stock:
-                prod.product_stock.current_stock +
-                (modalType === "increment" ? cantidad : -cantidad),
-            },
-          }
-        : prod
-    )
-
-    setProductos(updatedProductos)
-  } catch (error) {
-    console.error("Error actualizando stock:", error)
-    toast.error("Error al actualizar el stock del producto.")
   }
 }
 
 
   return (
     <div className="fade-in-up container-fluid">
+      {/* Encabezado de la vista */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="fw-bold">Gestión Inventario Productos</h2>
       </div>
 
-      {/* Tabla de productos con control de estados */}
+      {/* Tabla de productos usando componente reutilizable DataTable */}
       <DataTable
         headers={["#", "Producto", "Inventario Inicial", "Stock Actual", "Inventario Final", "Acciones"]}
         title="Listado de Productos"
@@ -123,18 +150,28 @@ console.log("Cantidad ingresada:", cantidad);
               <td>{p.product_stock.current_stock}</td>
               <td>{p.product_stock.total_sold}</td>
               <td>
-                {/* Botones para modificar stock */}
+                {/* Botón para entrada de stock */}
                 <button
                   className="btn btn-sm btn-outline-success me-2"
                   onClick={() => openModal(p, "increment")}
                 >
                   <i className="fa-solid fa-plus"></i> Entrada
                 </button>
+
+                {/* Botón para salida de stock */}
                 <button
                   className="btn btn-sm btn-outline-danger me-2"
                   onClick={() => openModal(p, "decrement")}
                 >
                   <i className="fa-solid fa-minus"></i> Salida
+                </button>
+
+                {/* Botón para resetear stock */}
+                <button
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={() => handleResetStock(p.product_stock.id_Stock)}
+                >
+                  <i className="bi bi-trash" /> Limpiar
                 </button>
               </td>
             </tr>
@@ -142,16 +179,53 @@ console.log("Cantidad ingresada:", cantidad);
         )}
       </DataTable>
 
-      {/* Modal para aumentar o disminuir stock */}
-      <StockModalContent
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        producto={formData}
-        tipo={modalType}
-        onSubmit={handleModalSubmit}
-      />
+      {/* Modal de entrada/salida de stock */}
+      {isModalOpen && formData && (
+        <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }} tabIndex={-1} role="dialog" aria-modal="true">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content shadow rounded-3">
+              <div className="modal-header bg-primary text-white">
+                <h5 className="modal-title">
+                  {modalType === "increment" ? "Entrada de Stock" : "Salida de Stock"}
+                </h5>
+                <button type="button" className="btn-close btn-close-white" onClick={() => setIsModalOpen(false)} />
+              </div>
+              <div className="modal-body">
+                <p><strong>Producto:</strong> {formData.product_name}</p>
+                <p><strong>Stock actual:</strong> {formData.product_stock?.current_stock}</p>
 
-      {/* Contenedor de notificaciones toast */}
+                {/* Campo para cantidad */}
+                <div className="mb-3">
+                  <label className="form-label">Cantidad</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    min="0"
+                    value={cantidad}
+                    onChange={(e) => setCantidad(Number(e.target.value))}
+                  />
+                </div>
+
+                {/* Campo para observación (no funcional actualmente) */}
+                <div className="mb-3">
+                  <label className="form-label">Observación</label>
+                  <textarea className="form-control" rows={3}></textarea>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>
+                  Cancelar
+                </button>
+                <button className="btn btn-primary" onClick={handleModalSubmit}>
+                  Guardar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contenedor para notificaciones */}
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
   )

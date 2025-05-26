@@ -67,3 +67,17 @@ export const updateIncrementStockProduct = (
     },
   })
 }
+/**
+ * Resetea el stock de un producto por su ID.
+ * 
+ * @param id_stock - ID del stock a limpiar
+ * @param token - Token de autenticación JWT
+ * @returns Promesa con la respuesta del backend
+ */
+export const resetStockProduct = (id_stock: string, token: string) =>
+  axios.post(`${PRODUCT_API_URL}/clean/${id_stock}`, '', {
+    headers: {
+      Accept: "*/*",
+      Authorization: `Bearer ${token}`,
+    },
+  })
