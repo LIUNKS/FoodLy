@@ -5,6 +5,7 @@ import { AuthProvider } from "@/context/AuthContext"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import "./globals.css"
+import "../styles/sidebar-responsive.css"
 
 import Script from "next/script"
 
