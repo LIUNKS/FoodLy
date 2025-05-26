@@ -2,7 +2,7 @@
 
 import { useContext, useState } from "react"
 import useProductoStock from "../hooks/useProductoStock"
-import { ProductStock } from "../types/productoStok"
+import { ProductStock, ProductStockItem } from "../types/productoStok"
 import { updateIncrementStockProduct, updateDecrementStockProduct, resetStockProduct, getAllProductStock } from "../services/productStockService"
 import DataTable from "@/components/common/DataTable"
 import { toast, ToastContainer } from "react-toastify"
@@ -19,7 +19,7 @@ export default function InventarioTable() {
   const { token } = useContext(AuthContext)
 
   // Estado para almacenar temporalmente los datos del producto en el modal
-  const [formData, setFormData] = useState<Partial<ProductStock>>({})
+  const [formData, setFormData] = useState<Partial<ProductStockItem>>({})
 
   // Estado para la cantidad a incrementar/decrementar
   const [cantidad, setCantidad] = useState<number>(0)
@@ -32,11 +32,10 @@ export default function InventarioTable() {
 
   // Hook personalizado para obtener los productos y su estado de carga
   const { productos, loading, setProductos } = useProductoStock(token)
-
   /**
    * Abre el modal con los datos del producto seleccionado y el tipo de operación (entrada o salida).
    */
-  const openModal = (producto: ProductStock, type: "increment" | "decrement") => {
+  const openModal = (producto: ProductStockItem, type: "increment" | "decrement") => {
     setFormData(producto)
     setModalType(type)
     setCantidad(0) // Reinicia la cantidad al abrir el modal
