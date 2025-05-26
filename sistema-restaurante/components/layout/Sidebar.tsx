@@ -1,14 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { useBreakpoints } from "@/hooks/useBreakpoints";
 
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+  toggleSidebar: () => void;
+}
+
+export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   const pathname = usePathname(); // Obtener la ruta actual
   const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>(
     {}
   );
+  const { isMobile } = useBreakpoints();
 
   const toggleSubmenu = (name: string) => {
     setOpenSubmenus((prev) => ({
@@ -21,15 +28,45 @@ export default function Sidebar() {
   const isActive = (href: string) => pathname === href;
 
   // Función para verificar si algún enlace del submenu está activo
-  const isSubmenuActive = (hrefs: string[]) => hrefs.some((href) => isActive(href));
+  const isSubmenuActive = (hrefs: string[]) => hrefs.some((href) => isActive(href));  // Cierra el sidebar al cambiar de ruta en dispositivos móviles
+  useEffect(() => {
+    const handleRouteChange = () => {
+      if (isMobile && isOpen) {
+        setTimeout(() => {
+          toggleSidebar();
+        }, 300); // Pequeño retraso para evitar problemas
+      }
+    };
+    
+    if (pathname) {
+      handleRouteChange();
+    }
+  }, [pathname]);
 
+  // Log para debugging
+  useEffect(() => {
+    console.log("Sidebar isOpen state:", isOpen);
+  }, [isOpen]);
   return (
-    <div id="sidebar">
+    <div id="sidebar" className={isOpen ? "open" : ""}>
       {/* Enlace de marca */}
-      <Link href="/" className="brand-link">
-        <i className="fa-2x fas fa-utensils"></i>
-        <span>FoodLy</span>
-      </Link>
+      <div className="brand-container">
+        <Link href="/" className="brand-link">
+          <i className="fa-2x fas fa-utensils"></i>
+          <span>FoodLy</span>
+        </Link>
+        {isMobile && (
+          <button 
+            className="close-sidebar-btn" 
+            onClick={() => {
+              console.log("Close sidebar button clicked");
+              toggleSidebar();
+            }}
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        )}
+      </div>
 
       <ul>
         {/* Menú: Caja */}
