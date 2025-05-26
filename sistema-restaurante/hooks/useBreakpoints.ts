@@ -7,9 +7,10 @@ import { useEffect, useState } from 'react';
  * @returns Objeto con variables booleanas para diferentes tamaños de pantalla
  */
 export function useBreakpoints() {
+  // Inicializar con valores por defecto para SSR
   const [windowSize, setWindowSize] = useState({
-    width: typeof window !== 'undefined' ? window.innerWidth : 0,
-    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+    width: typeof window !== 'undefined' ? window.innerWidth : 1200,
+    height: typeof window !== 'undefined' ? window.innerHeight : 800,
   });
 
   useEffect(() => {
@@ -30,10 +31,9 @@ export function useBreakpoints() {
     // Limpiar event listener al desmontar
     return () => window.removeEventListener('resize', handleResize);
   }, []); // Array vacío significa que este efecto se ejecuta una vez al montar
-
   return {
-    isMobile: windowSize.width < 576,
-    isTablet: windowSize.width >= 576 && windowSize.width < 992,
+    isMobile: windowSize.width < 768, // Ajustado para coincidir con las media queries
+    isTablet: windowSize.width >= 768 && windowSize.width < 992,
     isDesktop: windowSize.width >= 992,
     isLargeDesktop: windowSize.width >= 1200,
     width: windowSize.width,
