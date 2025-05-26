@@ -37,10 +37,8 @@ export default function ProductosTable() {
         setFormData(producto || {})
         const modalEl = document.getElementById("productoModal")
         modalEl && new (window as any).bootstrap.Modal(modalEl).show()
-    }
-
-    // Manejar cambios en inputs del formulario
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    }    // Manejar cambios en inputs del formulario
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
     }
 
