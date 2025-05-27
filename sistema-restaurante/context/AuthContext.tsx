@@ -50,12 +50,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           if (storedToken) setToken(storedToken);
     }
   }, []);
-
   const login = async (username: string, password: string) => {
     setIsLoading(true);
     setError(null);
   
-
     try {
       const response = await loginService({ username, password });
 
@@ -77,10 +75,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         router.push("/cocina");
       } else {
         router.push("/apertura-cierre");
+      }    } catch (err) {
+      // Registrar el error para fines de desarrollo pero sin mostrarlo en producción
+      if (process.env.NODE_ENV !== 'production') {
+        console.error("Error en proceso de login:", err);
       }
-
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error de autenticación");
+      
+      // Manejar y establecer el mensaje de error de forma más amigable
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Error desconocido durante la autenticación. Por favor, intente nuevamente.");
+      }
+      
+      // Re-lanzar el error para que los componentes también puedan manejarlo si es necesario
+      throw err;
     } finally {
       setIsLoading(false);
     }
