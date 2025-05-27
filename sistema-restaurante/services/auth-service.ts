@@ -27,8 +27,7 @@ interface LoginCredentials {
 
 export async function login(
   credentials: LoginCredentials
-): Promise<LoginResponse> {
-  try {
+): Promise<LoginResponse> {  try {
     // Reemplaza esta URL con la URL real de tu API de Spring Boot
     const response = await fetch("http://localhost:8080/api/v1.5/auth/login", {
       method: "POST",
@@ -38,16 +37,36 @@ export async function login(
       body: JSON.stringify(credentials),
     });
 
-    if (!response.ok) {
-      // Si el servidor responde con un error, lo manejamos
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error de autenticación");
+    // Obtener el texto de la respuesta primero
+    const responseText = await response.text();
+    
+    // Intentar parsear como JSON si hay contenido
+    let data;
+    try {
+      data = responseText ? JSON.parse(responseText) : null;
+    } catch (e) {
+      console.error("Error al parsear respuesta JSON:", e);
+      throw new Error("Formato de respuesta inválido del servidor");
+    }    if (!response.ok) {
+      // Manejar diferentes tipos de errores según el status
+      if (response.status === 401 || response.status === 403) {
+        throw new Error("Usuario o contraseña incorrectos. Por favor, verifica tus credenciales.");
+      }  else if (response.status === 404) {
+        throw new Error("Usuario no encontrado. Por favor, verifica que el usuario exista.");
+      } else {
+        // Usar el mensaje del servidor si está disponible, o proporcionar un mensaje genérico con información útil
+        const errorMessage = data?.message || `Error de conexión: No se pudo completar la autenticación.`;
+        throw new Error(errorMessage);
+      }
     }
 
-    // Parseamos la respuesta exitosa
-    const data: LoginResponse = await response.json();
+    // Si la respuesta es exitosa pero no hay datos
+    if (!data) {
+      throw new Error("Respuesta vacía del servidor");
+    }
+
     console.log("Respuesta del servidor:", data);
-    return data;
+    return data as LoginResponse;
   } catch (error) {
     console.error("Error en el servicio de autenticación:", error);
     throw error;
