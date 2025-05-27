@@ -11,17 +11,24 @@ interface FormData {
 }
 
 export default function LoginForm() {
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading, error: authError } = useAuth();
   const [formData, setFormData] = useState<FormData>({
     username: "",
     password: "",
   });
+  const [error, setError] = useState<string | null>(null);
+
+  // Actualizar el error local cuando cambia el error de autenticación
+  useEffect(() => {
+    if (authError) {
+      setError(authError);
+    }
+  }, [authError]);
 
   useEffect(() => {
     // Log para depuración
     console.log("Estado de isLoading:", isLoading);
   }, [isLoading]);
-
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -30,15 +37,33 @@ export default function LoginForm() {
       ...prev,
       [name]: value,
     }));
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
+    // Limpiar error cuando el usuario comienza a escribir nuevamente
+    if (error) setError(null);
+  };  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    
+    // Validación básica del lado del cliente
+    if (!formData.username.trim() || !formData.password.trim()) {
+      setError("Por favor, complete todos los campos");
+      return;
+    }
+    
+    // Limpiar errores previos
+    setError(null);
+    
     console.log("Intentando iniciar sesión con:", formData);
     try {
       await login(formData.username, formData.password);
+      // Si llegamos aquí y no hay error, es un inicio de sesión exitoso
     } catch (err) {
-      console.error("Error de inicio de sesión:", err);
+      // No mostrar el error en la consola para evitar errores en la interfaz
+      // El error ya se maneja en el AuthContext y se muestra en la UI
+      // Opcionalmente podemos agregar mensajes de error personalizados aquí si es necesario
+      
+      // Si por alguna razón no se estableció el error desde AuthContext, establecerlo aquí
+      if (!error && err instanceof Error) {
+        setError(err.message);
+      }
     }
   };
 
@@ -50,20 +75,26 @@ export default function LoginForm() {
         <div className="login-card">
           <div className="login-header">
             <h1>FOODLY</h1>
-          </div>
-          <div className="login-body">
+          </div>          <div className="login-body">
             {error && (
               <div
                 style={{
-                  padding: "10px",
+                  padding: "12px",
                   marginBottom: "20px",
-                  backgroundColor: "#FFF0F0",
-                  color: "#E53935",
-                  borderRadius: "6px",
+                  backgroundColor: "#FFEBEE",
+                  color: "#D32F2F",
+                  borderRadius: "8px",
                   fontSize: "14px",
                   textAlign: "center",
+                  border: "1px solid #FFCDD2",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: "500"
                 }}
               >
+                <i className="fas fa-exclamation-circle" style={{ marginRight: "8px", fontSize: "16px" }}></i>
                 {error}
               </div>
             )}
