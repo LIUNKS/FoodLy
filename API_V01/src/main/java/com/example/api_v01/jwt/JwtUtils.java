@@ -18,7 +18,7 @@ import java.util.Date;
 @Component
 public class JwtUtils {
 
-    @Value("600")
+    @Value("${jwt-seconds}")
     private int expired_seconds;
 
     @Value("${jwt-secret-word}")

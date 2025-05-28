@@ -14,11 +14,11 @@ import java.util.UUID;
 
 public interface ProductService {
 
-    Tuple saveProduct(UUID id_admin, ProductResponseDTO product) throws NotFoundException;
+    Tuple<ProductResponseDTO,UUID> saveProduct(UUID id_admin, ProductResponseDTO product) throws NotFoundException;
 
     void deleteProduct(UUID id) throws NotFoundException;
 
-    List<ProductDTO> getProducts();
+    List<ProductDTO> getProducts(int page);
 
     ProductDTO getProductDTO(UUID id) throws NotFoundException;
 
@@ -26,8 +26,8 @@ public interface ProductService {
 
     ProductResponseDTO updateProduct(UUID id, ProductResponseDTO productDTO) throws NotFoundException;
 
-    List<ProductDTO> getProductByCategory(Category categoria) throws NotFoundException;
+    List<ProductDTO> getProductByCategory(Category categoria,int page) throws NotFoundException;
 
-    List<ProductDTO> getProductByName(String name) throws NotFoundException;
+    List<ProductDTO> getProductByName(String name,int page) throws NotFoundException;
 
 }

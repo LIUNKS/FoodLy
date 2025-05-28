@@ -13,9 +13,10 @@ import java.util.UUID;
 
 public interface ProductStockService {
     ProductWithStockDTO getProductStockById(UUID id) throws NotFoundException;
-    List<ProductWithStockDTO> getAllProductStock();
-    List<ProductWithStockDTO> getAllProductStockByCategory(Category category) throws NotFoundException;
-    List<ProductWithStockDTO> getAllProductStockByNameProduct(String product) throws NotFoundException;
+    List<ProductWithStockDTO> getAllProductStock(int page);
+    List<ProductWithStockDTO> getAllProductStockByCategory(Category category,int page) throws NotFoundException;
+    List<ProductWithStockDTO> getAllProductStockByNameProduct(String product,int page) throws NotFoundException;
+
     ProductWithStockDTO cleanStockById(UUID id) throws NotFoundException;
     ProductWithStockDTO increaseStockById(StockChangeRequestDTO stockChangeRequestDTO) throws NotFoundException;
     ProductWithStockDTO discountStockById(StockChangeRequestDTO stockChangeRequestDTO) throws NotFoundException , BadRequestException;

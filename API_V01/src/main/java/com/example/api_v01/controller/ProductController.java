@@ -26,32 +26,32 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     //Busca todos los productos por categoria
     @GetMapping("/list/category")
-    public ResponseEntity<?> getAllProductsByCategory(@RequestParam Category category) throws NotFoundException{
+    public ResponseEntity<?> getAllProductsByCategory(@RequestParam Category category,@RequestParam int page) throws NotFoundException{
         SuccessMessage <List<ProductDTO>> successMessage = SuccessMessage.<List<ProductDTO>>builder()
                 .status(HttpStatus.OK.value())
                 .message("Lista de productos por categoria")
-                .data(productService.getProductByCategory(category))
+                .data(productService.getProductByCategory(category,page))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(successMessage);
     }
     //Busca todos los productos que tengan el mismo nombre
     @GetMapping("/list/name")
-    public ResponseEntity<?> getAllProductsByName(@RequestParam String name) throws NotFoundException {
+    public ResponseEntity<?> getAllProductsByName(@RequestParam String name,@RequestParam int page) throws NotFoundException {
         SuccessMessage <List<ProductDTO>> successMessage = SuccessMessage.<List<ProductDTO>>builder()
                 .status(HttpStatus.OK.value())
                 .message("Lista de productos por nombre")
-                .data(productService.getProductByName(name))
+                .data(productService.getProductByName(name,page))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(successMessage);
     }
 
     // Me devuelve la lista entera de productos
     @GetMapping("/list")
-    public ResponseEntity<?> getAllProducts() {
+    public ResponseEntity<?> getAllProducts(@RequestParam int page) throws NotFoundException {
         SuccessMessage<List<ProductDTO>> successMessage = SuccessMessage.<List<ProductDTO>>builder()
                 .status(HttpStatus.OK.value())
                 .message("La lista de productos")
-                .data(productService.getProducts())
+                .data(productService.getProducts(page))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(successMessage);
     }
