@@ -24,8 +24,8 @@ public interface OrderSetService {
 
 
 
-    List<OrderSetDTO> getOrderSetByNameCustomer(String name) throws NotFoundException;
+    List<OrderSetDTO> getOrderSetByNameCustomer(String name,int page) throws NotFoundException;
 
-    List<OrderSetDTO> getOrderSetsByArching(UUID id_arching) throws NotFoundException ;
+    List<OrderSetDTO> getOrderSetsByArching(UUID id_arching,int page) throws NotFoundException ;
 
 }

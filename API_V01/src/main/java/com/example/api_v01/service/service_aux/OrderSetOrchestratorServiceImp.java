@@ -69,14 +69,14 @@ public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorServi
 
     //Me devulver una lista de OrderSet Mas completo por el id del arqueo
     @Override
-    public List<OrderSetDTO> findOrderSetByArching(UUID id_arching) throws NotFoundException {
-        return orderSetService.getOrderSetsByArching(id_arching);
+    public List<OrderSetDTO> findOrderSetByArching(UUID id_arching,int page) throws NotFoundException {
+        return orderSetService.getOrderSetsByArching(id_arching,page);
     }
 
     //Me devulver una lista de OrderSet Mas completo por el nombre del cliente
     @Override
-    public List<OrderSetDTO> findOrderSetByCustomer(String name) throws NotFoundException {
-        return orderSetService.getOrderSetByNameCustomer(name);
+    public List<OrderSetDTO> findOrderSetByCustomer(String name,int page) throws NotFoundException {
+        return orderSetService.getOrderSetByNameCustomer(name,page);
     }
 
 }
