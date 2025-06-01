@@ -16,6 +16,8 @@ import com.example.api_v01.utils.ArchingMovement;
 import com.example.api_v01.utils.ExceptionMessage;
 import com.example.api_v01.utils.Tuple;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +30,9 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
     private final ArchingRepository archingRepository;
 
     private final BoxRepository boxRepository;
+
+    @Value("${Entity-size}")
+    private int size;
 
     //Se usa en un servicio auxiliar para la logica no borrar
     @Override
@@ -64,8 +69,12 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
 
     //Me trae todos los arqueos
     @Override
-    public List<ArchingDTO> getAllArching() {
-        return ArchingMovement.CreateListArchingDTO(archingRepository.findAll());
+    public List<ArchingDTO> getAllArching(int page) {
+        return ArchingMovement.CreateListArchingDTO(
+                archingRepository.findAll(
+                        PageRequest.of(page,size)
+                ).getContent()
+        );
     }
 
     //Me traen el arqueo por su id
@@ -80,33 +89,42 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
 
     //Me traer todos los arqueos por el id del ATM
     @Override
-    public List<ArchingWithAtmDTO> getArchingByATM(UUID id_atm) throws NotFoundException {
-        List<Arching>archingList=archingRepository.findArchingByIdAtm(id_atm)
-                .orElseThrow(() -> new NotFoundException(ATM_NOT_FOUND));
+    public List<ArchingWithAtmDTO> getArchingByATM(UUID id_atm,int page) throws NotFoundException {
+        List<Arching>archingList=archingRepository
+                .findArchingByIdAtm(
+                        id_atm,
+                        PageRequest.of(page,size)
+                ).getContent();
         return ArchingMovement.CreateListArchingWithAtmDTO(archingList);
     }
 
     //Me traer todos los arqueos por el nombre del ATM
     @Override
-    public List<ArchingWithAtmDTO> getArchingByNameATM(String name_ATM) throws NotFoundException {
-        List<Arching>archingList=archingRepository.findArchingByNameAtm(name_ATM)
-                .orElseThrow(() -> new NotFoundException(ATM_NOT_FOUND));
+    public List<ArchingWithAtmDTO> getArchingByNameATM(String name_ATM,int page) throws NotFoundException {
+        List<Arching>archingList=archingRepository.findArchingByNameAtm(
+                name_ATM,
+                PageRequest.of(page,size)
+        ).getContent();
         return ArchingMovement.CreateListArchingWithAtmDTO(archingList);
     }
 
     //Me traer todos los arqueos por el id del box
     @Override
-    public List<ArchingWithBoxDTO> getArchingByBox(UUID id_box) throws NotFoundException {
-        List<Arching>archingList=archingRepository.findArchingByIdBox(id_box)
-                .orElseThrow(() -> new NotFoundException(BOX_NOT_FOUND));
+    public List<ArchingWithBoxDTO> getArchingByBox(UUID id_box,int page) throws NotFoundException {
+        List<Arching>archingList=archingRepository.findArchingByIdBox(
+                id_box,
+                PageRequest.of(page,size)
+        ).getContent();
         return ArchingMovement.CreateListArchingWithBoxDTO(archingList);
     }
 
     //Me traer todos los arqueos por el nombre del box
     @Override
-    public List<ArchingWithBoxDTO> getArchingByNameBox(String name_BOX) throws NotFoundException {
-        List<Arching>archingList=archingRepository.findArchingByNameBox(name_BOX)
-                .orElseThrow(() -> new NotFoundException(BOX_NOT_FOUND));
+    public List<ArchingWithBoxDTO> getArchingByNameBox(String name_BOX,int page) throws NotFoundException {
+        List<Arching>archingList=archingRepository.findArchingByNameBox(
+                name_BOX,
+                PageRequest.of(page,size)
+        ).getContent();
         return ArchingMovement.CreateListArchingWithBoxDTO(archingList);
     }
 

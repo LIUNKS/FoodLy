@@ -15,6 +15,8 @@ import com.example.api_v01.utils.Tuple;
 import lombok.RequiredArgsConstructor;
 
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +29,9 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
 
     private final ProductRepository productRepository;
     private final AdminService adminService;
+
+    @Value("${Entity-size}")
+    private int size;
 
     @Override
     public Tuple<ProductResponseDTO,UUID> saveProduct(
@@ -47,14 +52,18 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
     }
 
     @Override
-    public List<ProductDTO> getProducts() {
-        return ProductMovement.ListProductDTO(productRepository.findAll());
+    public List<ProductDTO> getProducts(int page) {
+        return ProductMovement.ListProductDTO(
+                productRepository.findAll(
+                        PageRequest.of(page,20)
+                ).getContent()
+        );
     }
 
     @Override
     public ProductDTO getProductDTO(UUID id) throws NotFoundException{
         Optional<Product> product = productRepository.findById(id);
-        if(!product.isPresent()){
+        if(product.isEmpty()){
             throw new NotFoundException(PRODUCT_NOT_FOUND);
         }
         return ProductMovement.moveProductDTO(product.get());
@@ -63,7 +72,7 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
     @Override
     public Product getProduct(UUID id) throws NotFoundException {
         Optional<Product> product = productRepository.findById(id);
-        if(!product.isPresent()){
+        if(product.isEmpty()){
             throw new NotFoundException(PRODUCT_NOT_FOUND);
         }
         return product.get();
@@ -72,7 +81,7 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
     @Override
     public ProductResponseDTO updateProduct(UUID id, ProductResponseDTO productDTO) throws NotFoundException {
         Optional<Product> product = productRepository.findById(id);
-        if(!product.isPresent()){
+        if(product.isEmpty()){
             throw new NotFoundException(PRODUCT_NOT_FOUND);
         }
         Product existingProduct = product.get();
@@ -81,16 +90,23 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
     }
 
     @Override
-    public List<ProductDTO> getProductByCategory(Category categoria) throws NotFoundException {
-        List<Product> ListProduct= productRepository.findProductsByCategory(categoria)
-                .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND));
+    public List<ProductDTO> getProductByCategory(Category categoria,int page) throws NotFoundException {
+        List<Product> ListProduct= productRepository
+                .findProductsByCategory(
+                        categoria,
+                        PageRequest.of(page,20)
+                )
+                .getContent();
         return ProductMovement.ListProductDTO(ListProduct);
     }
 
     @Override
-    public List<ProductDTO> getProductByName(String name) throws NotFoundException {
-        List<Product> ListProduct= productRepository.findProductByName(name)
-                .orElseThrow(() -> new NotFoundException(NAME_PRODUCT_NOT_FOUND));
+    public List<ProductDTO> getProductByName(String name,int page) throws NotFoundException {
+        List<Product> ListProduct= productRepository
+                .findProductByName(
+                        name,
+                        PageRequest.of(page,20)
+                ).getContent();
         return ProductMovement.ListProductDTO(ListProduct);
     }
 

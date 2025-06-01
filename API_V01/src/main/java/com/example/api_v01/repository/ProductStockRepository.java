@@ -8,6 +8,4 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface ProductStockRepository extends JpaRepository<ProductStock, UUID> {
-
-}
+public interface ProductStockRepository extends JpaRepository<ProductStock, UUID> {}

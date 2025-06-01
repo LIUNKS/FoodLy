@@ -12,11 +12,14 @@ import com.example.api_v01.repository.ProductRepository;
 import com.example.api_v01.repository.ProductStockRepository;
 import com.example.api_v01.utils.ExceptionMessage;
 import com.example.api_v01.utils.InventoryMovement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+
 import java.util.UUID;
 
 
@@ -27,6 +30,9 @@ public class ProductStockServiceImp implements ProductStockService, ExceptionMes
     private final ProductStockRepository productStockRepository;
     private final ProductRepository productRepository;
 
+    @Value("${Entity-size}")
+    private int size;
+
     @Override
     public ProductWithStockDTO getProductStockById(UUID id_productStock) throws NotFoundException {
         Product product = productRepository.findProductStockById(id_productStock)
@@ -35,21 +41,32 @@ public class ProductStockServiceImp implements ProductStockService, ExceptionMes
     }
 
     @Override
-    public List<ProductWithStockDTO> getAllProductStock() {
-        return InventoryMovement.getListProductWithStock(productRepository.findAll());
+    public List<ProductWithStockDTO> getAllProductStock(int page) {
+        return InventoryMovement.getListProductWithStock(
+                productRepository.findAll(
+                        PageRequest.of(page,size)
+                ).getContent()
+        );
     }
 
     @Override
-    public List<ProductWithStockDTO> getAllProductStockByCategory(Category category) throws NotFoundException {
-        List<Product>ListProductByCategory=productRepository.findProductsByCategory(category)
-                .orElseThrow( ( ) -> new NotFoundException(CATEGORY_NOT_FOUND) );
+    public List<ProductWithStockDTO> getAllProductStockByCategory(Category category,int page) throws NotFoundException {
+        List<Product>ListProductByCategory=productRepository
+                .findProductsByCategory(
+                        category,
+                        PageRequest.of(page,size)
+                )
+                .getContent();
         return InventoryMovement.getListProductWithStock(ListProductByCategory);
     }
 
     @Override
-    public List<ProductWithStockDTO> getAllProductStockByNameProduct(String product) throws NotFoundException {
-        List<Product>ListProductByName=productRepository.findProductByName(product)
-                .orElseThrow( ( ) -> new NotFoundException(NAME_PRODUCT_NOT_FOUND) );
+    public List<ProductWithStockDTO> getAllProductStockByNameProduct(String product,int page) throws NotFoundException {
+        List<Product>ListProductByName=productRepository
+                .findProductByName(
+                        product,
+                        PageRequest.of(page,size)
+                ).getContent();
         return InventoryMovement.getListProductWithStock(ListProductByName);
     }
 

@@ -1,11 +1,16 @@
 package com.example.api_v01.jwt;
 
+import com.example.api_v01.dto.response.ErrorMassage;
+import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.service.user_service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,12 +40,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwtToken = null;
 
         System.out.println("Authorization header: " + authHeader);
-        if(authHeader != null && authHeader.startsWith("Bearer ")){
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwtToken = authHeader.substring(7);
             try {
                 username = jwtUtils.extractUsername(jwtToken);
-            }catch (Exception e){
-                System.out.println("Error extrayendo username del token: " + e.getMessage());
+            } catch (ExpiredJwtException ex) {
+                setErrorResponse(response, HttpStatus.UNAUTHORIZED, "El token ha expirado");
+                return;
+            } catch (Exception e) {
+                setErrorResponse(response, HttpStatus.BAD_REQUEST, "Error extrayendo username del token");
+                return;
             }
         }
 
@@ -58,7 +68,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
-
         filterChain.doFilter(request, response);
+    }
+
+    private void setErrorResponse(HttpServletResponse response, HttpStatus status, String message) throws IOException {
+        response.setStatus(status.value());
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        ErrorMassage error = new ErrorMassage(status.value(), message);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(response.getWriter(), error);
     }
 }

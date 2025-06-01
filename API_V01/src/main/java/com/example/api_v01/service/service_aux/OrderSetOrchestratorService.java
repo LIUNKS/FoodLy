@@ -13,6 +13,6 @@ import java.util.UUID;
 public interface OrderSetOrchestratorService {
     Tuple saveCompleteOrderSet(UUID id_arching, String name_client, List<CustomerOrderDTO> listCustomer) throws NotFoundException, BadRequestException;
     OrderSetWithListCustomerOrderDTO getOrderSetDTO(UUID id_orderSet) throws NotFoundException;
-    List<OrderSetDTO> findOrderSetByArching(UUID id_arching) throws NotFoundException;
-    List<OrderSetDTO> findOrderSetByCustomer(String name) throws NotFoundException;
+    List<OrderSetDTO> findOrderSetByArching(UUID id_arching,int page) throws NotFoundException;
+    List<OrderSetDTO> findOrderSetByCustomer(String name,int page) throws NotFoundException;
 }

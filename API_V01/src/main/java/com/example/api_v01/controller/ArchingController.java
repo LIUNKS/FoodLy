@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +36,8 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     })
     // Retorna todos los Arching
     @GetMapping("/list")
-    public ResponseEntity<?> getAllArching() {
-        List<ArchingDTO> response = archingService.getAllArching();
+    public ResponseEntity<?> getAllArching(@RequestParam int page) {
+        List<ArchingDTO> response = archingService.getAllArching(page);
         return ResponseEntity.ok(
                 new SuccessMessage<>(HttpStatus.OK.value(), "Listado de Arching obtenido correctamente", response)
         );
@@ -74,9 +75,10 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     // Traer Arching por el ID del ATM
     @GetMapping("/ATM/{id_atm}")
     public ResponseEntity<?> getArchingByATM(
-            @PathVariable UUID id_atm
+            @PathVariable UUID id_atm,
+            @RequestParam int page
     ) throws NotFoundException {
-        List<ArchingWithAtmDTO> response = archingService.getArchingByATM(id_atm);
+        List<ArchingWithAtmDTO> response = archingService.getArchingByATM(id_atm,page);
         return ResponseEntity.ok(
                 new SuccessMessage<>(HttpStatus.OK.value(), "Listado de Arching por ATM obtenido correctamente", response)
         );
@@ -94,9 +96,10 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     // Traer Arching por el nombre del ATM
     @GetMapping("/ATM/name/{name_atm}")
     public ResponseEntity<?> getArchingByNameATM(
-            @PathVariable String name_atm
+            @PathVariable String name_atm,
+            @RequestParam int page
     ) throws NotFoundException {
-        List<ArchingWithAtmDTO> response = archingService.getArchingByNameATM(name_atm);
+        List<ArchingWithAtmDTO> response = archingService.getArchingByNameATM(name_atm,page);
         return ResponseEntity.ok(
                 new SuccessMessage<>(HttpStatus.OK.value(), "Listado de Arching por nombre de ATM obtenido correctamente", response)
         );
@@ -114,9 +117,10 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     // Traer Arching por el ID del Box
     @GetMapping("/Box/{id_box}")
     public ResponseEntity<?> getArchingByBox(
-            @PathVariable UUID id_box
+            @PathVariable UUID id_box,
+            @RequestParam int page
     ) throws NotFoundException {
-        List<ArchingWithBoxDTO> response = archingService.getArchingByBox(id_box);
+        List<ArchingWithBoxDTO> response = archingService.getArchingByBox(id_box,page);
         return ResponseEntity.ok(
                 new SuccessMessage<>(HttpStatus.OK.value(), "Listado de Arching por Box obtenido correctamente", response)
         );
@@ -134,9 +138,10 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     // Traer Arching por el nombre del Box
     @GetMapping("/Box/name/{name_box}")
     public ResponseEntity<?> getArchingByNameBox(
-            @PathVariable String name_box
+            @PathVariable String name_box,
+            @RequestParam int page
     ) throws NotFoundException {
-        List<ArchingWithBoxDTO> response = archingService.getArchingByNameBox(name_box);
+        List<ArchingWithBoxDTO> response = archingService.getArchingByNameBox(name_box,page);
         return ResponseEntity.ok(
                 new SuccessMessage<>(HttpStatus.OK.value(), "Listado de Arching por nombre de Box obtenido correctamente", response)
         );

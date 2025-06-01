@@ -81,11 +81,11 @@ public class OrderSetController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     })
     //Me devuelve la lista de pedidos mediante el id del arqueo que los registro
     @GetMapping("/list/ByArching/{id_arching}")
-    public ResponseEntity<?> getListOrderSetByArching(@PathVariable UUID id_arching) throws NotFoundException {
+    public ResponseEntity<?> getListOrderSetByArching(@PathVariable UUID id_arching,@RequestParam int page) throws NotFoundException {
         SuccessMessage<?>successMessage=SuccessMessage.builder()
                 .status(HttpStatus.OK.value())
                 .message("Lista de cliente encontrada")
-                .data(orderSetOrchestratorService.findOrderSetByArching(id_arching))
+                .data(orderSetOrchestratorService.findOrderSetByArching(id_arching,page))
                 .build();
         return ResponseEntity.ok(successMessage);
     }
@@ -100,11 +100,11 @@ public class OrderSetController { //CONTROLADOR TESTEADO, LISTO PARA USAR
     })
     //Me devuelve la lista de pedidos de un cliente mediante su nombre
     @GetMapping("/list/ByNameCustomer/{name_client}")
-    public ResponseEntity<?> getListOrderSetByCustomer(@PathVariable String name_client) throws NotFoundException {
+    public ResponseEntity<?> getListOrderSetByCustomer(@PathVariable String name_client,@RequestParam int page) throws NotFoundException {
         SuccessMessage<?>successMessage=SuccessMessage.builder()
                 .status(HttpStatus.OK.value())
                 .message("Lista de cliente encontrada")
-                .data(orderSetOrchestratorService.findOrderSetByCustomer(name_client))
+                .data(orderSetOrchestratorService.findOrderSetByCustomer(name_client,page))
                 .build();
         return ResponseEntity.ok(successMessage);
     }

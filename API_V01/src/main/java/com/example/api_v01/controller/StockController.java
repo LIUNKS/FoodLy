@@ -36,11 +36,11 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     })
     //Me devulve la lista de stock con los nombre del producto al que pertenecen
     @GetMapping("/list")
-    public ResponseEntity<?> getAllStocks() {
+    public ResponseEntity<?> getAllStocks(@RequestParam int page) {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()
                 .status(HttpStatus.OK.value())
                 .message("La lista de stock (!puede que la lista este vacia)")
-                .data(productStockService.getAllProductStock())
+                .data(productStockService.getAllProductStock(page))
                 .build();
         return ResponseEntity.ok(successMessage);
     }
@@ -56,11 +56,11 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     })
     //Me devulve la lista de stock con los nombre del producto al que pertenecen por la categoria del producto
     @GetMapping("/list/category")
-    public ResponseEntity<?> getAllStocksCategory(@RequestParam Category category) throws NotFoundException {
+    public ResponseEntity<?> getAllStocksCategory(@RequestParam Category category,@RequestParam int page) throws NotFoundException {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()
                 .status(HttpStatus.OK.value())
                 .message("La lista de stock (!puede que la lista este vacia)")
-                .data(productStockService.getAllProductStockByCategory(category))
+                .data(productStockService.getAllProductStockByCategory(category,page))
                 .build();
         return ResponseEntity.ok(successMessage);
     }
@@ -76,11 +76,11 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     })
     //Me devulve la lista de stock con los nombre del producto al que pertenecen por el nombre del producto
     @GetMapping("/list/nameProduct")
-    public ResponseEntity<?> getAllStocksNameProduct(@RequestParam String nameProduct) throws NotFoundException {
+    public ResponseEntity<?> getAllStocksNameProduct(@RequestParam String nameProduct,@RequestParam int page) throws NotFoundException {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()
                 .status(HttpStatus.OK.value())
                 .message("La lista de stock (!puede que la lista este vacia)")
-                .data(productStockService.getAllProductStockByNameProduct(nameProduct))
+                .data(productStockService.getAllProductStockByNameProduct(nameProduct,page))
                 .build();
         return ResponseEntity.ok(successMessage);
     }
