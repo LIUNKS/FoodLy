@@ -73,13 +73,14 @@ public class OrderSetController { //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     @Operation(
             summary = "Obtener todos los conjuntos de pedidos por ID de arqueo",
-            description = "Devuelve una lista de conjuntos de pedidos registrados bajo un arqueo específico utilizando su identificador único."
+            description = "Devuelve una lista paginada de conjuntos de pedidos registrados bajo un arqueo específico utilizando su identificador único. " +
+                    "El parámetro 'page' indica el número de página a consultar."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de conjuntos de pedidos obtenida correctamente."),
             @ApiResponse(responseCode = "404", description = "Arqueo no encontrado.")
     })
-    //Me devuelve la lista de pedidos mediante el id del arqueo que los registro
+    //Me devuelve la lista de pedidos mediante el id del arqueo que los registro, paginada
     @GetMapping("/list/ByArching/{id_arching}")
     public ResponseEntity<?> getListOrderSetByArching(@PathVariable UUID id_arching,@RequestParam int page) throws NotFoundException {
         SuccessMessage<?>successMessage=SuccessMessage.builder()
@@ -92,13 +93,14 @@ public class OrderSetController { //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     @Operation(
             summary = "Obtener todos los conjuntos de pedidos por nombre de cliente",
-            description = "Devuelve una lista de conjuntos de pedidos realizados por un cliente específico utilizando su nombre."
+            description = "Devuelve una lista paginada de conjuntos de pedidos realizados por un cliente específico utilizando su nombre. " +
+                    "El parámetro 'page' indica el número de página a consultar."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de conjuntos de pedidos obtenida correctamente."),
             @ApiResponse(responseCode = "404", description = "Cliente no encontrado.")
     })
-    //Me devuelve la lista de pedidos de un cliente mediante su nombre
+    //Me devuelve la lista de pedidos de un cliente mediante su nombre, paginada
     @GetMapping("/list/ByNameCustomer/{name_client}")
     public ResponseEntity<?> getListOrderSetByCustomer(@PathVariable String name_client,@RequestParam int page) throws NotFoundException {
         SuccessMessage<?>successMessage=SuccessMessage.builder()

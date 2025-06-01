@@ -28,13 +28,13 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     private final ProductStockService productStockService;
 
     @Operation(
-            summary = "Obtener la lista de stock",
-            description = "Devuelve una lista de todos los stocks disponibles junto con los nombres de los productos asociados."
+            summary = "Obtener la lista de stock con paginación",
+            description = "Devuelve una lista paginada de todos los stocks disponibles junto con los nombres de los productos asociados. Se debe especificar el número de página con el parámetro 'page'."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de stock obtenida correctamente."),
+            @ApiResponse(responseCode = "200", description = "Lista de stock paginada obtenida correctamente."),
     })
-    //Me devulve la lista de stock con los nombre del producto al que pertenecen
+    //Me devuelve la lista de stock con los nombre del producto al que pertenecen
     @GetMapping("/list")
     public ResponseEntity<?> getAllStocks(@RequestParam int page) {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()
@@ -46,15 +46,15 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     }
 
     @Operation(
-            summary = "Obtener stock por categoría",
-            description = "Devuelve una lista de stock cuyos productos pertenecen a la categoría especificada."
+            summary = "Obtener stock por categoría con paginación",
+            description = "Devuelve una lista paginada de stock cuyos productos pertenecen a la categoría especificada. Se debe especificar el número de página con el parámetro 'page'."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de stock obtenida correctamente."),
+            @ApiResponse(responseCode = "200", description = "Lista de stock paginada obtenida correctamente."),
             @ApiResponse(responseCode = "404", description = "Categoría no encontrada."),
             @ApiResponse(responseCode = "400", description = "Solicitud inválida.")
     })
-    //Me devulve la lista de stock con los nombre del producto al que pertenecen por la categoria del producto
+    //Me devuelve la lista de stock con los nombre del producto al que pertenecen por la categoria del producto
     @GetMapping("/list/category")
     public ResponseEntity<?> getAllStocksCategory(@RequestParam Category category,@RequestParam int page) throws NotFoundException {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()
@@ -66,15 +66,15 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
     }
 
     @Operation(
-            summary = "Obtener stock por nombre del producto",
-            description = "Devuelve una lista de stock cuyos productos tienen el nombre especificado."
+            summary = "Obtener stock por nombre del producto con paginación",
+            description = "Devuelve una lista paginada de stock cuyos productos tienen el nombre especificado. Se debe especificar el número de página con el parámetro 'page'."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de stock obtenida correctamente."),
+            @ApiResponse(responseCode = "200", description = "Lista de stock paginada obtenida correctamente."),
             @ApiResponse(responseCode = "404", description = "Producto no encontrado."),
             @ApiResponse(responseCode = "400", description = "Solicitud inválida.")
     })
-    //Me devulve la lista de stock con los nombre del producto al que pertenecen por el nombre del producto
+    //Me devuelve la lista de stock con los nombre del producto al que pertenecen por el nombre del producto
     @GetMapping("/list/nameProduct")
     public ResponseEntity<?> getAllStocksNameProduct(@RequestParam String nameProduct,@RequestParam int page) throws NotFoundException {
         SuccessMessage<List<ProductWithStockDTO>> successMessage = SuccessMessage.<List<ProductWithStockDTO>>builder()
@@ -93,7 +93,7 @@ public class StockController {   //CONTROLADOR TESTEADO, LISTO PARA USAR
             @ApiResponse(responseCode = "200", description = "Stock encontrado correctamente."),
             @ApiResponse(responseCode = "404", description = "Stock no encontrado.")
     })
-    //me devulve un stock con el nombre del producto al que pertenecen mediante el ID del stock
+    //me devuelve un stock con el nombre del producto al que pertenecen mediante el ID del stock
     @GetMapping("/{id_stock}")
     public ResponseEntity<?> getStock(@PathVariable UUID id_stock) throws NotFoundException {
         ProductWithStockDTO productStock = productStockService.getProductStockById(id_stock);

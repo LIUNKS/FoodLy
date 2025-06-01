@@ -29,12 +29,14 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     @Operation(
             summary = "Obtener todos los Arching",
-            description = "Retorna una lista de todos los registros de Arching almacenados en el sistema."
+            description = "Retorna una lista paginada de todos los registros de Arching almacenados en el sistema. " +
+                    "El parámetro 'page' indica la página que se desea obtener (basado en cero)."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Listado de Arching obtenido correctamente")
+            @ApiResponse(responseCode = "200", description = "Listado paginado de Arching obtenido correctamente"),
+            @ApiResponse(responseCode = "400", description = "Parámetro de página inválido")
     })
-    // Retorna todos los Arching
+    // Retorna todos los Arching con paginación
     @GetMapping("/list")
     public ResponseEntity<?> getAllArching(@RequestParam int page) {
         List<ArchingDTO> response = archingService.getAllArching(page);
@@ -65,14 +67,15 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     @Operation(
             summary = "Obtener Arching por ID del ATM",
-            description = "Devuelve una lista de registros de Arching asociados a un cajero automático específico."
+            description = "Devuelve una lista paginada de registros de Arching asociados a un cajero automático específico. " +
+                    "El parámetro 'page' indica la página que se desea obtener (basado en cero)."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Listado de Arching por ATM obtenido correctamente"),
+            @ApiResponse(responseCode = "200", description = "Listado paginado de Arching por ATM obtenido correctamente"),
             @ApiResponse(responseCode = "404", description = "ATM no encontrado"),
             @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
     })
-    // Traer Arching por el ID del ATM
+    // Traer Arching por el ID del ATM con paginación
     @GetMapping("/ATM/{id_atm}")
     public ResponseEntity<?> getArchingByATM(
             @PathVariable UUID id_atm,
@@ -86,14 +89,15 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     @Operation(
             summary = "Obtener Arching por nombre del ATM",
-            description = "Devuelve una lista de registros de Arching asociados a un cajero automático especificado por nombre."
+            description = "Devuelve una lista paginada de registros de Arching asociados a un cajero automático especificado por nombre. " +
+                    "El parámetro 'page' indica la página que se desea obtener (basado en cero)."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Listado de Arching por nombre de ATM obtenido correctamente"),
+            @ApiResponse(responseCode = "200", description = "Listado paginado de Arching por nombre de ATM obtenido correctamente"),
             @ApiResponse(responseCode = "404", description = "ATM no encontrado"),
             @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
     })
-    // Traer Arching por el nombre del ATM
+    // Traer Arching por el nombre del ATM con paginación
     @GetMapping("/ATM/name/{name_atm}")
     public ResponseEntity<?> getArchingByNameATM(
             @PathVariable String name_atm,
@@ -107,14 +111,15 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     @Operation(
             summary = "Obtener Arching por ID de la caja (Box)",
-            description = "Devuelve una lista de registros de Arching asociados a una caja específica (Box)."
+            description = "Devuelve una lista paginada de registros de Arching asociados a una caja específica (Box). " +
+                    "El parámetro 'page' indica la página que se desea obtener (basado en cero)."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Listado de Arching por Box obtenido correctamente"),
+            @ApiResponse(responseCode = "200", description = "Listado paginado de Arching por Box obtenido correctamente"),
             @ApiResponse(responseCode = "404", description = "Box no encontrado"),
             @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
     })
-    // Traer Arching por el ID del Box
+    // Traer Arching por el ID del Box con paginación
     @GetMapping("/Box/{id_box}")
     public ResponseEntity<?> getArchingByBox(
             @PathVariable UUID id_box,
@@ -128,14 +133,15 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     @Operation(
             summary = "Obtener Arching por nombre de la caja (Box)",
-            description = "Devuelve una lista de registros de Arching asociados a una caja especificada por nombre."
+            description = "Devuelve una lista paginada de registros de Arching asociados a una caja especificada por nombre. " +
+                    "El parámetro 'page' indica la página que se desea obtener (basado en cero)."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Listado de Arching por nombre de Box obtenido correctamente"),
+            @ApiResponse(responseCode = "200", description = "Listado paginado de Arching por nombre de Box obtenido correctamente"),
             @ApiResponse(responseCode = "404", description = "Box no encontrado"),
             @ApiResponse(responseCode = "400", description = "Solicitud incorrecta")
     })
-    // Traer Arching por el nombre del Box
+    // Traer Arching por el nombre del Box con paginación
     @GetMapping("/Box/name/{name_box}")
     public ResponseEntity<?> getArchingByNameBox(
             @PathVariable String name_box,

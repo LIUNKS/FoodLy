@@ -28,8 +28,8 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
     private final ProductService productService;
 
     @Operation(
-            summary = "Buscar productos por categoría",
-            description = "Permite obtener todos los productos que pertenecen a una categoría específica."
+            summary = "Buscar productos por categoría (paginado)",
+            description = "Permite obtener todos los productos que pertenecen a una categoría específica. Soporta paginación mediante el parámetro 'page'."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de productos por categoría obtenida correctamente."),
@@ -48,8 +48,8 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
     }
 
     @Operation(
-            summary = "Buscar productos por nombre",
-            description = "Obtiene todos los productos que poseen el nombre especificado."
+            summary = "Buscar productos por nombre (paginado)",
+            description = "Obtiene todos los productos que poseen el nombre especificado. Soporta paginación mediante el parámetro 'page'."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de productos por nombre obtenida correctamente."),
@@ -68,8 +68,8 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
     }
 
     @Operation(
-            summary = "Obtener todos los productos",
-            description = "Devuelve la lista completa de productos registrados en el sistema."
+            summary = "Obtener todos los productos (paginado)",
+            description = "Devuelve la lista completa de productos registrados en el sistema. Soporta paginación mediante el parámetro 'page'."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de productos obtenida correctamente.")
@@ -166,6 +166,4 @@ public class ProductController {    //CONTROLADOR TESTEADO, LISTO PARA USAR
                 .build();
         return ResponseEntity.created(location).body(successMessage);
     }
-
-
 }
