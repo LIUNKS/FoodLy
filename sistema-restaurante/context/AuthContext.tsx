@@ -41,13 +41,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);  const router = useRouter();
-
   const logout = () => {
-    Cookies.remove("user");
-    localStorage.removeItem("authToken");
-    setUser(null);
-    setToken(null);
-    router.push("/");
+    console.log('🚪 Iniciando logout...');
+    
+    try {
+      // Limpiar cookies y localStorage
+      Cookies.remove("user");
+      localStorage.removeItem("authToken");
+      
+      // Limpiar estado del contexto
+      setUser(null);
+      setToken(null);
+      setError(null);
+      
+      console.log('✅ Estado limpiado, redirigiendo...');
+      
+      // Intentar redireccionar con Next.js router
+      router.push("/");
+      
+      // Fallback: si el router no funciona, usar window.location
+      setTimeout(() => {
+        if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+          console.log('🔄 Fallback: Usando window.location.href');
+          window.location.href = '/';
+        }
+      }, 500);
+      
+    } catch (error) {
+      console.error('❌ Error durante logout:', error);
+      // Fallback final
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
+    }
   };
 
   useEffect(() => {
@@ -55,14 +81,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const storedToken = localStorage.getItem("authToken"); // <-- cargar token
     if (storedUser) {
       setUser(JSON.parse(storedUser));
-      if (storedToken) setToken(storedToken);
-    }
-
-    // Configurar callback para el logout automático cuando el token expire
+      if (storedToken) setToken(storedToken);    }    // Configurar callback para el logout automático cuando el token expire
+    console.log('🔧 Configurando callback de expiración de token...');
     apiClient.onTokenExpiredCallback(() => {
-      console.warn('Token expirado, cerrando sesión automáticamente...');
+      console.warn('🚨 Token expirado detectado por callback, cerrando sesión automáticamente...');
       logout();
     });
+    console.log('✅ Callback de expiración de token configurado');
+
+    // Escuchar cambios en localStorage para detectar si el token fue eliminado
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'authToken' && !e.newValue && user) {
+        console.warn('Token eliminado del localStorage, ejecutando logout...');
+        logout();
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleStorageChange);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('storage', handleStorageChange);
+      }
+    };
   }, []);
   const login = async (username: string, password: string) => {
     setIsLoading(true);
