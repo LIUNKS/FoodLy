@@ -77,16 +77,37 @@ class ApiClient {
         ok: response.ok
       });      // Verificar si el token ha expirado
       if (response.status === 401 || response.status === 403) {
-        console.warn('Token expirado o acceso no autorizado');
+        console.warn('🚨 Token expirado o acceso no autorizado - Iniciando logout...');
         
-        // Disparar evento para componentes UI
+        // Limpiar token inmediatamente
         if (typeof window !== 'undefined') {
+          localStorage.removeItem('authToken');
+          
+          // Disparar evento para componentes UI
           window.dispatchEvent(new CustomEvent('tokenExpired'));
         }
         
-        // Ejecutar callback de token expirado
+        // Ejecutar callback de token expirado con un pequeño delay para asegurar que se ejecute
         if (this.onTokenExpired) {
-          this.onTokenExpired();
+          console.log('🔄 Ejecutando callback de logout...');
+          setTimeout(() => {
+            try {
+              this.onTokenExpired!();
+            } catch (error) {
+              console.error('❌ Error al ejecutar callback de logout:', error);
+              // Fallback: redirigir directamente
+              if (typeof window !== 'undefined') {
+                console.log('🔄 Fallback: Redirigiendo directamente al login...');
+                window.location.href = '/';
+              }
+            }
+          }, 100);
+        } else {
+          // Si no hay callback, redirigir directamente
+          console.log('⚠️ No hay callback configurado, redirigiendo directamente...');
+          if (typeof window !== 'undefined') {
+            window.location.href = '/';
+          }
         }
         
         throw new ApiError(
