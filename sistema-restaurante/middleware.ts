@@ -18,13 +18,34 @@ export function middleware(request: NextRequest) {
   if (publicRoutes.includes(pathname)) {
     return NextResponse.next()
   }
-
   // Verificar si el usuario está autenticado
   const userStr = request.cookies.get("user")?.value
 
   if (!userStr) {
     // Redirigir al login si no está autenticado
     return NextResponse.redirect(new URL("/", request.url))
+  }
+
+  // Verificar token de localStorage a través de headers (si está disponible)
+  const authToken = request.headers.get('authorization')?.replace('Bearer ', '');
+  
+  if (authToken) {
+    try {
+      // Decodificar y verificar expiración del token JWT
+      const tokenPayload = JSON.parse(atob(authToken.split('.')[1]));
+      const expirationTime = tokenPayload.exp * 1000;
+      const now = Date.now();
+      
+      if (expirationTime <= now) {
+        console.warn('🚨 Middleware: Token expirado detectado, redirigiendo al login...');
+        // Token expirado, redirigir al login
+        const response = NextResponse.redirect(new URL("/", request.url));
+        response.cookies.delete("user");
+        return response;
+      }
+    } catch (error) {
+      console.error('Error al verificar token en middleware:', error);
+    }
   }
 
   try {
