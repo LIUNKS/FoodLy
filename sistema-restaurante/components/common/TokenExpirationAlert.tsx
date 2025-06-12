@@ -12,14 +12,21 @@ export const TokenExpirationAlert = ({
   className = '' 
 }: TokenExpirationAlertProps) => {
   const [showAlert, setShowAlert] = useState(false);
-
   useEffect(() => {
     // Escuchar eventos de expiración de token
     const handleTokenExpired = () => {
+      console.log('🚨 TokenExpirationAlert: Token expirado detectado via evento');
       setShowAlert(true);
-      if (onSessionExpired) {
-        onSessionExpired();
-      }
+      
+      // Auto-redirigir después de 3 segundos
+      setTimeout(() => {
+        console.log('🔄 TokenExpirationAlert: Auto-redirigiendo al login...');
+        if (onSessionExpired) {
+          onSessionExpired();
+        } else {
+          window.location.href = '/';
+        }
+      }, 3000);
     };
 
     // Este componente puede ser activado por el apiClient cuando detecte un 401/403
@@ -54,15 +61,14 @@ export const TokenExpirationAlert = ({
               <i className="fas fa-exclamation-triangle me-2"></i>
               Sesión Expirada
             </h5>
-          </div>
-          <div className="modal-body">
+          </div>          <div className="modal-body">
             <div className="text-center">
               <i className="fas fa-clock fa-3x text-warning mb-3"></i>
               <p className="mb-3">
                 Su sesión ha expirado por motivos de seguridad.
               </p>
               <p className="text-muted">
-                Por favor, inicie sesión nuevamente para continuar.
+                Será redirigido al login automáticamente en unos segundos...
               </p>
             </div>
           </div>
