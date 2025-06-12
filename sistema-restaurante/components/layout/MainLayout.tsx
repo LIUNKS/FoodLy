@@ -4,6 +4,9 @@ import { useState, useEffect } from "react"
 import type { ReactNode } from "react"
 import Sidebar from "./Sidebar"
 import { useBreakpoints } from "@/hooks/useBreakpoints"
+import { useTokenMonitor } from "@/hooks/useTokenMonitor"
+import { TokenExpirationAlert } from "@/components/common/TokenExpirationAlert"
+import { TokenTimeRemaining } from "@/components/common/TokenTimeRemaining"
 
 interface MainLayoutProps {
   children: ReactNode
@@ -12,6 +15,9 @@ interface MainLayoutProps {
 export default function MainLayout({ children }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isMobile } = useBreakpoints();
+  
+  // Monitorear el estado del token constantemente
+  useTokenMonitor();
     // Cerrar el sidebar cuando cambiamos de móvil a desktop
   useEffect(() => {
     if (!isMobile && sidebarOpen) {
@@ -53,8 +59,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
       )}
       
       <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />      <div id="main" className="container-fluid">
-        {/* Botón hamburguesa para mostrar el sidebar en móvil */}
-        {isMobile && (
+        {/* Botón hamburguesa para mostrar el sidebar en móvil */}        {isMobile && (
           <button 
             className={`hamburger-btn ${sidebarOpen ? 'hidden' : ''}`} 
             onClick={() => {
@@ -66,6 +71,11 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <i className="fas fa-bars"></i>
           </button>
         )}
+        
+        {/* Componentes de manejo de expiración de token */}
+        <TokenExpirationAlert />
+        <TokenTimeRemaining />
+        
         {children}
       </div>
     </div>
