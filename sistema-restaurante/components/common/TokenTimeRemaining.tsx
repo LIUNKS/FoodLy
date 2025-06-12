@@ -8,7 +8,7 @@ interface TokenTimeRemainingProps {
 }
 
 export const TokenTimeRemaining = ({ className = '' }: TokenTimeRemainingProps) => {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
   const [timeRemaining, setTimeRemaining] = useState<string>('');
   const [isExpiringSoon, setIsExpiringSoon] = useState(false);
 
@@ -16,21 +16,36 @@ export const TokenTimeRemaining = ({ className = '' }: TokenTimeRemainingProps) 
     if (!token) {
       setTimeRemaining('');
       return;
-    }
-
-    // Decodificar el token JWT para obtener la fecha de expiración
+    }    // Decodificar el token JWT para obtener la fecha de expiración
     try {
       const tokenPayload = JSON.parse(atob(token.split('.')[1]));
       const expirationTime = tokenPayload.exp * 1000; // Convertir a millisegundos
+      
+      // Verificar inmediatamente si el token ya está expirado
+      const now = Date.now();
+      if (expirationTime <= now) {
+        console.warn('Token ya expirado al cargar componente, ejecutando logout...');
+        setTimeRemaining('Expirado');
+        setIsExpiringSoon(true);
+        setTimeout(() => {
+          logout();
+        }, 500);
+        return;
+      }
 
       const interval = setInterval(() => {
         const now = Date.now();
-        const remaining = expirationTime - now;
-
-        if (remaining <= 0) {
+        const remaining = expirationTime - now;        if (remaining <= 0) {
           setTimeRemaining('Expirado');
           setIsExpiringSoon(true);
           clearInterval(interval);
+          
+          // Forzar logout cuando el token expire
+          console.warn('Token expirado detectado en TokenTimeRemaining, ejecutando logout...');
+          setTimeout(() => {
+            logout();
+          }, 1000); // Dar tiempo para que se vea el mensaje "Expirado"
+          
           return;
         }
 
