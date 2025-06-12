@@ -4,6 +4,7 @@ import { createContext, useState, useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { login as loginService } from "@/services/auth-service";
+import { apiClient } from "@/services/apiClient";
 
 interface User {
   id: string;
@@ -39,16 +40,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);  const router = useRouter();
+
+  const logout = () => {
+    Cookies.remove("user");
+    localStorage.removeItem("authToken");
+    setUser(null);
+    setToken(null);
+    router.push("/");
+  };
 
   useEffect(() => {
     const storedUser = Cookies.get("user");
-        const storedToken = localStorage.getItem("authToken"); // <-- cargar token
+    const storedToken = localStorage.getItem("authToken"); // <-- cargar token
     if (storedUser) {
       setUser(JSON.parse(storedUser));
-          if (storedToken) setToken(storedToken);
+      if (storedToken) setToken(storedToken);
     }
+
+    // Configurar callback para el logout automático cuando el token expire
+    apiClient.onTokenExpiredCallback(() => {
+      console.warn('Token expirado, cerrando sesión automáticamente...');
+      logout();
+    });
   }, []);
   const login = async (username: string, password: string) => {
     setIsLoading(true);
@@ -90,16 +104,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
       // Re-lanzar el error para que los componentes también puedan manejarlo si es necesario
       throw err;
-    } finally {
-      setIsLoading(false);
+    } finally {      setIsLoading(false);
     }
-  };
-
-  const logout = () => {
-    Cookies.remove("user");
-    localStorage.removeItem("authToken");
-    setUser(null);
-    router.push("/");
   };
 
   return (
