@@ -3,7 +3,7 @@
 import { createContext, useState, useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { login as loginService } from "@/services/auth-service";
+import { login as loginService, saveAuthToken, saveUserRole, saveUserId, clearAllAuthData } from "@/services/auth-service";
 import { apiClient } from "@/services/apiClient";
 
 interface User {
@@ -40,14 +40,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);  const router = useRouter();
-  const logout = () => {
+  const [error, setError] = useState<string | null>(null);  const router = useRouter();  const logout = () => {
     console.log('🚪 Iniciando logout...');
     
     try {
       // Limpiar cookies y localStorage
       Cookies.remove("user");
-      localStorage.removeItem("authToken");
+      clearAllAuthData();
       
       // Limpiar estado del contexto
       setUser(null);
@@ -112,9 +111,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setError(null);
   
     try {
-      const response = await loginService({ username, password });
-
-      const userData: User = {
+      const response = await loginService({ username, password });      const userData: User = {
         id: response.data.id_admin,
         name: response.data.name_admin,
         email: response.data.email_admin,
@@ -122,9 +119,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         role: response.role,
       };
 
+      // Guardar datos en localStorage y cookies
+      saveAuthToken(response.token);
+      saveUserRole(response.role);
+      saveUserId(response.data.id_admin);
+      
       Cookies.set("user", JSON.stringify(userData), { expires: 7 });
-      localStorage.setItem("authToken", response.token);
-      setToken(response.token);  // <-- guarda el token en el estado también
+      setToken(response.token);
       setUser(userData);
 
       // Redirigir según el rol
