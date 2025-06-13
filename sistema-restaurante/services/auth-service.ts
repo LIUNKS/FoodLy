@@ -2,22 +2,13 @@
 
 interface LoginResponse {
   token: string;
-  user: {
-    id: number;
-    username: string;
-    role: string;
-  };
-  redirectUrl: string;
-  
   role: string;
   data: {
     id_admin: string;
     name_admin: string;
     email_admin: string;
     dni_admin: string;
-  
-}
-
+  };
 }
 
 interface LoginCredentials {
@@ -83,6 +74,36 @@ export function getAuthToken(): string | null {
 
 export function removeAuthToken(): void {
   localStorage.removeItem("authToken");
+}
+
+export function saveUserRole(role: string): void {
+  localStorage.setItem("userRole", role);
+}
+
+export function getUserRole(): string | null {
+  return localStorage.getItem("userRole");
+}
+
+export function removeUserRole(): void {
+  localStorage.removeItem("userRole");
+}
+
+export function saveUserId(id: string): void {
+  localStorage.setItem("userId", id);
+}
+
+export function getUserId(): string | null {
+  return localStorage.getItem("userId");
+}
+
+export function removeUserId(): void {
+  localStorage.removeItem("userId");
+}
+
+export function clearAllAuthData(): void {
+  removeAuthToken();
+  removeUserRole();
+  removeUserId();
 }
 
 export function isAuthenticated(): boolean {
