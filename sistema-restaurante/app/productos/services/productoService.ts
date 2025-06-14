@@ -17,8 +17,8 @@ const PRODUCT_API_URL = `${API_BASE_URL}product`;
  * @param token - Token de autenticación JWT
  * @returns Promesa con un array de productos y el estado de la respuesta
  */
-export const getAllProductos = (token: string) =>
-  axios.get<{ status: number; data: Producto[] }>(`${PRODUCT_API_URL }/list`, {
+export const getAllProductos = (token: string,page:number=0) =>
+  axios.get<{ status: number; data: Producto[] }>(`${PRODUCT_API_URL }/list?page=${page}`, {
     headers: { Authorization: `Bearer ${token}` }, // Se pasa el token en el encabezado
   })
 
