@@ -55,7 +55,7 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
     public List<ProductDTO> getProducts(int page) {
         return ProductMovement.ListProductDTO(
                 productRepository.findAll(
-                        PageRequest.of(page,20)
+                        PageRequest.of(page,size)
                 ).getContent()
         );
     }
@@ -94,7 +94,7 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
         List<Product> ListProduct= productRepository
                 .findProductsByCategory(
                         categoria,
-                        PageRequest.of(page,20)
+                        PageRequest.of(page,size)
                 )
                 .getContent();
         return ProductMovement.ListProductDTO(ListProduct);
@@ -105,7 +105,7 @@ public class ProductServiceImp implements ProductService , ExceptionMessage {
         List<Product> ListProduct= productRepository
                 .findProductByName(
                         name,
-                        PageRequest.of(page,20)
+                        PageRequest.of(page,size)
                 ).getContent();
         return ProductMovement.ListProductDTO(ListProduct);
     }
