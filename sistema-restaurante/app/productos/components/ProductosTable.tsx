@@ -23,14 +23,32 @@ export default function ProductosTable() {
     const [formData, setFormData] = useState<Partial<Producto>>({})
 
     // Hook para obtener productos y estado de carga
-    const { productos, loading, setProductos } = useProductos(token)
-
+    const [paginaActual, setPaginaActual] = useState(0)
+    const { productos, setProductos } = useProductos(token,paginaActual)
+    const [loading, setLoading] = useState(true)
     // Obtener token del localStorage o cookie al montar
     useEffect(() => {
         const localToken = typeof window !== "undefined" ? localStorage.getItem("authToken") : null
         const cookieToken = Cookies.get("token")
-        setToken(localToken || cookieToken || null)
-    }, [])
+        const userCookie = localToken || cookieToken ||  null
+        setToken(userCookie)
+        if (userCookie) {
+            fetchProductos(userCookie,paginaActual)
+        }
+
+    }, [paginaActual])
+    const fetchProductos = async (userCookie: string, page: number) => {
+        setLoading(true)
+        try {
+            const res = await getAllProductos(userCookie, page)
+            setProductos(res.data.data)
+        } catch (error) {
+            console.error("Error cargando productos", error)
+            setProductos([])
+        } finally {
+            setLoading(false)
+        }
+    }
 
     // Abrir modal y rellenar datos si es edición
     const openModal = (producto: Producto | null = null) => {
@@ -60,7 +78,7 @@ export default function ProductosTable() {
             // Cerrar modal después de guardar
             const modalEl = document.getElementById("productoModal")
             modalEl && (window as any).bootstrap.Modal.getInstance(modalEl).hide()
-            const response = await getAllProductos(token)
+            const response = await getAllProductos(token,0)
                 setProductos(response.data.data)
         } catch {
             toast.error("Error al guardar producto")
@@ -84,7 +102,7 @@ export default function ProductosTable() {
             try {
                 await deleteProducto(id, token)
                 toast.success("Producto eliminado")
-                  const response = await getAllProductos(token)
+                  const response = await getAllProductos(token,0)
                 setProductos(response.data.data)
             } catch {
                 toast.error("Error al eliminar")
@@ -127,20 +145,40 @@ export default function ProductosTable() {
                         </tr>
                     ))
                 )}
+                {/* Paginación */}
+                    <tr>
+                        <td colSpan={5}>
+                            <div className="d-flex justify-content-between align-items-center mt-4 px-2">
+                                <div className="text-muted">
+                                    Página <strong>{paginaActual + 1}</strong>
+                                </div>
+                                <nav>
+                                    <ul className="pagination pagination-sm mb-0">
+                                        <li className={`page-item ${paginaActual === 0 ? "disabled" : ""}`}>
+                                            <button
+                                                className="page-link"
+                                                onClick={() => setPaginaActual(prev => Math.max(prev - 1, 0))}
+                                            >
+                                                <i className="bi bi-chevron-left" /> Anterior
+                                            </button>
+                                        </li>
+                                        <li className="page-item active">
+                                            <span className="page-link">{paginaActual + 1}</span>
+                                        </li>
+                                        <li className={`page-item ${productos.length < 10 ? "disabled" : ""}`}>
+                                            <button
+                                                className="page-link"
+                                                onClick={() => setPaginaActual(prev => prev + 1)}
+                                            >
+                                                Siguiente <i className="bi bi-chevron-right" />
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </td>
+                    </tr>
             </DataTable>
-
-            {/* Información de registros y paginación (estática) */}
-            <div className="d-flex justify-content-between align-items-center mt-3">
-                <div className="text-muted">Mostrando {productos.length} registros</div>
-                <nav>
-                    <ul className="pagination mb-0">
-                        <li className="page-item disabled"><a className="page-link">Anterior</a></li>
-                        <li className="page-item active"><a className="page-link">1</a></li>
-                        <li className="page-item disabled"><a className="page-link">Siguiente</a></li>
-                    </ul>
-                </nav>
-            </div>
-
             {/* Modal de producto mejorado */}
             <ModalPortal>
                 <div className="modal fade" id="productoModal" tabIndex={-1}>
