@@ -1,7 +1,8 @@
 "use client"
 
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import useProductoStock from "../hooks/useProductoStock"
+import Cookies from "js-cookie"
 import { ProductStock, ProductStockItem } from "../types/productoStok"
 import { updateIncrementStockProduct, updateDecrementStockProduct, resetStockProduct, getAllProductStock } from "../services/productStockService"
 import DataTable from "@/components/common/DataTable"
@@ -31,7 +32,32 @@ export default function InventarioTable() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Hook personalizado para obtener los productos y su estado de carga
-  const { productos, loading, setProductos } = useProductoStock(token)
+  const [paginaActual, setPaginaActual] = useState(0)
+  const { productos, setProductos } = useProductoStock(token, paginaActual)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const localToken = typeof window !== "undefined" ? localStorage.getItem("authToken") : null
+    const cookieToken = Cookies.get("token")
+    const userCookie = localToken || cookieToken || null
+
+    if (userCookie) {
+      fetchProductos(userCookie, paginaActual)
+    }
+  }, [paginaActual])
+
+  const fetchProductos = async (userCookie: string, page: number) => {
+    setLoading(true)
+    try {
+      const res = await getAllProductStock(userCookie, page) // ✅ corregido
+      setProductos(res.data.data)
+    } catch (error) {
+      console.error("Error cargando productos", error)
+      setProductos([])
+    } finally {
+      setLoading(false)
+    }
+  }
   /**
    * Abre el modal con los datos del producto seleccionado y el tipo de operación (entrada o salida).
    */
@@ -64,8 +90,8 @@ export default function InventarioTable() {
       if (modalType === "increment") {
         await updateIncrementStockProduct(formData.product_stock.id_Stock, cantidad, token)
         toast.success("Stock incrementado exitosamente.")
-                  // Actualizar tabla inventario con los cambios
- 
+        // Actualizar tabla inventario con los cambios
+
       } else {
         // Validación para no decrementar más del stock disponible
         if (formData.product_stock && cantidad > formData.product_stock.current_stock) {
@@ -74,17 +100,17 @@ export default function InventarioTable() {
         }
         await updateDecrementStockProduct(formData.product_stock.id_Stock, cantidad, token)
         toast.success("Stock decrementado exitosamente.")
-         // Actualizar tabla inventario con los cambios
+        // Actualizar tabla inventario con los cambios
       }
 
       // Cierra el modal después de la operación
       setIsModalOpen(false)
 
       // Actualiza localmente el estado del producto con los nuevos valores de stock
-         // ✅ Trae la lista actualizada desde la API
-    const response = await getAllProductStock(token)
-    setProductos(response.data.data)
-      
+      // ✅ Trae la lista actualizada desde la API
+      const response = await getAllProductStock(token)
+      setProductos(response.data.data)
+
     } catch (error) {
       console.error("Error actualizando stock:", error)
       toast.error("Error al actualizar el stock del producto.")
@@ -94,30 +120,30 @@ export default function InventarioTable() {
   /**
    * Maneja la acción de resetear el stock de un producto después de confirmación del usuario.
    */
-const handleResetStock = async (id_stock: string) => {
-  if (!token) return
+  const handleResetStock = async (id_stock: string) => {
+    if (!token) return
 
-  const confirm = await MySwal.fire({
-    title: "¿Resetear stock del producto?",
-    text: "Esta acción no se puede deshacer.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Sí, resetear",
-    cancelButtonText: "Cancelar",
-  })
+    const confirm = await MySwal.fire({
+      title: "¿Resetear stock del producto?",
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, resetear",
+      cancelButtonText: "Cancelar",
+    })
 
-  if (confirm.isConfirmed) {
-    try {
-      await resetStockProduct(id_stock, token)
-      toast.success("Stock reseteado correctamente")
-          // ✅ Trae la lista actualizada desde la API
-    const response = await getAllProductStock(token)
-    setProductos(response.data.data)
-    } catch {
-      toast.error("Error al resetear stock")
+    if (confirm.isConfirmed) {
+      try {
+        await resetStockProduct(id_stock, token)
+        toast.success("Stock reseteado correctamente")
+        // ✅ Trae la lista actualizada desde la API
+        const response = await getAllProductStock(token)
+        setProductos(response.data.data)
+      } catch {
+        toast.error("Error al resetear stock")
+      }
     }
   }
-}
 
 
   return (
@@ -176,6 +202,39 @@ const handleResetStock = async (id_stock: string) => {
             </tr>
           ))
         )}
+        {/* Paginación */}
+        <tr>
+          <td colSpan={6}>
+            <div className="d-flex justify-content-between align-items-center mt-4 px-2">
+              <div className="text-muted">
+                Página <strong>{paginaActual + 1}</strong>
+              </div>
+              <nav>
+                <ul className="pagination pagination-sm mb-0">
+                  <li className={`page-item ${paginaActual === 0 ? "disabled" : ""}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => setPaginaActual(prev => Math.max(prev - 1, 0))}
+                    >
+                      <i className="bi bi-chevron-left" /> Anterior
+                    </button>
+                  </li>
+                  <li className="page-item active">
+                    <span className="page-link">{paginaActual + 1}</span>
+                  </li>
+                  <li className={`page-item ${productos.length < 10 ? "disabled" : ""}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => setPaginaActual(prev => prev + 1)}
+                    >
+                      Siguiente <i className="bi bi-chevron-right" />
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </td>
+        </tr>
       </DataTable>
 
       {/* Modal de entrada/salida de stock */}
