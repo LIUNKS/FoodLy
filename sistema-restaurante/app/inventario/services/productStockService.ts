@@ -17,12 +17,12 @@ const PRODUCT_API_URL = `${API_BASE_URL}stock`;
  * @param token - Token de autenticación JWT
  * @returns Promesa con un array de productos con stock
  */
-export const getAllProductStock = (token: string) =>
+export const getAllProductStock = (token: string,page:number = 0) =>
   axios.get<{
     status: number;
     message: string;
     data: ProductStockItem[];
-  }>(`${PRODUCT_API_URL}/list`, {
+  }>(`${PRODUCT_API_URL}/list?page=${page}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -39,7 +39,7 @@ export const getAllProductStock = (token: string) =>
 export const updateIncrementStockProduct = (
   id_product_stock: string,
   count: number,
-  token: string
+  token: string,
 ) =>
   axios.post(`${PRODUCT_API_URL}/increase`, {
     id_product_stock,
