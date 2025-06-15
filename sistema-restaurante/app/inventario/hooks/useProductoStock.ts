@@ -16,7 +16,7 @@ import { getAllProductStock } from "../services/productStockService";
  *  - loading: estado de carga (true si está cargando)
  *  - setProductos: función para modificar manualmente el estado de productos
  */
-export default function useProductoStock(token: string | null) {
+export default function useProductoStock(token: string | null, page: number = 0) {
   // Estado que contiene la lista de productos con su stock
   const [productos, setProductos] = useState<ProductStockItem[]>([]);
 
@@ -32,22 +32,26 @@ export default function useProductoStock(token: string | null) {
     setLoading(true);
 
     // Se obtiene el stock desde el backend
-    getAllProductStock(token)
+    getAllProductStock(token, page)
       .then((res) => {
         // Si la respuesta es exitosa, se actualiza el estado
         if (res.data.status === 200) {
           setProductos(res.data.data);
+        }else{
+          setProductos([]);
+          console.error("Error al cargar productos:", res.data.message);
         }
       })
       .catch((err) => {
         // Se muestra cualquier error en consola
         console.error("Error cargando productos", err);
+        setProductos([]);
       })
       .finally(() => {
         // Al terminar, se desactiva el estado de carga
         setLoading(false);
       });
-  }, [token]);
+  }, [token,page]);
 
   // Se retorna el estado y funciones para utilizar en componentes
   return { productos, loading, setProductos };
