@@ -30,6 +30,9 @@ public class Box {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
+    @Column(nullable = true)
+    private UUID id_Arching_aux;
+
     @Column
     @Builder.Default
     private Boolean is_open = false;
