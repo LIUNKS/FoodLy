@@ -55,12 +55,12 @@ public class BoxController { //CONTROLADOR LISTO PARA USAR
     }
 
     //sirve para cerrar una caja pero necesita el id de box y de la caja que estan actual
-    @PostMapping("off-box/{id_box}/arching/{id_arching}")
-    public ResponseEntity<?> OffBox(@PathVariable("id_box") UUID id_box,@PathVariable UUID id_arching) throws NotFoundException, BadRequestException {
+    @PostMapping("off-box/{id_box}")
+    public ResponseEntity<?> OffBox(@PathVariable("id_box") UUID id_box) throws NotFoundException, BadRequestException {
         SuccessMessage<BoxWithArchingDTO>successMessage = SuccessMessage.<BoxWithArchingDTO>builder()
                 .status(HttpStatus.OK.value())
                 .message("La caja se ha cerrado")
-                .data(boxservice.toggleBoxDeactivationStatus(id_box,id_arching))
+                .data(boxservice.toggleBoxDeactivationStatus(id_box))
                 .build();
         return ResponseEntity.ok().body(successMessage);
     }
