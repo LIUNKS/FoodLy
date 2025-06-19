@@ -14,6 +14,8 @@ import com.example.api_v01.service.user_service.UserService;
 import com.example.api_v01.utils.ATMMovement;
 import com.example.api_v01.utils.ExceptionMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,9 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
     private final ATMRepository atmRepository;
     private final AdminService adminService;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${Entity-size}")
+    private int size;
 
     @Override
     public AtmResponseDTO saveATM(UUID id_admin, AtmResponseDTO atm) throws NotFoundException { //Funciona Bien
@@ -104,8 +109,13 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
     }
 
     @Override
-    public List<AtmDTO> getAllATMs() {
-        List<ATM> atms = atmRepository.findAll();
+    public List<AtmDTO> getAllATMs(int page) {
+
+        List<ATM> atms = atmRepository.findAll(
+                PageRequest.of(page, size)
+        ).getContent();
+
         return ATMMovement.convertToDTO(atms);
+
     }
 }
