@@ -47,8 +47,8 @@ public class ATMController { //CONTROLADOR TESTEADO, LISTO PARA USAR
 
     //Me devuelve la lista de ATMs
     @GetMapping("/list")
-    public ResponseEntity<?> getAllATMs() {
-        List<AtmDTO> atmList = atmservice.getAllATMs();
+    public ResponseEntity<?> getAllATMs(@RequestParam(defaultValue = "0") int page ) {
+        List<AtmDTO> atmList = atmservice.getAllATMs(page);
         SuccessMessage<List<AtmDTO>> successMessage = SuccessMessage.<List<AtmDTO>>builder()
                 .status(HttpStatus.OK.value())
                 .message("Todos los ATMs recuperados exitosamente")
