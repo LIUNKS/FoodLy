@@ -78,3 +78,39 @@ export const deleteEmpleado = (atmId: string, token: string) =>
       Authorization: `Bearer ${token}`, // Token JWT para autenticación
     },
   });
+
+/**
+ * Busca empleados por nombre.
+ * @param token - Token de autenticación JWT
+ * @param searchByName - Nombre o parte del nombre a buscar
+ * @param page - Número de página para paginación (opcional, por defecto 0)
+ * @return Promesa con un array de empleados que coinciden con la búsqueda
+ * */
+ export const searchEmpleados = (
+  token: string,
+  searchByName: string,
+  page: number = 0
+) =>
+  axios.get<{ status: number; data: Empleado[] }>(
+    `${EMPLEADO_API_URL}/searchByName?name=${searchByName}&page=${page}`,
+    {
+      headers: { Authorization: `Bearer ${token}` }, // Se pasa el token en el encabezado
+    }
+  );
+
+// Asignar un usuario a un ATM
+export const assignUserToAtm = (
+  atmId: string,
+  token: string,
+  payload: { username: string; password: string }
+) =>
+  axios.post(
+    `${EMPLEADO_API_URL}/${atmId}/assign-user`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );

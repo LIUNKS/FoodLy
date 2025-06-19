@@ -1,6 +1,6 @@
 // Importación de componentes necesarios para la página de empleados
 import MainLayout from "@/components/layout/MainLayout"  // Componente de diseño principal que proporciona la estructura común
-import EmpleadosTable from "@/components/empleados/EmpleadosTable"  // Tabla que muestra la lista de empleados
+import EmpleadosTable from "./components/EmpleadosTable"  // Tabla que muestra la lista de empleados
 import { ProtectedRoute } from "@/components/common/ProtectedRoute"  // Componente de protección de rutas
 import { AppModule } from "@/utils/permissions"
 
