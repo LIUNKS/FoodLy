@@ -13,6 +13,7 @@ public interface ExceptionMessage {
 
     final String BOX_OPEN="La caja ya esta abierta";
     final String BOX_CLOSE="La caja ya esta cerrada";
+    final String user_find = "El atm ya tiene un usuario asociado";
     final String ARCHING_ERROR = "La caja ya esta controlado un arqueo";
     final String STOCK_DISCOUNT="No se puede quitar mas del stock actual del producto";
     final String ORDER_SET_NOT_FOUND = "La lista de ordenes del cliente no fue encontrada";
