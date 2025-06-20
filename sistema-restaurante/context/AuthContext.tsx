@@ -74,13 +74,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     }
   };
-
   useEffect(() => {
     const storedUser = Cookies.get("user");
     const storedToken = localStorage.getItem("authToken"); // <-- cargar token
+    
+    console.log("🔍 AuthContext useEffect - storedUser:", storedUser);
+    console.log("🔍 AuthContext useEffect - storedToken:", storedToken ? "presente" : "ausente");
+    
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
-      if (storedToken) setToken(storedToken);    }    // Configurar callback para el logout automático cuando el token expire
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        console.log("🔍 Usuario parseado desde cookies:", parsedUser);
+        setUser(parsedUser);
+        if (storedToken) setToken(storedToken);
+      } catch (error) {
+        console.error("❌ Error al parsear usuario desde cookies:", error);
+      }
+    }// Configurar callback para el logout automático cuando el token expire
     console.log('🔧 Configurando callback de expiración de token...');
     apiClient.onTokenExpiredCallback(() => {
       console.warn('🚨 Token expirado detectado por callback, cerrando sesión automáticamente...');
@@ -109,15 +119,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const login = async (username: string, password: string) => {
     setIsLoading(true);
     setError(null);
-  
     try {
-      const response = await loginService({ username, password });      const userData: User = {
+      const response = await loginService({ username, password });
+      
+      console.log("🔍 Respuesta completa del login:", response);
+      console.log("🔍 Rol recibido del backend:", response.role);
+      console.log("🔍 Tipo del rol:", typeof response.role);
+
+      const userData: User = {
         id: response.data.id_admin,
         name: response.data.name_admin,
         email: response.data.email_admin,
         dni: response.data.dni_admin,
         role: response.role,
       };
+
+      console.log("🔍 userData creado:", userData);
 
       // Guardar datos en localStorage y cookies
       saveAuthToken(response.token);
@@ -127,6 +144,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       Cookies.set("user", JSON.stringify(userData), { expires: 7 });
       setToken(response.token);
       setUser(userData);
+
+      console.log("🔍 Usuario establecido en contexto:", userData);
 
       // Redirigir según el rol
       if (userData.role === "cocina") {
