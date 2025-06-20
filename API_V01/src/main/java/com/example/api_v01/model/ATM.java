@@ -42,7 +42,8 @@ public class ATM {
     private String dni;
 
     @Column(nullable = true)
-    private boolean is_active;
+    @Builder.Default
+    private Boolean is_active=false;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_user",referencedColumnName = "id_user")

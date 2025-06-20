@@ -59,7 +59,7 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
                 .build();
 
         atmOptional.setUser_atm(user);
-        atmOptional.set_active(true);
+        atmOptional.setIs_active(true);
         ATM savedATM = atmRepository.save(atmOptional);
 
         return ATMMovement.convertToResponseDTO(savedATM); //transform

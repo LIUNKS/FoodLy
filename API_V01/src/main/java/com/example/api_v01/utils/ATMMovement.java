@@ -63,7 +63,7 @@ public class ATMMovement {
                 .email(atm.getEmail())
                 .phone(atm.getPhone())
                 .dni(atm.getDni())
-                .is_active(atm.is_active())
+                .is_active(atm.getIs_active())
                 .build();
     }
 
