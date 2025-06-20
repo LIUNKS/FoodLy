@@ -25,4 +25,6 @@ public class AtmDTO {
 
     private String dni;
 
+    private Boolean is_active;
+
 }

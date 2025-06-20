@@ -3,6 +3,7 @@ package com.example.api_v01.service.atm_service;
 import com.example.api_v01.dto.entityLike.AtmDTO;
 import com.example.api_v01.dto.response.AtmResponseDTO;
 import com.example.api_v01.dto.response.RegisterAtmUserDTO;
+import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.ATM;
 import com.example.api_v01.model.Admin;
@@ -42,10 +43,14 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
     }
 
     @Override
-    public AtmResponseDTO assingUserATM(UUID id_atm, RegisterAtmUserDTO atm) throws NotFoundException { //Funciona bien
+    public AtmResponseDTO assingUserATM(UUID id_atm, RegisterAtmUserDTO atm) throws NotFoundException, BadRequestException { //Funciona bien
 
         ATM atmOptional = atmRepository.findById(id_atm)
                 .orElseThrow(() -> new NotFoundException(ExceptionMessage.ATM_NOT_FOUND));
+
+        if(atmOptional.getUser_atm() != null) {
+            throw new BadRequestException(user_find);
+        }
 
         User user = User.builder()
                 .role(Rol.ATM)
@@ -54,7 +59,7 @@ public class ATMServiceImp implements ATMService, ExceptionMessage {
                 .build();
 
         atmOptional.setUser_atm(user);
-
+        atmOptional.set_active(true);
         ATM savedATM = atmRepository.save(atmOptional);
 
         return ATMMovement.convertToResponseDTO(savedATM); //transform
