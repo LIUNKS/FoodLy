@@ -38,7 +38,6 @@ export function useAuth(): UseAuthReturn {
 
     checkAuth()
   }, [])
-
   const handleLogin = async (username: string, password: string) => {
     setIsLoading(true)
     setError(null)
@@ -49,12 +48,23 @@ export function useAuth(): UseAuthReturn {
       // Guardar el token
       saveAuthToken(response.token)
 
+      // Crear objeto de usuario basado en la respuesta
+      const userData: User = {
+        id: parseInt(response.data.id_admin),
+        username: response.data.name_admin,
+        role: response.role,
+      }
+
       // Actualizar el estado
-      setUser(response.user)
+      setUser(userData)
       setIsUserAuthenticated(true)
 
       // Redireccionar según el rol
-      router.push(response.redirectUrl)
+      if (response.role === "cocina") {
+        router.push("/cocina")
+      } else {
+        router.push("/apertura-cierre")
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error de autenticación")
     } finally {

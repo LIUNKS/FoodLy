@@ -65,39 +65,60 @@ export async function login(
 }
 
 export function saveAuthToken(token: string): void {
-  localStorage.setItem("authToken", token);
+  if (typeof window !== 'undefined') {
+    localStorage.setItem("authToken", token);
+  }
 }
 
 export function getAuthToken(): string | null {
-  return localStorage.getItem("authToken");
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem("authToken");
+  }
+  return null;
 }
 
 export function removeAuthToken(): void {
-  localStorage.removeItem("authToken");
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem("authToken");
+  }
 }
 
 export function saveUserRole(role: string): void {
-  localStorage.setItem("userRole", role);
+  if (typeof window !== 'undefined') {
+    localStorage.setItem("userRole", role);
+  }
 }
 
 export function getUserRole(): string | null {
-  return localStorage.getItem("userRole");
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem("userRole");
+  }
+  return null;
 }
 
 export function removeUserRole(): void {
-  localStorage.removeItem("userRole");
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem("userRole");
+  }
 }
 
 export function saveUserId(id: string): void {
-  localStorage.setItem("userId", id);
+  if (typeof window !== 'undefined') {
+    localStorage.setItem("userId", id);
+  }
 }
 
 export function getUserId(): string | null {
-  return localStorage.getItem("userId");
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem("userId");
+  }
+  return null;
 }
 
 export function removeUserId(): void {
-  localStorage.removeItem("userId");
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem("userId");
+  }
 }
 
 export function clearAllAuthData(): void {

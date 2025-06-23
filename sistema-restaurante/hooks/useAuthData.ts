@@ -21,7 +21,48 @@ export const useAuthData = () => {
   
   // Datos del usuario desde el contexto
   const { user, token, isLoading, error } = context;
-    // Verificar si el usuario tiene un rol específico
+    // DEBUG: Log para verificar el estado del usuario
+  console.log("🔍 useAuthData DEBUG:");
+  console.log("🔍 Usuario desde contexto:", user);
+  console.log("🔍 Token desde contexto:", token ? "presente" : "ausente");
+  console.log("🔍 Rol almacenado:", getStoredRole());
+  console.log("🔍 Token almacenado:", getStoredToken() ? "presente" : "ausente");
+  
+  // LOG MUY ESPECÍFICO DEL ROL
+  if (user) {
+    console.log("🔍 === ANÁLISIS DETALLADO DEL ROL ===");
+    console.log("🔍 user.role valor exacto:", user.role);
+    console.log("🔍 user.role tipo:", typeof user.role);
+    console.log("🔍 user.role longitud:", user.role?.length);
+    console.log("🔍 user.role como JSON:", JSON.stringify(user.role));
+    console.log("🔍 user.role en minúsculas:", user.role?.toLowerCase());
+    console.log("🔍 Comparación directa con 'admin':", user.role === 'admin');
+    console.log("🔍 Comparación lowercase con 'admin':", user.role?.toLowerCase() === 'admin');
+    console.log("🔍 === FIN ANÁLISIS DETALLADO ===");
+  }
+  
+  const storedRole = getStoredRole();
+  if (storedRole) {
+    console.log("🔍 === ANÁLISIS DETALLADO DEL ROL ALMACENADO ===");
+    console.log("🔍 storedRole valor exacto:", storedRole);
+    console.log("🔍 storedRole tipo:", typeof storedRole);
+    console.log("🔍 storedRole longitud:", storedRole?.length);
+    console.log("🔍 storedRole como JSON:", JSON.stringify(storedRole));
+    console.log("🔍 storedRole en minúsculas:", storedRole?.toLowerCase());
+    console.log("🔍 Comparación directa con 'admin':", storedRole === 'admin');
+    console.log("🔍 Comparación lowercase con 'admin':", storedRole?.toLowerCase() === 'admin');
+    console.log("🔍 === FIN ANÁLISIS DETALLADO ALMACENADO ===");
+  }
+  // Verificar si el usuario es admin (función simple y directa)
+  const isAdmin = (): boolean => {
+    const userRole = user?.role || getStoredRole();
+    console.log("🔍 isAdmin verificando rol:", userRole);
+    const result = userRole?.toLowerCase() === 'admin';
+    console.log("🔍 isAdmin resultado:", result);
+    return result;
+  };
+
+  // Verificar si el usuario tiene un rol específico
   const hasRole = (role: string): boolean => {
     return user?.role === role || getStoredRole() === role;
   };
@@ -72,8 +113,7 @@ export const useAuthData = () => {
       dni: user.dni,
       role: user.role,
     };
-  };
-  return {
+  };  return {
     // Estado del contexto
     user,
     token,
@@ -83,6 +123,7 @@ export const useAuthData = () => {
     // Funciones de utilidad
     hasRole,
     isAuthenticated,
+    isAdmin,
     getUserInfo,
     
     // Funciones de control de acceso
