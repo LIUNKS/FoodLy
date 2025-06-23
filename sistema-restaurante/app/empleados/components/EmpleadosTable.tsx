@@ -31,8 +31,7 @@ export default function EmpleadosTable() {
         if (userCookie) {
             loadEmpleados(userCookie, paginaActual)
         }
-        // Cargar empleados al montar el componente
-        // loadEmpleados();
+        
     }, [paginaActual]);
     const loadEmpleados = async (token: string, page: number) => {
         setLoading(true);
@@ -69,10 +68,10 @@ export default function EmpleadosTable() {
         try {
             if (formData.id_atm) {
                 await updateEmpleado(formData.id_atm, formData, token)
-                toast.success("Producto actualizado")
+                toast.success("Empleado actualizado")
             } else {
                 await createEmpleado(formData as Empleado, idAdmin, token)
-                toast.success("Producto creado")
+                toast.success("Empleado creado")
             }
 
             // Cerrar modal después de guardar
@@ -81,7 +80,7 @@ export default function EmpleadosTable() {
             const response = await getAllEmpleados(token, 0)
             setEmpleados(response.data.data)
         } catch {
-            toast.error("Error al guardar producto")
+            toast.error("Error al guardar empleado")
         }
     }
 
