@@ -31,7 +31,7 @@ export default function EmpleadosTable() {
         if (userCookie) {
             loadEmpleados(userCookie, paginaActual)
         }
-        
+
     }, [paginaActual]);
     const loadEmpleados = async (token: string, page: number) => {
         setLoading(true);
@@ -120,7 +120,10 @@ export default function EmpleadosTable() {
 
             toast.success("Usuario asignado correctamente");
 
-            // Cerrar modal y limpiar datos
+            // ✅ Refrescar la tabla de empleados con los nuevos datos
+            await loadEmpleados(token, paginaActual);
+
+            // ✅ Cerrar el modal y limpiar datos
             const modalEl = document.getElementById("asignarUsuarioModal");
             modalEl && (window as any).bootstrap.Modal.getInstance(modalEl)?.hide();
 
@@ -195,16 +198,23 @@ export default function EmpleadosTable() {
                             <td>{empleado.phone}</td>
                             <td>
                                 {/* Botón de asignación */}
-                                <button
-                                    className="btn btn-outline-success btn-sm me-2"
-                                    onClick={() => {
-                                        setFormData(empleado);
-                                        const modal = document.getElementById("asignarUsuarioModal");
-                                        modal && new (window as any).bootstrap.Modal(modal).show();
-                                    }}
-                                >
-                                    <BsPersonPlus className="me-1" /> Asignar a Cajero
-                                </button>
+                                {empleado.is_active ? (
+                                    <button className="btn btn-outline-secondary btn-sm me-2" disabled>
+                                        <BsPersonPlus className="me-1" /> Asignado a Caja
+                                    </button>
+                                ) : (
+                                    <button
+                                        className="btn btn-outline-success btn-sm me-2"
+                                        onClick={() => {
+                                            setFormData(empleado);
+                                            const modal = document.getElementById("asignarUsuarioModal");
+                                            modal && new (window as any).bootstrap.Modal(modal).show();
+                                        }}
+                                    >
+                                        <BsPersonPlus className="me-1" /> Asignar a Cajero
+                                    </button>
+                                )}
+
 
                                 <button className="btn btn-sm btn-outline-primary me-2" onClick={() => openModal(empleado)}>
                                     <BsPencil /> Editar
