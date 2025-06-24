@@ -5,5 +5,6 @@ export interface Empleado {
   email: string; // Correo electrónico del empleado
   phone: string; // Número de teléfono del empleado
   dni: string; // Documento Nacional de Identidad del empleado
+  is_active: boolean; // Estado del empleado (activo/inactivo)
   user_atm?: string; // ID del usuario asociado al empleado (requerido para asignación a caja)
 }
