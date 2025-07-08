@@ -8,6 +8,7 @@ import { Empleado } from "@/app/empleados/types/empleado";
 import { useAuthData } from "@/hooks/useAuthData";
 import { ProtectedRoute } from "@/components/common/ProtectedRoute";
 import { atmService, ATMDTO, ATMResponseDTO, ATMResponseWrapper } from "@/services/atm-service"; // Importar el servicio de ATM actualizado
+import CreateCajaModal from "@/components/apertura-cierre/CreateCajaModal";
 
 function AperturaCierreContent() {
   const [cajas, setCajas] = useState<BoxDTO[]>([]);
@@ -19,6 +20,8 @@ function AperturaCierreContent() {
   const [loadingEmpleados, setLoadingEmpleados] = useState(false);
   const [loadingAtms, setLoadingAtms] = useState(false); // Estado para carga de ATMs
   const [selectedCajaForATM, setSelectedCajaForATM] = useState<string | null>(null);
+  const [isCreateCajaModalOpen, setIsCreateCajaModalOpen] = useState(false);
+  const [isCreatingCaja, setIsCreatingCaja] = useState(false);
   const { user, getStoredUserId, isAuthenticated, isAdmin } = useAuthData();
 
   // Estado para controlar errores de conexión
@@ -216,10 +219,11 @@ function AperturaCierreContent() {
       
       if (!adminId) {
         console.error("❌ No se pudo obtener el ID del administrador");
-        alert("Error: No se pudo identificar al usuario administrador");
+        showConnectionError("Error: No se pudo identificar al usuario administrador");
         return;
       }
 
+      setIsCreatingCaja(true);
       console.log("🏗️ Creando caja:", { nombreCaja, adminId });
       
       // Llamar al servicio para crear la caja
@@ -229,9 +233,14 @@ function AperturaCierreContent() {
       // Recargar la lista de cajas desde el backend
       await loadCajas();
       
+      // Cerrar el modal
+      setIsCreateCajaModalOpen(false);
+      
     } catch (error) {
       console.error("❌ Error al crear la caja:", error);
-      alert("Error al crear la caja. Por favor, inténtelo de nuevo.");
+      showConnectionError("Error al crear la caja. Por favor, inténtelo de nuevo.");
+    } finally {
+      setIsCreatingCaja(false);
     }
   };  // Función para abrir modal de asignar ATM
   const handleActivarCaja = async (cajaId: string) => {
@@ -541,12 +550,7 @@ function AperturaCierreContent() {
                     padding: '8px 16px',
                     boxShadow: '0 2px 8px rgba(40, 167, 69, 0.3)'
                   }}
-                  onClick={() => {
-                    const nombre = prompt("Nombre de la nueva caja:");
-                    if (nombre && nombre.trim()) {
-                      handleCreateCaja(nombre.trim());
-                    }
-                  }}
+                  onClick={() => setIsCreateCajaModalOpen(true)}
                 >
                   <i className="fas fa-plus me-2"></i>
                   Crear Caja
@@ -591,12 +595,7 @@ function AperturaCierreContent() {
                       borderRadius: '8px',
                       padding: '10px 20px'
                     }}
-                    onClick={() => {
-                      const nombre = prompt("Nombre de la nueva caja:");
-                      if (nombre && nombre.trim()) {
-                        handleCreateCaja(nombre.trim());
-                      }
-                    }}
+                    onClick={() => setIsCreateCajaModalOpen(true)}
                   >
                     <i className="fas fa-plus me-2"></i>
                     Crear Primera Caja
@@ -1012,6 +1011,15 @@ function AperturaCierreContent() {
           </div>
         </div>
       )}
+
+      {/* Modal para crear caja */}
+      <CreateCajaModal
+        isOpen={isCreateCajaModalOpen}
+        onClose={() => setIsCreateCajaModalOpen(false)}
+        onSubmit={handleCreateCaja}
+        isLoading={isCreatingCaja}
+        cajasExistentes={cajas}
+      />
     </MainLayout>
   );
 }
