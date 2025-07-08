@@ -58,6 +58,12 @@ class ApiClient {
     };
 
     try {
+      // Verificar conexión a internet
+      if (typeof window !== 'undefined' && !window.navigator.onLine) {
+        console.error('🔌 Sin conexión a internet');
+        throw new ApiError('No hay conexión a internet. Por favor verifique su conectividad.', 0);
+      }
+      
       console.log('📤 Sending request:', {
         url,
         method: options.method || 'GET',
@@ -65,10 +71,17 @@ class ApiClient {
         body: options.body
       });
       
+      // Usar un timeout para la petición
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos de timeout
+      
       const response = await fetch(url, {
         ...options,
         headers,
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
 
       console.log('📥 Response received:', {
         url,
@@ -160,10 +173,25 @@ class ApiClient {
       
       // Error de red u otro tipo de error
       console.error('Error en request API:', error);
-      throw new ApiError(
-        'Error de conexión. Verifique su conexión a internet.',
-        0
-      );
+      
+      // Detectar tipos específicos de errores para mensajes más descriptivos
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        throw new ApiError(
+          'La solicitud tomó demasiado tiempo. Verifique su conexión o inténtelo más tarde.',
+          0
+        );
+      } else if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        // Problema común cuando no se puede contactar al servidor
+        throw new ApiError(
+          'No se pudo contactar al servidor. Verifique la URL y su conexión a internet.',
+          0
+        );
+      } else {
+        throw new ApiError(
+          'Error de conexión. Verifique su conexión a internet.',
+          0
+        );
+      }
     }
   }
 
