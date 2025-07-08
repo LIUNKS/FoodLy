@@ -7,11 +7,38 @@ import { getAllEmpleados } from "@/app/empleados/services/empleadoService";
 import { Empleado } from "@/app/empleados/types/empleado";
 import { useAuthData } from "@/hooks/useAuthData";
 import { ProtectedRoute } from "@/components/common/ProtectedRoute";
+import { atmService, ATMDTO, ATMResponseDTO, ATMResponseWrapper } from "@/services/atm-service"; // Importar el servicio de ATM actualizado
 
-function AperturaCierreContent() {  const [cajas, setCajas] = useState<BoxDTO[]>([]);
-  const [loading, setLoading] = useState(true);  const [empleados, setEmpleados] = useState<Empleado[]>([]);
+function AperturaCierreContent() {
+  const [cajas, setCajas] = useState<BoxDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [empleados, setEmpleados] = useState<Empleado[]>([]);
+  const [atms, setAtms] = useState<ATMDTO[]>([]); // Estado para ATMs según filtro actual
+  const [allAtms, setAllAtms] = useState<ATMDTO[]>([]); // Estado para todos los ATMs
+  const [atmFilter, setAtmFilter] = useState<'all' | 'active' | 'inactive'>('active'); // Filtro de ATMs
   const [loadingEmpleados, setLoadingEmpleados] = useState(false);
-  const [selectedCajaForATM, setSelectedCajaForATM] = useState<string | null>(null);  const { user, getStoredUserId, isAuthenticated, isAdmin } = useAuthData();
+  const [loadingAtms, setLoadingAtms] = useState(false); // Estado para carga de ATMs
+  const [selectedCajaForATM, setSelectedCajaForATM] = useState<string | null>(null);
+  const { user, getStoredUserId, isAuthenticated, isAdmin } = useAuthData();
+
+  // Estado para controlar errores de conexión
+  const [connectionError, setConnectionError] = useState<string | null>(null);
+
+  // Función para mostrar error de conexión
+  const showConnectionError = (message: string) => {
+    setConnectionError(message);
+    // Auto-ocultar después de 10 segundos
+    setTimeout(() => setConnectionError(null), 10000);
+  };
+
+  // Función para verificar la conexión a internet
+  const checkInternetConnection = () => {
+    if (!navigator.onLine) {
+      showConnectionError("No hay conexión a internet. Verifique su conectividad.");
+      return false;
+    }
+    return true;
+  };
 
   // Cargar la lista de cajas al inicializar el componente
   const loadCajas = async () => {
@@ -120,7 +147,31 @@ function AperturaCierreContent() {  const [cajas, setCajas] = useState<BoxDTO[]>
     } finally {
       setLoadingEmpleados(false);
     }
-  };  // Cargar cajas cuando el componente se monta
+  };  // Cargar lista de ATMs activos disponibles para asignación
+  const loadActiveATMs = async () => {
+    try {
+      setLoadingAtms(true);
+      console.log("🏧 Cargando lista de ATMs activos...");
+      
+      // Obtener solo los ATMs activos
+      const activeATMs = await atmService.getActiveATMs();
+      console.log("✅ ATMs activos obtenidos:", activeATMs.length);
+      console.log("📋 Lista de ATMs activos:", activeATMs);
+      
+      setAtms(activeATMs);
+      
+    } catch (error) {
+      console.error("❌ Error al cargar ATMs activos:", error);
+      if (error instanceof Error) {
+        console.error("❌ Mensaje de error:", error.message);
+      }
+      setAtms([]);
+    } finally {
+      setLoadingAtms(false);
+    }
+  };
+
+  // Cargar cajas cuando el componente se monta
   useEffect(() => {
     console.log("🎬 Componente AperturaCierreContent montado, cargando cajas...");
     loadCajas();
@@ -192,9 +243,38 @@ function AperturaCierreContent() {  const [cajas, setCajas] = useState<BoxDTO[]>
       return;
     }
     
-    console.log("🔐 Usuario autenticado, procediendo a cargar empleados...");
+    // Verificar conexión a internet
+    if (!checkInternetConnection()) {
+      return;
+    }
+    
+    console.log("🔐 Usuario autenticado, procediendo a cargar ATMs...");
     setSelectedCajaForATM(cajaId);
-    await loadATMs();
+    
+    try {
+      // Establecer filtro por defecto en activos
+      setAtmFilter('active');
+      
+      // Cargar todos los ATMs
+      const atmList = await loadAllATMs();
+      
+      // Si no hay ATMs, mostrar mensaje de error
+      if (!atmList || atmList.length === 0) {
+        setConnectionError("No se pudieron cargar los empleados. Verifique su conexión e inténtelo nuevamente.");
+      }
+      
+      // También cargar empleados para mantener compatibilidad
+      try {
+        await loadATMs();
+      } catch (empError) {
+        console.warn("⚠️ Error al cargar empleados (no crítico):", empError);
+        // No mostramos error aquí para no interrumpir el flujo principal
+      }
+    } catch (error) {
+      console.error("❌ Error al preparar modal de asignación:", error);
+      showConnectionError("Error de conexión. No se pudieron cargar los empleados. Por favor, verifique su conexión a internet.");
+      // Mantener el modal abierto para permitir reintentar
+    }
   };// Función para asignar empleado (ATM) a una caja
   const handleAsignarATM = async (atmId: string) => {
     if (!selectedCajaForATM) {
@@ -208,22 +288,22 @@ function AperturaCierreContent() {  const [cajas, setCajas] = useState<BoxDTO[]>
       console.log("🔗 Caja seleccionada:", selectedCajaForATM);
       console.log("🔗 Empleado seleccionado:", atmId);
       
-      // Encontrar el empleado seleccionado antes de la asignación
-      const selectedEmpleado = empleados.find(emp => emp.id_atm === atmId);
-      console.log("👤 Empleado encontrado:", selectedEmpleado);
+      // Encontrar el ATM seleccionado en la lista completa
+      const selectedATM = allAtms.find(atm => atm.id_atm === atmId);
+      console.log("👤 ATM encontrado:", selectedATM);
       
-      if (!selectedEmpleado) {
-        console.error("❌ No se encontró el empleado en la lista local");
+      if (!selectedATM) {
+        console.error("❌ No se encontró el ATM en la lista local");
         alert("Error: No se encontró el empleado seleccionado");
         return;
-      }      // ✨ NUEVA VALIDACIÓN: Verificar si el empleado tiene usuario
-      if (!selectedEmpleado.user_atm) {
-        console.warn("⚠️ El empleado no tiene usuario asociado");
-        alert(`⚠️ El empleado "${selectedEmpleado.name_atm}" necesita tener un usuario asociado para poder ser asignado a una caja.\n\nPor favor, ve a la sección de Empleados y crea un usuario para este empleado primero.`);
+      }
+      
+      // Verificar si el ATM está activo
+      if (!selectedATM.is_active) {
+        console.error("❌ Intento de asignar un ATM inactivo");
+        alert("Error: No se pueden asignar empleados inactivos. Solo los empleados activos pueden ser asignados a cajas.");
         return;
       }
-
-      console.log("✅ Empleado tiene usuario asociado:", selectedEmpleado.user_atm);
       
       console.log("📡 Llamando al servicio assignATMToBox...");
       
@@ -241,8 +321,8 @@ function AperturaCierreContent() {  const [cajas, setCajas] = useState<BoxDTO[]>
         // Recargar las cajas desde el backend para obtener el estado más actual
         await loadCajas();
         
-        console.log("✅ Empleado asignado exitosamente:", selectedEmpleado.name_atm);
-        alert(`✅ Empleado ${selectedEmpleado.name_atm} asignado exitosamente a la caja`);
+        console.log("✅ Empleado asignado exitosamente:", selectedATM.name_atm);
+        alert(`✅ Empleado ${selectedATM.name_atm} asignado exitosamente a la caja`);
         
         // Cerrar el modal
         setSelectedCajaForATM(null);
@@ -250,7 +330,7 @@ function AperturaCierreContent() {  const [cajas, setCajas] = useState<BoxDTO[]>
         console.error("❌ Respuesta inesperada del servidor:", response);
         alert("Error: La asignación no se completó correctamente");
       }
-        } catch (error) {
+    } catch (error) {
       console.error("❌ Error completo al asignar empleado:", error);
       
       // Log detallado del error
@@ -259,7 +339,8 @@ function AperturaCierreContent() {  const [cajas, setCajas] = useState<BoxDTO[]>
         console.error("❌ Error.message:", error.message);
         console.error("❌ Error.stack:", error.stack);
       }
-        // Si el error tiene una respuesta HTTP, mostrarla
+      
+      // Si el error tiene una respuesta HTTP, mostrarla
       if (error && typeof error === 'object' && 'response' in error) {
         const httpError = error as { response: { status?: number; data?: unknown } };
         console.error("❌ HTTP Error Response:", httpError.response);
@@ -267,22 +348,7 @@ function AperturaCierreContent() {  const [cajas, setCajas] = useState<BoxDTO[]>
         console.error("❌ HTTP Data:", httpError.response?.data);
       }
       
-      // Mostrar mensaje específico según el tipo de error
-      if (error instanceof Error) {
-        if (error.message.includes("atm necesita un user")) {
-          alert("❌ Error: El empleado seleccionado necesita tener un usuario asociado para poder ser asignado a una caja.\n\nPor favor, ve a la sección de Empleados y crea un usuario para este empleado.");
-        } else if (error.message.includes("401") || error.message.includes("403")) {
-          alert("❌ Error de autenticación: Su sesión ha expirado. Por favor, inicie sesión nuevamente.");
-        } else if (error.message.includes("404")) {
-          alert("❌ Error: La caja o el empleado no fueron encontrados en el servidor.");
-        } else if (error.message.includes("500")) {
-          alert("❌ Error del servidor: Por favor, inténtelo de nuevo más tarde.");
-        } else {
-          alert(`❌ Error al asignar empleado: ${error.message}`);
-        }
-      } else {
-        alert("❌ Error desconocido al asignar empleado. Por favor, inténtelo de nuevo.");
-      }
+      alert("❌ Error al asignar empleado. Por favor, inténtelo de nuevo.");
     }
   };// Función para cambiar estado de caja
   const handleToggleCaja = async (cajaId: string) => {
@@ -315,7 +381,90 @@ function AperturaCierreContent() {  const [cajas, setCajas] = useState<BoxDTO[]>
       console.error("❌ Error al cambiar estado de caja:", error);
       alert("Error al cambiar el estado de la caja");
     }
-  };  return (
+  };  // Cargar lista de todos los ATMs y aplicar filtro
+  const loadAllATMs = async () => {
+    try {
+      setLoadingAtms(true);
+      console.log("🏧 Cargando lista completa de ATMs...");
+      
+      // Verificar conexión a internet antes de la petición
+      if (!navigator.onLine) {
+        throw new Error("No hay conexión a internet. Por favor, verifique su conectividad y vuelva a intentarlo.");
+      }
+      
+      // Llamada directa al servicio sin usar Promise.race
+      // El manejo de timeout ya está en el apiClient
+      console.log("📡 Llamando a atmService.getAllATMsWithStatus()");
+      const allATMsList = await atmService.getAllATMsWithStatus();
+      
+      // Si llegamos aquí, la petición fue exitosa
+      console.log("✅ Total de ATMs obtenidos:", allATMsList.length);
+      console.log("📋 Lista de ATMs:", allATMsList);
+      
+      // Guardar todos los ATMs
+      setAllAtms(allATMsList);
+      
+      // Aplicar filtro actual
+      applyATMFilter(allATMsList, atmFilter);
+      
+      // Limpiar cualquier error de conexión previo
+      setConnectionError(null);
+      
+      return allATMsList;
+    } catch (error) {
+      console.error("❌ Error al cargar todos los ATMs:", error);
+      
+      // Log detallado del error
+      let errorMessage = "Error desconocido al cargar empleados";
+      
+      if (error instanceof Error) {
+        console.error("❌ Mensaje de error:", error.message);
+        console.error("❌ Tipo de error:", error.name);
+        errorMessage = error.message;
+        
+        // Mostrar mensaje de error en la UI
+        showConnectionError(`Error al cargar empleados: ${errorMessage}`);
+      }
+      
+      // Usar datos vacíos para evitar romper la UI
+      setAllAtms([]);
+      setAtms([]);
+      return [];
+    } finally {
+      setLoadingAtms(false);
+    }
+  };
+  
+  // Aplicar filtro a la lista de ATMs
+  const applyATMFilter = (atmList: ATMDTO[] = allAtms, filter: 'all' | 'active' | 'inactive' = atmFilter) => {
+    console.log(`🔍 Aplicando filtro "${filter}" a ${atmList.length} ATMs`);
+    
+    let filteredATMs: ATMDTO[] = [];
+    
+    switch (filter) {
+      case 'all':
+        filteredATMs = atmList;
+        break;
+      case 'active':
+        filteredATMs = atmList.filter(atm => atm.is_active === true);
+        break;
+      case 'inactive':
+        filteredATMs = atmList.filter(atm => atm.is_active === false);
+        break;
+    }
+    
+    console.log(`✅ ATMs filtrados (${filter}):`, filteredATMs.length);
+    setAtms(filteredATMs);
+  };
+  
+  // Función para cambiar el filtro de ATMs
+  const handleFilterChange = (filter: 'all' | 'active' | 'inactive') => {
+    console.log(`🔄 Cambiando filtro a "${filter}"`);
+    setAtmFilter(filter);
+    applyATMFilter(allAtms, filter);
+  };
+
+  return (
     <MainLayout>
       <nav className="navbar bg-body-tertiary">
         <div className="container-fluid">
@@ -354,6 +503,27 @@ function AperturaCierreContent() {  const [cajas, setCajas] = useState<BoxDTO[]>
             </div>
           </div>
         </div>
+
+        {/* Mensaje de error de conexión */}
+        {connectionError && (
+          <div 
+            className="alert alert-danger position-fixed bottom-0 start-50 translate-middle-x mb-4 d-flex align-items-center"
+            style={{
+              zIndex: 9999,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              maxWidth: '90%',
+              width: 'auto',
+            }}
+          >
+            <i className="fas fa-exclamation-triangle me-2"></i>
+            <div>{connectionError}</div>
+            <button 
+              type="button" 
+              className="btn-close ms-3" 
+              onClick={() => setConnectionError(null)}
+            ></button>
+          </div>
+        )}
 
         {/* Sección de cajas creadas */}
         <div className="row">
@@ -682,111 +852,165 @@ function AperturaCierreContent() {  const [cajas, setCajas] = useState<BoxDTO[]>
                   <div className="alert alert-info d-flex align-items-center">
                     <i className="fas fa-info-circle me-2"></i>
                     <small>
-                      <strong>Nota:</strong> Solo los empleados que tienen un usuario asociado pueden ser asignados a una caja. 
-                      Si un empleado no aparece disponible, debe crear un usuario para él en la sección de Empleados.
+                      <strong>Nota:</strong> Solo los empleados activos pueden ser asignados a cajas. Los empleados inactivos aparecen deshabilitados.
                     </small>
+                  </div>
+                  
+                  {/* Botones de filtrado */}
+                  <div className="btn-group w-100 mb-3">
+                    <button 
+                      type="button"
+                      className={`btn ${atmFilter === 'all' ? 'btn-primary' : 'btn-outline-primary'}`}
+                      onClick={() => handleFilterChange('all')}
+                    >
+                      <i className="fas fa-users me-1"></i> Todos
+                    </button>
+                    <button 
+                      type="button"
+                      className={`btn ${atmFilter === 'active' ? 'btn-success' : 'btn-outline-success'}`}
+                      onClick={() => handleFilterChange('active')}
+                    >
+                      <i className="fas fa-check-circle me-1"></i> Activos
+                    </button>
+                    <button 
+                      type="button"
+                      className={`btn ${atmFilter === 'inactive' ? 'btn-warning' : 'btn-outline-warning'}`}
+                      onClick={() => handleFilterChange('inactive')}
+                    >
+                      <i className="fas fa-pause-circle me-1"></i> Inactivos
+                    </button>
                   </div>
                 </div>
                 
-                {loadingEmpleados ? (
+                {loadingAtms ? (
                   <div className="text-center py-4">
                     <div className="spinner-border spinner-border-sm text-primary me-2" role="status">
                       <span className="visually-hidden">Cargando...</span>
                     </div>
-                    Cargando empleados disponibles...
-                  </div>                ) : empleados.length === 0 ? (
+                    Cargando empleados...
+                  </div>
+                ) : atms.length === 0 ? (
                   <div className="text-center py-4 text-muted">
                     <i className="fas fa-exclamation-triangle fa-2x mb-2 d-block text-warning"></i>
-                    No hay empleados disponibles en este momento
-                  </div>
-                ) : (                  <div className="list-group">
-                    {empleados.map((empleado) => {
-                      const tieneUsuario = !!empleado.user_atm;
-                      
-                      return (
-                        <div
-                          key={empleado.id_atm}
-                          className={`list-group-item d-flex justify-content-between align-items-center ${!tieneUsuario ? 'bg-light opacity-75' : ''}`}
+                    No hay empleados {atmFilter === 'active' ? 'activos' : atmFilter === 'inactive' ? 'inactivos' : ''} disponibles
+                    {atmFilter !== 'all' && (
+                      <div className="mt-2">
+                        <button 
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={() => handleFilterChange('all')}
                         >
-                          <div className="flex-grow-1">
-                            <div className="d-flex align-items-center">
-                              <i className={`fas fa-user ${tieneUsuario ? 'text-primary' : 'text-muted'} me-2`}></i>
-                              <div>
-                                <h6 className={`mb-0 ${!tieneUsuario ? 'text-muted' : ''}`}>
-                                  {empleado.name_atm}
-                                  {tieneUsuario && (
-                                    <span className="badge bg-success ms-2 small">
-                                      <i className="fas fa-check-circle me-1"></i>
-                                      Con Usuario
-                                    </span>
-                                  )}
-                                  {!tieneUsuario && (
-                                    <span className="badge bg-warning ms-2 small">
-                                      <i className="fas fa-exclamation-triangle me-1"></i>
-                                      Sin Usuario
-                                    </span>
-                                  )}
-                                </h6>
-                                <small className="text-muted">
-                                  <i className="fas fa-at me-1"></i>
-                                  {empleado.alias}
-                                </small>
-                                {empleado.email && (
-                                  <div>
-                                    <small className="text-muted">
-                                      <i className="fas fa-envelope me-1"></i>
-                                      {empleado.email}
-                                    </small>
-                                  </div>
+                          Ver todos los empleados
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="list-group">
+                    {atms.map((atm) => (
+                      <div
+                        key={atm.id_atm}
+                        className={`list-group-item d-flex justify-content-between align-items-center ${!atm.is_active ? 'bg-light' : ''}`}
+                      >
+                        <div className="flex-grow-1">
+                          <div className="d-flex align-items-center">
+                            <i className={`fas fa-user ${atm.is_active ? 'text-primary' : 'text-muted'} me-2`}></i>
+                            <div>
+                              <h6 className="mb-0">
+                                {atm.name_atm}
+                                {atm.is_active ? (
+                                  <span className="badge bg-success ms-2 small">
+                                    <i className="fas fa-check-circle me-1"></i>
+                                    Activo
+                                  </span>
+                                ) : (
+                                  <span className="badge bg-warning text-dark ms-2 small">
+                                    <i className="fas fa-pause-circle me-1"></i>
+                                    Inactivo
+                                  </span>
                                 )}
-                                {!tieneUsuario && (
-                                  <div>
-                                    <small className="text-warning">
-                                      <i className="fas fa-info-circle me-1"></i>
-                                      Debe tener un usuario para ser asignado
-                                    </small>
-                                  </div>
-                                )}
-                              </div>
+                              </h6>
+                              <small className="text-muted">
+                                <i className="fas fa-at me-1"></i>
+                                {atm.alias}
+                              </small>
+                              {atm.email && (
+                                <div>
+                                  <small className="text-muted">
+                                    <i className="fas fa-envelope me-1"></i>
+                                    {atm.email}
+                                  </small>
+                                </div>
+                              )}
+                              {!atm.is_active && (
+                                <div>
+                                  <small className="text-warning">
+                                    <i className="fas fa-exclamation-triangle me-1"></i>
+                                    Este empleado está marcado como inactivo
+                                  </small>
+                                </div>
+                              )}
                             </div>
                           </div>
-                          <div className="d-flex gap-2">
-                            <button
-                              type="button"
-                              className={`btn btn-sm ${tieneUsuario ? 'btn-success' : 'btn-secondary'}`}
-                              disabled={!tieneUsuario}
-                              onClick={() => {
-                                if (tieneUsuario) {
-                                  console.log("🔘 Botón Asignar clickeado");
-                                  console.log("🔘 empleado.id_atm:", empleado.id_atm);
-                                  console.log("🔘 selectedCajaForATM:", selectedCajaForATM);
-                                  console.log("🔘 empleado completo:", empleado);
-                                  console.log("🔘 empleado.user_atm:", empleado.user_atm);
-                                  handleAsignarATM(empleado.id_atm);
-                                }
-                              }}
-                              title={tieneUsuario ? "Asignar empleado a la caja" : "El empleado necesita un usuario para ser asignado"}
-                            >
-                              <i className={`fas ${tieneUsuario ? 'fa-check' : 'fa-ban'} me-1`}></i>
-                              {tieneUsuario ? 'Asignar' : 'No disponible'}
-                            </button>
-                          </div>
                         </div>
-                      );
-                    })}
+                        <div className="d-flex gap-2">
+                          <button
+                            type="button"
+                            className={`btn btn-sm ${atm.is_active ? 'btn-success' : 'btn-secondary'}`}
+                            onClick={() => {
+                              console.log("🔘 Botón Asignar clickeado");
+                              console.log("🔘 atm.id_atm:", atm.id_atm);
+                              console.log("🔘 selectedCajaForATM:", selectedCajaForATM);
+                              handleAsignarATM(atm.id_atm);
+                            }}
+                            disabled={!atm.is_active}
+                            title={atm.is_active ? "Asignar empleado a la caja" : "No se puede asignar empleados inactivos"}
+                          >
+                            <i className={`fas ${atm.is_active ? 'fa-check' : 'fa-ban'} me-1`}></i>
+                            {atm.is_active ? 'Asignar' : 'No disponible'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                )}</div>
+                )}
+
+                {/* Mensaje de error y botón de reintento */}
+                {(allAtms.length === 0 || atms.length === 0) && connectionError && (
+                  <div className="alert alert-danger mt-3">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div>
+                        <i className="fas fa-exclamation-triangle me-2"></i>
+                        Error al cargar los empleados
+                      </div>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => loadAllATMs()}
+                      >
+                        <i className="fas fa-sync-alt me-1"></i> Reintentar
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
               <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary"
-                  onClick={() => setSelectedCajaForATM(null)}
-                >
-                  Cancelar
-                </button>
+                <div className="w-100 d-flex justify-content-between align-items-center">
+                  <div>
+                    <small className="text-muted">
+                      Mostrando {atms.length} de {allAtms.length} empleados
+                    </small>
+                  </div>
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary"
+                    onClick={() => setSelectedCajaForATM(null)}
+                  >
+                    Cerrar
+                  </button>
+                </div>
               </div>
             </div>
-          </div>        </div>
+          </div>
+        </div>
       )}
     </MainLayout>
   );
