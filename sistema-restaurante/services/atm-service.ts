@@ -9,6 +9,7 @@ export interface ATMDTO {
   phone: string;
   dni: string;
   is_active: boolean;
+  isLoading?: boolean; // Estado de carga para UI
 }
 
 // Interfaz para la respuesta del servidor, según el formato en Swagger
@@ -195,5 +196,74 @@ export const atmService = {
       console.error("❌ Error al asignar ATM:", error);
       throw error;
     }
-  }
+  },
+
+  /**
+   * Obtener todas las cajas asignadas a cualquier ATM en el sistema
+   * @returns Objeto con mapeo de id_box -> id_atm y datos completos de las asignaciones
+   */
+  getAllBoxesAssignedToATMs: async (): Promise<{ boxMap: Map<string, string>, atmBoxes: Map<string, any[]> }> => {
+    try {
+      console.log("🔄 Obteniendo todas las cajas asignadas a ATMs...");
+      
+      // Obtener todos los ATMs primero
+      const atms = await atmService.getAllATMsWithStatus();
+      
+      // Preparar estructuras de datos para el resultado
+      const boxMap = new Map<string, string>();  // id_box -> id_atm
+      const atmBoxes = new Map<string, any[]>(); // id_atm -> [cajas]
+      
+      console.log(`🔍 Consultando asignaciones para ${atms.length} ATMs`);
+      
+      // Para cada ATM, obtener sus cajas asignadas
+      const atmPromises = atms.map(async (atm) => {
+        try {
+          if (!atm.is_active) {
+            console.log(`⏭️ Omitiendo ATM inactivo: ${atm.name_atm} (${atm.id_atm})`);
+            return; // Ignorar ATMs inactivos
+          }
+          
+          console.log(`🔍 Consultando cajas asignadas para ATM: ${atm.name_atm} (${atm.id_atm})`);
+          
+          // Importar el servicio de cajas aquí para evitar importaciones circulares
+          const { boxService } = await import('./box-service');
+          const response = await boxService.getBoxesByAtm(atm.id_atm);
+          
+          if (response && response.data && Array.isArray(response.data)) {
+            if (response.data.length > 0) {
+              console.log(`✅ ATM ${atm.name_atm} (${atm.id_atm}) tiene ${response.data.length} cajas asignadas`);
+              
+              // Guardar las cajas de este ATM
+              atmBoxes.set(atm.id_atm, response.data);
+              
+              // Actualizar el mapa global caja -> ATM
+              response.data.forEach(box => {
+                boxMap.set(box.id_box, atm.id_atm);
+                console.log(`  → Caja ${box.id_box} (${box.name_box}) asignada a ATM ${atm.id_atm}`);
+              });
+            } else {
+              console.log(`ℹ️ ATM ${atm.name_atm} (${atm.id_atm}) no tiene cajas asignadas`);
+            }
+          } else {
+            console.warn(`⚠️ Formato de respuesta inválido para ATM ${atm.id_atm}:`, response);
+          }
+        } catch (error) {
+          console.error(`❌ Error al obtener cajas para ATM ${atm.id_atm}:`, error);
+          console.error(`  Detalles: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      });
+      
+      // Esperar a que todas las consultas terminen
+      await Promise.all(atmPromises);
+      
+      console.log(`✅ Mapa global construido: ${boxMap.size} cajas asignadas a ATMs`);
+      console.log(`📊 Detalle del mapa:`, Array.from(boxMap.entries()));
+      
+      return { boxMap, atmBoxes };
+    } catch (error) {
+      console.error("❌ Error al obtener todas las cajas asignadas:", error);
+      console.error("  Detalles:", error instanceof Error ? error.message : String(error));
+      return { boxMap: new Map<string, string>(), atmBoxes: new Map<string, any[]>() };
+    }
+  },
 };
