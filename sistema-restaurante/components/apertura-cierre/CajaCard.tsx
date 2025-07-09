@@ -1,5 +1,5 @@
 import "@/styles/common.css"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { BoxDTO } from "@/services/box-service"
 
 interface User {
@@ -11,27 +11,37 @@ interface User {
 }
 
 interface CajaCardProps {
-  onCreateCaja?: (nombreCaja: string) => void
   cajas: BoxDTO[]
   loading: boolean
-  onRefresh: () => void
+  onRefresh?: () => void
   onActivarCaja?: (cajaId: string) => void
   onToggleCaja?: (cajaId: string) => void
   user: User | null
   isAdmin: boolean
+  cajasAsignadas?: Map<string, string> // Mapa de cajas asignadas a ATMs (ID caja -> ID atm)
 }
 
-export default function CajaCard({ onCreateCaja, cajas, loading, onRefresh, onActivarCaja, onToggleCaja, user, isAdmin }: CajaCardProps) {
-  const [showModal, setShowModal] = useState(false)
-  const [nombreCaja, setNombreCaja] = useState("")
+export default function CajaCard({ cajas, loading, onRefresh, onActivarCaja, onToggleCaja, user, isAdmin, cajasAsignadas = new Map() }: CajaCardProps) {
+  // Estado local para rastrear cuando fue la última actualización
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
-  const handleCreateCaja = () => {
-    if (nombreCaja.trim()) {
-      onCreateCaja?.(nombreCaja.trim())
-      setNombreCaja("")
-      setShowModal(false)
-    }
-  }
+  // Efecto para actualizar datos periódicamente
+  useEffect(() => {
+    // Función para actualizar datos
+    const refreshData = () => {
+      console.log("🔄 Actualizando datos automáticamente desde CajaCard");
+      if (onRefresh) {
+        onRefresh();
+        setLastRefresh(new Date());
+      }
+    };
+
+    // Configurar intervalo de actualización (cada 60 segundos)
+    const intervalId = setInterval(refreshData, 60000);
+
+    // Limpiar el intervalo cuando el componente se desmonte
+    return () => clearInterval(intervalId);
+  }, [onRefresh]);
 
   const formatDate = (dateString: string) => {
     try {
@@ -45,6 +55,48 @@ export default function CajaCard({ onCreateCaja, cajas, loading, onRefresh, onAc
     }
   };
 
+  // Función para verificar si una caja está asignada a un ATM según el mapa global
+  const isCajaAsignada = (cajaId: string): boolean => {
+    // Verificar primero si la caja tiene un ATM asignado en sus propios datos
+    const caja = cajas.find(c => c.id_box === cajaId);
+    if (caja?.atm) {
+      console.log(`✅ Caja ${cajaId} tiene ATM asignado en sus propios datos:`, caja.atm.id_atm);
+      return true;
+    }
+    
+    // Si no, verificar en el mapa global de asignaciones
+    const estaAsignada = cajasAsignadas.has(cajaId);
+    if (estaAsignada) {
+      console.log(`✅ Caja ${cajaId} tiene ATM asignado según el mapa global:`, cajasAsignadas.get(cajaId));
+    }
+    return estaAsignada;
+  };
+  
+  // Función para obtener el ATM asignado a una caja (combina datos locales y globales)
+  const getATMForCaja = (cajaId: string): any => {
+    // Buscar la caja en el estado local
+    const caja = cajas.find(c => c.id_box === cajaId);
+    
+    // Si la caja tiene datos de ATM, usarlos
+    if (caja?.atm) {
+      return caja.atm;
+    }
+    
+    // Si no tiene datos pero está en el mapa global, buscar el ATM correspondiente
+    if (cajasAsignadas.has(cajaId)) {
+      const atmId = cajasAsignadas.get(cajaId);
+      // En este caso solo tenemos el ID del ATM, buscar el objeto completo
+      // Podríamos devolver un objeto mínimo con solo el ID si no lo encontramos
+      return { 
+        id_atm: atmId, 
+        name_atm: `ATM ${atmId?.substring(0, 8)}...` // Mostrar parte del ID si no tenemos el nombre
+      };
+    }
+    
+    // Si no está asignada, devolver null
+    return null;
+  };
+
   // Ordenar cajas por fecha de creación (más recientes primero)
   const sortedCajas = [...cajas].sort((a, b) => {
     const dateA = new Date(a.date);
@@ -55,21 +107,30 @@ export default function CajaCard({ onCreateCaja, cajas, loading, onRefresh, onAc
   return (
     <>
       <div className="foodly-card fade-in-up">
-        <div className="foodly-card-header">
-          <div className="d-flex justify-content-between align-items-center">
-            <h3>Lista de cajas</h3>
-            <button 
-              className="btn btn-outline-light btn-sm"
-              onClick={onRefresh}
-              disabled={loading}
-            >
+        <div className="foodly-card-body pt-4">
+          {/* Indicador de última actualización */}
+          <div className="d-flex justify-content-between align-items-center mb-2">
+            <small className="text-muted" style={{ fontSize: '10px' }}>
               <i className="fas fa-sync-alt me-1"></i>
-              {loading ? 'Actualizando...' : 'Actualizar'}
+              Última actualización: {lastRefresh.toLocaleTimeString()}
+            </small>
+            <button 
+              className="btn btn-sm btn-outline-secondary" 
+              style={{ fontSize: '12px' }}
+              onClick={() => {
+                if (onRefresh) {
+                  console.log("🔄 Actualizando datos manualmente desde CajaCard");
+                  onRefresh();
+                  setLastRefresh(new Date());
+                }
+              }}
+              title="Actualizar ahora"
+            >
+              <i className="fas fa-redo-alt me-1"></i>
+              Actualizar
             </button>
           </div>
-        </div>
-        <div className="foodly-card-body">
-          {/* Sección superior: Botón crear caja o mensaje */}
+          {/* Mensaje para cuando no hay cajas */}
           {sortedCajas.length === 0 && !loading ? (
             <div className="text-center mb-4">
               <div className="mb-4">
@@ -77,36 +138,12 @@ export default function CajaCard({ onCreateCaja, cajas, loading, onRefresh, onAc
               </div>
               <p className="mb-3" style={{ fontSize: '16px', color: 'var(--text-medium)' }}>
                 {isAdmin 
-                  ? 'Haga click en el botón para crear una nueva caja'
+                  ? 'No hay cajas creadas. Utilice el botón "Crear Caja" en la parte superior para agregar una nueva.'
                   : 'No hay cajas creadas. Solo los administradores pueden crear cajas.'
                 }
               </p>
-              {isAdmin && (
-                <button 
-                  type="button" 
-                  className="foodly-btn"
-                  onClick={() => setShowModal(true)}
-                >
-                  <i className="fas fa-plus me-2"></i>
-                  Crear Caja
-                </button>
-              )}
             </div>
-          ) : (
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h5 className="mb-0">Cajas Creadas</h5>
-              {isAdmin && (
-                <button 
-                  type="button" 
-                  className="foodly-btn"
-                  onClick={() => setShowModal(true)}
-                >
-                  <i className="fas fa-plus me-2"></i>
-                  Crear Caja
-                </button>
-              )}
-            </div>
-          )}
+          ) : null}
 
           {/* Grid de cajas rediseñado - Más limpio y moderno */}
           {(sortedCajas.length > 0 || loading) && (
@@ -140,9 +177,9 @@ export default function CajaCard({ onCreateCaja, cajas, loading, onRefresh, onAc
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         height: '200px',
                         cursor: 'pointer',
-                        background: !caja.atm ? 
+                        background: !isCajaAsignada(caja.id_box) ? 
                           'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)' :
-                          caja.atm && caja.is_open ? 
+                          caja.is_open ? 
                           'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)' :
                           'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)'
                       }}
@@ -176,16 +213,16 @@ export default function CajaCard({ onCreateCaja, cajas, loading, onRefresh, onAc
                                 width: '40px',
                                 height: '40px',
                                 borderRadius: '12px',
-                                background: !caja.atm ? '#6c757d' :
-                                          caja.atm && caja.is_open ? '#28a745' :
+                                background: !isCajaAsignada(caja.id_box) ? '#6c757d' :
+                                          caja.is_open ? '#28a745' :
                                           '#ff6b35',
                                 color: 'white'
                               }}
                             >
                               <i 
                                 className={`fas ${
-                                  !caja.atm ? 'fa-lock' :
-                                  caja.atm && caja.is_open ? 'fa-play' :
+                                  !isCajaAsignada(caja.id_box) ? 'fa-lock' :
+                                  caja.is_open ? 'fa-play' :
                                   'fa-pause'
                                 }`}
                                 style={{ fontSize: '16px' }}
@@ -205,25 +242,26 @@ export default function CajaCard({ onCreateCaja, cajas, loading, onRefresh, onAc
                           <span 
                             className="badge rounded-pill px-2 py-1"
                             style={{
-                              background: !caja.atm ? '#6c757d' :
-                                        caja.atm && caja.is_open ? '#28a745' :
+                              background: !isCajaAsignada(caja.id_box) ? '#6c757d' :
+                                        caja.is_open ? '#28a745' :
                                         '#ff6b35',
                               color: 'white',
                               fontSize: '10px',
                               fontWeight: '600'
                             }}
                           >
-                            {!caja.atm ? 'SIN ATM' :
-                             caja.atm && caja.is_open ? 'ACTIVA' :
+                            {!isCajaAsignada(caja.id_box) ? 'SIN ATM' :
+                             caja.is_open ? 'ACTIVA' :
                              'PAUSADA'}
                           </span>
                         </div>
 
                         {/* Info del empleado o mensaje */}
                         <div className="flex-grow-1 mb-3">
-                          {caja.atm ? (
-                            <div className="d-flex align-items-center">
-                              <div 
+                          {isCajaAsignada(caja.id_box) ? (
+                            <div>
+                              <div className="d-flex align-items-center">
+                                <div 
                                 className="d-flex align-items-center justify-content-center me-2"
                                 style={{
                                   width: '24px',
@@ -237,9 +275,51 @@ export default function CajaCard({ onCreateCaja, cajas, loading, onRefresh, onAc
                               </div>
                               <div>
                                 <p className="mb-0 fw-semibold" style={{ fontSize: '13px', color: '#2c3e50' }}>
-                                  {caja.atm.name_atm || caja.atm.alias || `ATM ${caja.atm.id_atm}`}
+                                  {(() => {
+                                    const atmData = getATMForCaja(caja.id_box);
+                                    return atmData ? 
+                                      (atmData.name_atm || atmData.alias || `ATM ${atmData.id_atm}`) :
+                                      "Empleado asignado";
+                                  })()}
                                 </p>
-                                <small className="text-muted" style={{ fontSize: '10px' }}>Empleado asignado</small>
+                                <small className="text-muted" style={{ fontSize: '10px' }}>
+                                  {(() => {
+                                    const atmData = getATMForCaja(caja.id_box);
+                                    if (atmData && atmData.email) {
+                                      return <span><i className="fas fa-envelope me-1" style={{ fontSize: '8px' }}></i>{atmData.email}</span>;
+                                    }
+                                    if (atmData && atmData.alias) {
+                                      return <span><i className="fas fa-at me-1" style={{ fontSize: '8px' }}></i>{atmData.alias}</span>;
+                                    }
+                                    return "Empleado asignado";
+                                  })()}
+                                </small>
+                              </div>
+                              </div>
+                              
+                              {/* Indicador de caja configurada */}
+                              <div className="mt-2 pt-2 border-top">
+                                <div className="d-flex justify-content-between align-items-center">
+                                  <div className="d-flex align-items-center">
+                                    <div 
+                                      className={`me-2`} 
+                                      style={{
+                                        width: '6px',
+                                        height: '6px',
+                                        borderRadius: '50%',
+                                        background: caja.is_open ? '#28a745' : '#ffc107'
+                                      }}
+                                    ></div>
+                                    <small style={{ fontSize: '10px', fontWeight: 500 }}>
+                                      Estado: <span className={`${caja.is_open ? 'text-success' : 'text-warning'} fw-semibold`}>
+                                        {caja.is_open ? 'Abierta' : 'Cerrada'}
+                                      </span>
+                                    </small>
+                                  </div>
+                                  <small className="text-muted" style={{ fontSize: '9px', fontWeight: 600 }}>
+                                    CAJA CONFIGURADA
+                                  </small>
+                                </div>
                               </div>
                             </div>
                           ) : (
@@ -254,20 +334,21 @@ export default function CajaCard({ onCreateCaja, cajas, loading, onRefresh, onAc
 
                         {/* Botón de acción compacto */}
                         <div className="mt-auto">
-                          {!caja.atm ? (
+                          {/* Verificar tanto en la data local como en el mapa global */}
+                          {!isCajaAsignada(caja.id_box) ? (
                             // Solo mostrar botón "Asignar Empleado" si el usuario es admin
                             isAdmin ? (
                               <button 
                                 className="btn w-100 fw-semibold"
                                 style={{ 
-                                  background: '#3498db',
-                                  color: 'white',
-                                  border: 'none',
-                                  borderRadius: '10px',
-                                  padding: '8px 12px',
-                                  fontSize: '12px',
-                                  transition: 'all 0.2s ease'
-                                }}
+                                background: '#3498db',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '10px',
+                                padding: '8px 12px',
+                                fontSize: '12px',
+                                transition: 'all 0.3s ease'
+                              }}
                                 onMouseEnter={(e) => {
                                   e.currentTarget.style.background = '#2980b9';
                                   e.currentTarget.style.transform = 'translateY(-1px)';
@@ -304,21 +385,41 @@ export default function CajaCard({ onCreateCaja, cajas, loading, onRefresh, onAc
                                 </div>
                               </div>
                             )
-                          ) : caja.is_open ? (
+                          ) : (caja as any).isLoading ? (
                             <button 
                               className="btn w-100 fw-semibold"
                               style={{ 
-                                background: '#f39c12',
+                                background: '#6c757d',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '10px',
                                 padding: '8px 12px',
-                                fontSize: '12px'
+                                fontSize: '12px',
+                                transition: 'all 0.3s ease',
+                                opacity: '0.8'
+                              }}
+                              disabled
+                            >
+                              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                              Procesando...
+                            </button>
+                          ) : caja.is_open ? (
+                            <button 
+                              className="btn w-100 fw-semibold"
+                              style={{ 
+                                background: '#e74c3c',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '10px',
+                                padding: '8px 12px',
+                                fontSize: '12px',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 2px 8px rgba(231, 76, 60, 0.3)'
                               }}
                               onClick={() => onToggleCaja?.(caja.id_box)}
                             >
-                              <i className="fas fa-pause me-2"></i>
-                              Pausar
+                              <i className="fas fa-lock me-2"></i>
+                              Cerrar Caja
                             </button>
                           ) : (
                             <button 
@@ -329,12 +430,14 @@ export default function CajaCard({ onCreateCaja, cajas, loading, onRefresh, onAc
                                 border: 'none',
                                 borderRadius: '10px',
                                 padding: '8px 12px',
-                                fontSize: '12px'
+                                fontSize: '12px',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 2px 8px rgba(39, 174, 96, 0.3)'
                               }}
                               onClick={() => onToggleCaja?.(caja.id_box)}
                             >
                               <i className="fas fa-play me-2"></i>
-                              Activar
+                              Activar Caja
                             </button>
                           )}
                         </div>
@@ -347,61 +450,6 @@ export default function CajaCard({ onCreateCaja, cajas, loading, onRefresh, onAc
           )}
         </div>
       </div>
-
-      {/* Modal para crear caja */}
-      {showModal && (
-        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Crear Nueva Caja</h5>
-                <button 
-                  type="button" 
-                  className="btn-close" 
-                  onClick={() => {
-                    setShowModal(false)
-                    setNombreCaja("")
-                  }}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="mb-3">
-                  <label htmlFor="nombreCaja" className="form-label">Nombre de la caja</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="nombreCaja"
-                    value={nombreCaja}
-                    onChange={(e) => setNombreCaja(e.target.value)}
-                    placeholder="Ingrese el nombre de la caja"
-                    autoFocus
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary"
-                  onClick={() => {
-                    setShowModal(false)
-                    setNombreCaja("")
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="button" 
-                  className="btn btn-primary"
-                  onClick={handleCreateCaja}
-                  disabled={!nombreCaja.trim()}
-                >
-                  Crear Caja
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   )
 }
