@@ -6,11 +6,18 @@ export interface BoxNameDTO {
   name_box: string;
 }
 
+export interface ArqueoInitDTO {
+  initial_amount: number;
+  responsible_user?: string;
+  notes?: string;
+}
+
 export interface BoxDTO {
   id_box: string;
   name_box: string;
   date: string;
   is_open: boolean;
+  isLoading?: boolean; // Estado de carga para UI
   atm?: {
     id_atm: string;
     name_atm?: string;
@@ -84,6 +91,43 @@ export class BoxService {
     console.log("🔗 Enviando solicitud para asignar empleado a caja:", { boxId, atmId });
     // Intentar con POST en lugar de PUT
     return await apiClient.post(`box/${boxId}/assign-atm/${atmId}`);
+  }
+
+  /**
+   * Abrir una caja específica con arqueo inicial
+   * @param boxId ID de la caja
+   * @param arqueoData Datos del arqueo inicial
+   * @returns Promise con la respuesta del servidor
+   */
+  async openBox(boxId: string, arqueoData: ArqueoInitDTO): Promise<SuccessMessage<BoxDTO>> {
+    return await apiClient.post<SuccessMessage<BoxDTO>>(`box/on-box/${boxId}`, arqueoData);
+  }
+
+  /**
+   * Cerrar una caja específica
+   * @param boxId ID de la caja
+   * @returns Promise con la respuesta del servidor
+   */
+  async closeBox(boxId: string): Promise<SuccessMessage<BoxDTO>> {
+    return await apiClient.post<SuccessMessage<BoxDTO>>(`box/off-box/${boxId}`);
+  }
+
+  /**
+   * Cambiar el estado de una caja (abrir/cerrar)
+   * @param boxId ID de la caja
+   * @param shouldOpen Si la caja debe estar abierta o cerrada
+   * @param arqueoData Datos del arqueo inicial (requerido solo para abrir)
+   * @returns Promise con la respuesta del servidor
+   */
+  async toggleBoxState(boxId: string, shouldOpen: boolean, arqueoData?: ArqueoInitDTO): Promise<SuccessMessage<BoxDTO>> {
+    if (shouldOpen) {
+      if (!arqueoData) {
+        throw new Error('El arqueo inicial es requerido para abrir una caja');
+      }
+      return this.openBox(boxId, arqueoData);
+    } else {
+      return this.closeBox(boxId);
+    }
   }
 }
 
