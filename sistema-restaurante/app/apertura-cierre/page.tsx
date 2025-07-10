@@ -3,23 +3,21 @@
 import { useState, useEffect } from "react";
 import MainLayout from "../../components/layout/MainLayout";
 import { boxService, BoxDTO } from "@/services/box-service";
-import { getAllEmpleados } from "@/app/empleados/services/empleadoService";
-import { Empleado } from "@/app/empleados/types/empleado";
 import { useAuthData } from "@/hooks/useAuthData";
 import { ProtectedRoute } from "@/components/common/ProtectedRoute";
-import { atmService, ATMDTO, ATMResponseDTO, ATMResponseWrapper } from "@/services/atm-service"; // Importar el servicio de ATM actualizado
+import { atmService, ATMDTO } from "@/services/atm-service"; // Importar el servicio de ATM actualizado
 import CreateCajaModal from "@/components/apertura-cierre/CreateCajaModal";
 import CajaCard from "@/components/apertura-cierre/CajaCard"; // Importar el componente CajaCard
 import ArqueoModal, { ArqueoInitDTO } from "@/components/apertura-cierre/ArqueoModal"; // Importar el modal de arqueo
+import ConfirmationModal from "@/components/common/ConfirmationModal"; // Modal de confirmación
+import NotificationModal from "@/components/common/NotificationModal"; // Modal de notificación
 
 function AperturaCierreContent() {
   const [cajas, setCajas] = useState<BoxDTO[]>([]);
   const [loading, setLoading] = useState(true);
-  const [empleados, setEmpleados] = useState<Empleado[]>([]);
   const [atms, setAtms] = useState<ATMDTO[]>([]); // Estado para ATMs según filtro actual
   const [allAtms, setAllAtms] = useState<ATMDTO[]>([]); // Estado para todos los ATMs
   const [atmFilter, setAtmFilter] = useState<'all' | 'active' | 'inactive'>('active'); // Filtro de ATMs
-  const [loadingEmpleados, setLoadingEmpleados] = useState(false);
   const [loadingAtms, setLoadingAtms] = useState(false); // Estado para carga de ATMs
   const [selectedCajaForATM, setSelectedCajaForATM] = useState<string | null>(null);
   const [showATMModal, setShowATMModal] = useState(false);
@@ -27,6 +25,74 @@ function AperturaCierreContent() {
   const [isCreatingCaja, setIsCreatingCaja] = useState(false);
   const [showArqueoModal, setShowArqueoModal] = useState(false);
   const [selectedCajaForArqueo, setSelectedCajaForArqueo] = useState<string | null>(null);
+  
+  // Estados para modales de confirmación y notificación
+  const [confirmationModal, setConfirmationModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    type?: 'danger' | 'warning' | 'info' | 'success';
+    confirmText?: string;
+    isLoading?: boolean;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+  
+  const [notificationModal, setNotificationModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type?: 'success' | 'error' | 'warning' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+  });
+
+  // Funciones auxiliares para modales
+  const showNotification = (
+    title: string, 
+    message: string, 
+    type: 'success' | 'error' | 'warning' | 'info' = 'info'
+  ) => {
+    setNotificationModal({
+      isOpen: true,
+      title,
+      message,
+      type,
+    });
+  };
+
+  const showConfirmation = (
+    title: string,
+    message: string,
+    onConfirm: () => void,
+    type: 'danger' | 'warning' | 'info' | 'success' = 'warning',
+    confirmText: string = 'Confirmar'
+  ) => {
+    setConfirmationModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm,
+      type,
+      confirmText,
+      isLoading: false,
+    });
+  };
+
+  const closeConfirmationModal = () => {
+    setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+  };
+
+  const closeNotificationModal = () => {
+    setNotificationModal(prev => ({ ...prev, isOpen: false }));
+  };
+
   const { user, getStoredUserId, isAuthenticated, isAdmin } = useAuthData();
   
   // Mapa global que almacena todas las cajas asignadas a ATMs
@@ -195,77 +261,29 @@ function AperturaCierreContent() {
     } finally {
       setLoading(false);
     }
-  };// Cargar lista de empleados disponibles (ATMs)
-  const loadATMs = async () => {
-    try {
-      setLoadingEmpleados(true);
-      console.log("👥 Cargando lista de empleados...");
-      
-      // Obtener token del usuario usando la clave correcta
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        console.error("❌ No se encontró token de autenticación");
-        throw new Error('No se encontró token de autenticación');
-      }
-      
-      console.log("🔑 Token encontrado, llamando a getAllEmpleados...");
-      
-      const response = await getAllEmpleados(token);
-      console.log("📋 Respuesta completa de getAllEmpleados:", response);
-      console.log("📋 response.data:", response.data);
-      console.log("📋 response.status:", response.status);
-      
-      // Axios devuelve { data: T, status: number, ... }
-      // Donde T puede ser directamente el array o un objeto con estructura { status, data }
-      let empleadosData: Empleado[] = [];
-      
-      if (response.status === 200) {
-        // Verificar si response.data es directamente un array
-        if (Array.isArray(response.data)) {
-          empleadosData = response.data;
-          console.log("✅ response.data es directamente un array de empleados");
-        } 
-        // Verificar si response.data tiene la estructura { status, data: [] }
-        else if (response.data && typeof response.data === 'object' && Array.isArray(response.data.data)) {
-          empleadosData = response.data.data;
-          console.log("✅ response.data tiene estructura { status, data: [] }");
-        }        // Verificar si response.data tiene estructura de paginación { content: [] }
-        else if (response.data && typeof response.data === 'object' && 'content' in response.data && Array.isArray((response.data as { content: Empleado[] }).content)) {
-          empleadosData = (response.data as { content: Empleado[] }).content;
-          console.log("✅ response.data tiene estructura de paginación { content: [] }");
-        }
-        else {
-          console.warn("⚠️ Estructura de respuesta no reconocida");
-          console.warn("⚠️ response.data:", response.data);
-          console.warn("⚠️ Tipo de response.data:", typeof response.data);
-          empleadosData = [];
-        }
-        
-        setEmpleados(empleadosData);
-        console.log("✅ Empleados cargados exitosamente:", empleadosData.length, "empleados");
-      } else {
-        console.warn("⚠️ Status de respuesta no es 200:", response.status);
-        setEmpleados([]);
-      }
-      
-    } catch (error) {
-      console.error("❌ Error al cargar empleados:", error);
-      if (error instanceof Error) {
-        console.error("❌ Mensaje de error:", error.message);
-      }
-      setEmpleados([]);
-      throw error;
-    } finally {
-      setLoadingEmpleados(false);
-    }
-  };  // Cargar lista de ATMs activos disponibles para asignación
+  };
+
+  // Cargar lista de ATMs activos disponibles para asignación
   const loadActiveATMs = async () => {
     try {
       setLoadingAtms(true);
       console.log("🏧 Cargando lista de ATMs activos...");
       
-      // Obtener solo los ATMs activos
-      const activeATMs = await atmService.getActiveATMs();
+      // Obtener solo los ATMs activos - con un timeout máximo para no bloquear la UI
+      const activeATMsPromise = atmService.getActiveATMs();
+      
+      // Usar Promise.race para limitar el tiempo de espera a 3 segundos
+      const timeoutPromise = new Promise<ATMDTO[]>((_, reject) => {
+        setTimeout(() => reject(new Error("Timeout al cargar ATMs")), 3000);
+      });
+      
+      const activeATMs = await Promise.race([activeATMsPromise, timeoutPromise])
+        .catch(error => {
+          console.warn("⚠️ Tiempo de espera excedido al cargar ATMs:", error);
+          // Devolver un array vacío en caso de timeout para no bloquear la UI
+          return [];
+        });
+      
       console.log("✅ ATMs activos obtenidos:", activeATMs.length);
       console.log("📋 Lista de ATMs activos:", activeATMs);
       
@@ -325,7 +343,7 @@ function AperturaCierreContent() {
           console.log("  - Cajas cargadas:", cajas.length);
           console.log("  - Cajas asignadas:", cajasAsignadas.size);
           console.log("  - Detalle de asignaciones:", Array.from(cajasAsignadas.entries()));
-        }, 1000);
+        }, 500); // Reducido de 1000ms a 500ms para mejor rendimiento
         
         console.log("✅ Inicialización de datos completada siguiendo el flujo recomendado");
       } catch (error) {
@@ -351,6 +369,234 @@ function AperturaCierreContent() {
       // Limpiar intervalo al desmontar el componente
       clearInterval(intervalId);
     };
+  }, []);
+
+  // Log para depurar cambios en el estado de cajas
+  useEffect(() => {
+    console.log("📊 Estado de cajas actualizado:", cajas);
+    if (cajas.length > 0) {
+      console.log("📊 Resumen de cajas:");
+      cajas.forEach((caja, index) => {
+        console.log(`  Caja ${index + 1}: ${caja.name_box} - ${caja.is_open ? 'Abierta' : 'Cerrada'} - ATM: ${caja.atm ? caja.atm.name_atm : 'Sin asignar'}`);
+      });
+      
+      // Actualizar el mapa global de asignaciones cuando cambian las cajas
+      // Pero solo usando los datos que ya tenemos, sin hacer llamadas API
+      const nuevoMapa = new Map<string, string>(cajasAsignadas);
+      
+      // Primero, extraer todas las asignaciones que vienen en los datos de cajas
+      cajas.forEach(caja => {
+        if (caja.atm) {
+          // Agregar o actualizar la asignación en el mapa
+          nuevoMapa.set(caja.id_box, caja.atm.id_atm);
+          console.log(`🔄 Actualizando mapa: Caja ${caja.id_box} asignada a ATM ${caja.atm.id_atm}`);
+        }
+      });
+      
+      // Actualizar el mapa global si hubo cambios
+      if (nuevoMapa.size !== cajasAsignadas.size || 
+          [...nuevoMapa.entries()].some(([k, v]) => cajasAsignadas.get(k) !== v)) {
+        console.log("🔄 Actualizando mapa global desde datos de cajas");
+        setCajasAsignadas(nuevoMapa);
+      }
+    }
+  }, [cajas]);
+
+  // Efecto adicional para garantizar la consistencia de datos
+  useEffect(() => {
+    // Si tenemos tanto cajas como ATMs cargados, verificar la sincronización
+    if (cajas.length > 0 && allAtms.length > 0) {
+      console.log("🔄 Verificando sincronización entre cajas y ATMs");
+      
+      // Verificar si hay cajas que tienen ATM en su propio objeto pero no en el mapa global
+      const cajasConDiscrepancia = cajas.filter(caja => 
+        caja.atm && 
+        (!cajasAsignadas.has(caja.id_box) || cajasAsignadas.get(caja.id_box) !== caja.atm?.id_atm)
+      );
+      
+      // Si hay discrepancias, actualizar el mapa global
+      if (cajasConDiscrepancia.length > 0) {
+        console.log(`⚠️ Se encontraron ${cajasConDiscrepancia.length} cajas con discrepancias entre el objeto y el mapa global`);
+        console.log("🔄 Forzando actualización del mapa global para mantener consistencia");
+        
+        // Programar una actualización completa para evitar ciclos de renderizado
+        const timeoutId = setTimeout(() => {
+          actualizarMapaCajasAsignadas();
+        }, 1000);
+        
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [cajas, allAtms]);
+
+  // Recargar cajas cuando la ventana vuelve a tener foco (usuario regresa de otra pestaña)
+  // o de forma periódica para mantener los datos sincronizados
+  useEffect(() => {
+    // Reiniciar completamente los datos cuando la ventana recupera el foco
+    const handleFocus = async () => {
+      console.log("🔄 Ventana recuperó el foco, reiniciando datos completamente...");
+      
+      try {
+        // Mostrar indicador de carga pero con un retraso para evitar parpadeos si es un cambio rápido
+        const loadingTimeoutId = setTimeout(() => {
+          setLoading(true);
+        }, 300); // Solo mostrar loading si tarda más de 300ms
+        
+        // Cargar datos nuevamente siguiendo el flujo recomendado
+        // 1. Obtener todos los ATMs primero
+        console.log("🏧 Recargando lista de ATMs");
+        const atmsList = await loadAllATMs();
+        
+        // 2. Obtener todas las cajas asignadas
+        console.log("🔍 Obteniendo todas las cajas asignadas a ATMs");
+        const { boxMap } = await atmService.getAllBoxesAssignedToATMs();
+        
+        // 3. Actualizar mapa global
+        console.log("📝 Actualizando el mapa global");
+        setCajasAsignadas(boxMap);
+        
+        // 4. Recargar cajas
+        console.log("📦 Recargando todas las cajas");
+        await loadCajas();
+        
+        // 5. Verificación final de consistencia
+        console.log("✅ Verificación final de consistencia después de recuperar foco");
+        setTimeout(() => {
+          // Una última verificación para garantizar consistencia total
+          actualizarMapaCajasAsignadas();
+        }, 500);
+        
+        // Cancelar el timeout de carga si aún no se ha activado
+        clearTimeout(loadingTimeoutId);
+        
+        console.log("✅ Datos reiniciados completamente después de recuperar el foco");
+      } catch (error) {
+        console.error("❌ Error al recargar datos:", error);
+        showConnectionError("Error al actualizar los datos. Intente recargar la página.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    // Agregar listener para detectar cuando la ventana recupera el foco
+    window.addEventListener('focus', handleFocus);
+    
+    // Remover listener cuando el componente se desmonte
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
+
+  // Log para depurar cambios en el estado de cajas
+  useEffect(() => {
+    console.log("📊 Estado de cajas actualizado:", cajas);
+    if (cajas.length > 0) {
+      console.log("📊 Resumen de cajas:");
+      cajas.forEach((caja, index) => {
+        console.log(`  Caja ${index + 1}: ${caja.name_box} - ${caja.is_open ? 'Abierta' : 'Cerrada'} - ATM: ${caja.atm ? caja.atm.name_atm : 'Sin asignar'}`);
+      });
+      
+      // Actualizar el mapa global de asignaciones cuando cambian las cajas
+      // Pero solo usando los datos que ya tenemos, sin hacer llamadas API
+      const nuevoMapa = new Map<string, string>(cajasAsignadas);
+      
+      // Primero, extraer todas las asignaciones que vienen en los datos de cajas
+      cajas.forEach(caja => {
+        if (caja.atm) {
+          // Agregar o actualizar la asignación en el mapa
+          nuevoMapa.set(caja.id_box, caja.atm.id_atm);
+          console.log(`🔄 Actualizando mapa: Caja ${caja.id_box} asignada a ATM ${caja.atm.id_atm}`);
+        }
+      });
+      
+      // Actualizar el mapa global si hubo cambios
+      if (nuevoMapa.size !== cajasAsignadas.size || 
+          [...nuevoMapa.entries()].some(([k, v]) => cajasAsignadas.get(k) !== v)) {
+        console.log("🔄 Actualizando mapa global desde datos de cajas");
+        setCajasAsignadas(nuevoMapa);
+      }
+    }
+  }, [cajas]);
+
+  // Efecto adicional para garantizar la consistencia de datos
+  useEffect(() => {
+    // Si tenemos tanto cajas como ATMs cargados, verificar la sincronización
+    if (cajas.length > 0 && allAtms.length > 0) {
+      console.log("🔄 Verificando sincronización entre cajas y ATMs");
+      
+      // Verificar si hay cajas que tienen ATM en su propio objeto pero no en el mapa global
+      const cajasConDiscrepancia = cajas.filter(caja => 
+        caja.atm && 
+        (!cajasAsignadas.has(caja.id_box) || cajasAsignadas.get(caja.id_box) !== caja.atm?.id_atm)
+      );
+      
+      // Si hay discrepancias, actualizar el mapa global
+      if (cajasConDiscrepancia.length > 0) {
+        console.log(`⚠️ Se encontraron ${cajasConDiscrepancia.length} cajas con discrepancias entre el objeto y el mapa global`);
+        console.log("🔄 Forzando actualización del mapa global para mantener consistencia");
+        
+        // Programar una actualización completa para evitar ciclos de renderizado
+        const timeoutId = setTimeout(() => {
+          actualizarMapaCajasAsignadas();
+        }, 1000);
+        
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [cajas, allAtms]);
+
+  // Recargar cajas cuando la ventana vuelve a tener foco (usuario regresa de otra pestaña)
+  // o de forma periódica para mantener los datos sincronizados
+  useEffect(() => {
+    // Reiniciar completamente los datos cuando la ventana recupera el foco
+    const handleFocus = async () => {
+      console.log("🔄 Ventana recuperó el foco, reiniciando datos completamente...");
+      
+      try {
+        // Mostrar indicador de carga pero con un retraso para evitar parpadeos si es un cambio rápido
+        const loadingTimeoutId = setTimeout(() => {
+          setLoading(true);
+        }, 300); // Solo mostrar loading si tarda más de 300ms
+        
+        // Cargar datos nuevamente siguiendo el flujo recomendado
+        // 1. Obtener todos los ATMs primero
+        console.log("🏧 Recargando lista de ATMs");
+        const atmsList = await loadAllATMs();
+        
+        // 2. Obtener todas las cajas asignadas
+        console.log("🔍 Obteniendo todas las cajas asignadas a ATMs");
+        const { boxMap } = await atmService.getAllBoxesAssignedToATMs();
+        
+        // 3. Actualizar mapa global
+        console.log("📝 Actualizando el mapa global");
+        setCajasAsignadas(boxMap);
+        
+        // 4. Recargar cajas
+        console.log("📦 Recargando todas las cajas");
+        await loadCajas();
+        
+        // 5. Verificación final de consistencia
+        console.log("✅ Verificación final de consistencia después de recuperar foco");
+        setTimeout(() => {
+          // Una última verificación para garantizar consistencia total
+          actualizarMapaCajasAsignadas();
+        }, 500);
+        
+        // Cancelar el timeout de carga si aún no se ha activado
+        clearTimeout(loadingTimeoutId);
+        
+        console.log("✅ Datos reiniciados completamente después de recuperar el foco");
+      } catch (error) {
+        console.error("❌ Error al recargar datos:", error);
+        showConnectionError("Error al actualizar los datos. Intente recargar la página.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    // Agregar listener para detectar cuando la ventana recupera el foco
+    window.addEventListener('focus', handleFocus);
+    
+    // Remover listener cuando el componente se desmonte
+    return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
   // Log para depurar cambios en el estado de cajas
@@ -617,7 +863,11 @@ function AperturaCierreContent() {
     
     // Verificar si el usuario está autenticado
     if (!isAuthenticated()) {
-      alert("⚠️ Debes iniciar sesión para asignar empleados a las cajas. Por favor, inicia sesión primero.");
+      showNotification(
+        "Sesión requerida",
+        "Debes iniciar sesión para asignar empleados a las cajas. Por favor, inicia sesión primero.",
+        "warning"
+      );
       return;
     }
     
@@ -640,7 +890,11 @@ function AperturaCierreContent() {
       const atmNombre = atmInfo ? atmInfo.name_atm : `ATM ${atmAsignado}`;
       
       // Mostrar alerta y no abrir el modal
-      alert(`Esta caja ya tiene asignado el empleado: ${atmNombre}\n\nSi desea cambiar la asignación, primero debe desasignar este empleado.`);
+      showNotification(
+        "Empleado ya asignado",
+        `Esta caja ya tiene asignado el empleado: ${atmNombre}\n\nSi desea cambiar la asignación, primero debe desasignar este empleado.`,
+        "warning"
+      );
       
       // Forzar una actualización de la UI para reflejar el estado correcto
       await loadCajas();
@@ -654,7 +908,11 @@ function AperturaCierreContent() {
       console.log(`⚠️ La caja ${cajaId} ya tiene asignado el ATM ${cajaSeleccionada.atm.id_atm} según el objeto local`);
       
       // Mostrar alerta y no abrir el modal
-      alert(`Esta caja ya tiene asignado el empleado: ${cajaSeleccionada.atm.name_atm || cajaSeleccionada.atm.id_atm}\n\nSi desea cambiar la asignación, primero debe desasignar este empleado.`);
+      showNotification(
+        "Empleado ya asignado",
+        `Esta caja ya tiene asignado el empleado: ${cajaSeleccionada.atm.name_atm || cajaSeleccionada.atm.id_atm}\n\nSi desea cambiar la asignación, primero debe desasignar este empleado.`,
+        "warning"
+      );
       
       // Actualizar el mapa global si no estaba registrado
       if (!cajasAsignadas.has(cajaId)) {
@@ -687,7 +945,7 @@ function AperturaCierreContent() {
       setCajas(prevCajas => 
         prevCajas.map(caja => 
           caja.id_box === cajaId 
-            ? { ...caja, isLoading: true }
+            ? { ...caja, isLoading: false } // No mostrar "Procesando..." para mejor experiencia visual
             : caja
         )
       );
@@ -709,208 +967,130 @@ function AperturaCierreContent() {
   const handleAsignarATM = async (atmId: string) => {
     if (!selectedCajaForATM) {
       console.error("❌ No hay caja seleccionada");
-      alert("Error: No hay caja seleccionada");
+      showNotification("Error", "No hay caja seleccionada", "error");
       return;
     }
 
+    // Encontrar el ATM seleccionado en la lista completa
+    const selectedATM = allAtms.find(atm => atm.id_atm === atmId);
+    
+    if (!selectedATM) {
+      console.error("❌ No se encontró el ATM en la lista local");
+      showNotification("Error", "No se encontró el empleado seleccionado", "error");
+      return;
+    }
+    
+    // Verificar si el ATM está activo
+    if (!selectedATM.is_active) {
+      console.error("❌ Intento de asignar un ATM inactivo");
+      showNotification(
+        "Empleado inactivo",
+        "No se pueden asignar empleados inactivos. Solo los empleados activos pueden ser asignados a cajas.",
+        "error"
+      );
+      return;
+    }
+    
+    console.log("🔗 Iniciando asignación de empleado a caja...");
+    console.log("🔗 Caja seleccionada:", selectedCajaForATM);
+    console.log("🔗 Empleado seleccionado:", atmId);
+    
+    // 1. OPTIMIZACIÓN VISUAL: Cerrar el modal inmediatamente para mejor experiencia
+    setShowATMModal(false);
+    
+    // 2. OPTIMIZACIÓN UI: Actualizar la UI instantáneamente sin esperar al servidor
+    // Esto da sensación de respuesta inmediata al usuario
+    setCajas(prevCajas => prevCajas.map(caja => 
+      caja.id_box === selectedCajaForATM ? {
+        ...caja,
+        atm: {
+          id_atm: selectedATM.id_atm,
+          name_atm: selectedATM.name_atm,
+          alias: selectedATM.alias,
+          email: selectedATM.email,
+          phone: selectedATM.phone || "",
+          dni: selectedATM.dni || ""
+        },
+        isLoading: false // Ya no mostramos loading para una experiencia más fluida
+      } : caja
+    ));
+    
+    // 3. OPTIMIZACIÓN ESTADO GLOBAL: Actualizar el mapa global instantáneamente
+    setCajasAsignadas(prevMapa => {
+      const nuevoMapa = new Map(prevMapa);
+      nuevoMapa.set(selectedCajaForATM, atmId);
+      return nuevoMapa;
+    });
+    
+    // 4. FEEDBACK INSTANTÁNEO: Mostrar notificación de éxito inmediatamente
+    // Esto da sensación de que la operación ya se completó
+    showNotification(
+      "Éxito",
+      `Empleado ${selectedATM.name_atm} asignado exitosamente a la caja`,
+      "success"
+    );
+    
+    // 5. LIMPIEZA: Limpiar estado del modal
+    setSelectedCajaForATM(null);
+    
+    // 6. BACKEND ASYNC: Realizar la llamada al servidor en segundo plano
+    // Esta llamada ya no bloquea la UI ni afecta la experiencia
     try {
-      console.log("🔗 Iniciando asignación de empleado a caja...");
-      console.log("🔗 Caja seleccionada:", selectedCajaForATM);
-      console.log("🔗 Empleado seleccionado:", atmId);
-      
-      // Encontrar el ATM seleccionado en la lista completa
-      const selectedATM = allAtms.find(atm => atm.id_atm === atmId);
-      console.log("👤 ATM encontrado:", selectedATM);
-      
-      if (!selectedATM) {
-        console.error("❌ No se encontró el ATM en la lista local");
-        alert("Error: No se encontró el empleado seleccionado");
-        return;
-      }
-      
-      // Verificar si el ATM está activo
-      if (!selectedATM.is_active) {
-        console.error("❌ Intento de asignar un ATM inactivo");
-        alert("Error: No se pueden asignar empleados inactivos. Solo los empleados activos pueden ser asignados a cajas.");
-        return;
-      }
-      
-      // Mostrar indicador de carga en la interfaz
-      setAtms(prevAtms => prevAtms.map(atm => 
-        atm.id_atm === atmId ? { ...atm, isLoading: true } : atm
-      ));
-      
-      console.log("📡 Llamando al servicio assignATMToBox...");
-      
-      // Llamar al servicio para asignar empleado a caja
+      console.log("📡 Llamando al servicio assignATMToBox en segundo plano...");
       const response = await boxService.assignATMToBox(selectedCajaForATM, atmId);
       console.log("✅ Respuesta de asignación recibida:", response);
-      console.log("✅ Status de respuesta:", response?.status);
-      console.log("✅ Message de respuesta:", response?.message);
-      console.log("✅ Data de respuesta:", response?.data);
       
-      // Verificar si la asignación fue exitosa
-      if (response && (response.status === 200 || response.status === 201)) {
-        console.log("✅ Asignación exitosa, recargando cajas...");
-        
-        // Actualizar localmente mientras se recarga
-        const selectedCajaIndex = cajas.findIndex(c => c.id_box === selectedCajaForATM);
-        if (selectedCajaIndex !== -1) {
-          // Actualizamos el estado local inmediatamente
-          setCajas(prevCajas => prevCajas.map((caja, index) => 
-            index === selectedCajaIndex ? {
-              ...caja,
-              atm: {
-                id_atm: selectedATM.id_atm,
-                name_atm: selectedATM.name_atm,
-                alias: selectedATM.alias,
-                email: selectedATM.email
-              }
-            } : caja
-          ));
-          
-          // Actualizar inmediatamente el mapa global
-          setCajasAsignadas(prevMapa => {
-            const nuevoMapa = new Map(prevMapa);
-            nuevoMapa.set(selectedCajaForATM, atmId);
-            console.log("🔄 Mapa global actualizado inmediatamente:", Array.from(nuevoMapa.entries()));
-            return nuevoMapa;
-          });
-        }
-        
-        // Recargar las cajas desde el backend para obtener el estado más actual
-        await loadCajas();
-        
-        // Verificar explícitamente la asignación
-        try {
-          // Pequeña pausa para asegurar que el backend procesó la asignación completamente
-          await new Promise(resolve => setTimeout(resolve, 300));
-          
-          // Verificar asignación explícitamente para un solo ATM
-          const boxesAssigned = await boxService.getBoxesByAtm(atmId);
-          console.log("🔍 Cajas asignadas al ATM después de la asignación:", boxesAssigned);
-          
-          // Actualizar explícitamente la UI con la información verificada
-          if (boxesAssigned && boxesAssigned.data && Array.isArray(boxesAssigned.data) && boxesAssigned.data.length > 0) {
-            const assignedBox = boxesAssigned.data.find(box => box.id_box === selectedCajaForATM);
-            if (assignedBox) {
-              console.log("✅ Confirmación: caja correctamente asignada al ATM");
-              
-              // Actualización final para asegurar que la UI refleja el estado correcto
-              // Usar un objeto completo de caja para evitar perder datos
-              setCajas(prevCajas => prevCajas.map(caja => 
-                caja.id_box === selectedCajaForATM ? {
-                  ...caja,
-                  atm: {
-                    id_atm: selectedATM.id_atm,
-                    name_atm: selectedATM.name_atm,
-                    alias: selectedATM.alias,
-                    email: selectedATM.email,
-                    phone: selectedATM.phone,
-                    dni: selectedATM.dni
-                  },
-                  is_open: assignedBox.is_open
-                } : caja
-              ));
-              
-              // Actualizar también el mapa global de cajas asignadas
-              setCajasAsignadas(prevMapa => {
-                const nuevoMapa = new Map(prevMapa);
-                nuevoMapa.set(selectedCajaForATM, atmId);
-                console.log("🔄 Mapa global actualizado manualmente:", Array.from(nuevoMapa.entries()));
-                return nuevoMapa;
-              });
-              
-              // Forzar actualización completa del mapa global
-              console.log("🔄 Forzando actualización completa del mapa global");
-              await actualizarMapaCajasAsignadas();
-            }
-          }
-        } catch (verifyError) {
-          console.error("❌ Error al verificar asignación:", verifyError);
-          // No interrumpimos el flujo, ya que la asignación fue exitosa
-        }
-        
-        console.log("✅ Empleado asignado exitosamente:", selectedATM.name_atm);
-        
-        // Primero, asegurarnos de que el estado está completamente actualizado antes de mostrar la alerta
-        // y luego cerrar el modal solo después de que el usuario cierre la alerta
-        setTimeout(() => {
-          alert(`✅ Empleado ${selectedATM.name_atm} asignado exitosamente a la caja`);
-          // Cerrar el modal
-          setShowATMModal(false);
-          setSelectedCajaForATM(null);
-        }, 100);
-      } else {
-        console.error("❌ Respuesta inesperada del servidor:", response);
-        alert("Error: La asignación no se completó correctamente");
-        
-        // Quitar indicador de carga
-        setAtms(prevAtms => prevAtms.map(atm => 
-          atm.id_atm === atmId ? { ...atm, isLoading: false } : atm
-        ));
-      }
+      // 7. RECARGA DISCRETA: Recargar datos solo después de completar la operación
+      // Y hacerlo con un pequeño retraso para que no sea perceptible
+      setTimeout(() => {
+        console.log("🔄 Recargando datos después de asignación exitosa");
+        loadCajas().catch(err => 
+          console.warn("⚠️ Error menor al recargar datos en segundo plano:", err)
+        );
+      }, 500);
     } catch (error) {
-      // Log más inteligente para evitar confusión con tokens expirados
-      if (error && typeof error === 'object' && 'status' in error && 'name' in error && (error as any).name === 'ApiError') {
-        const apiError = error as any;
-        if (apiError.status === 403 || apiError.status === 401) {
-          console.warn("⚠️ Error al asignar empleado: Token expirado");
-        } else {
-          console.error("❌ Error completo al asignar empleado:", error);
-          // Log detallado solo para errores que no sean de token expirado
-          console.error("❌ ApiError Response:", apiError);
-          console.error("❌ ApiError Status:", apiError.status);
-          console.error("❌ ApiError Message:", apiError.message);
-        }
-      } else {
-        console.error("❌ Error completo al asignar empleado:", error);
-        // Log detallado del error
-        if (error instanceof Error) {
-          console.error("❌ Error.name:", error.name);
-          console.error("❌ Error.message:", error.message);
-          console.error("❌ Error.stack:", error.stack);
-        }
-      }
+      console.error("❌ Error al asignar empleado:", error);
       
-      // Si el error tiene una respuesta HTTP, mostrarla
-      if (error && typeof error === 'object' && 'status' in error && 'name' in error && (error as any).name === 'ApiError') {
-        const apiError = error as any; // Conversión más segura
-        
-        if (apiError.status === 403 || apiError.status === 401) {
-          // Error 403/401: Token expirado o acceso no autorizado
-          console.warn("⚠️ Token expirado o acceso no autorizado");
-          alert("Su sesión ha expirado. Por favor, inicie sesión nuevamente para continuar.");
-          
-          // Cerrar el modal y no restaurar estado ya que el usuario será redirigido al login
-          setShowATMModal(false);
-          setSelectedCajaForATM(null);
-          return;
-        }
-      } 
-      // Fallback para errores HTTP con respuesta del servidor
-      else if (error && typeof error === 'object' && 'response' in error) {
-        const httpError = error as { response: { status?: number; data?: unknown } };
-        console.error("❌ HTTP Error Response:", httpError.response);
-        console.error("❌ HTTP Status:", httpError.response?.status);
-        console.error("❌ HTTP Data:", httpError.response?.data);
-        
-        if (httpError.response?.status === 403) {
-          console.warn("⚠️ Token expirado o acceso no autorizado");
-          alert("Su sesión ha expirado. Por favor, inicie sesión nuevamente para continuar.");
-          
-          setShowATMModal(false);
-          setSelectedCajaForATM(null);
-          return;
-        }
-      }
-      
-      alert("❌ Error al asignar empleado. Por favor, inténtelo de nuevo.");
-      
-      // Quitar indicador de carga
-      setAtms(prevAtms => prevAtms.map(atm => 
-        atm.id_atm === atmId ? { ...atm, isLoading: false } : atm
+      // 8. RESTAURACIÓN EN CASO DE ERROR: Solo si hay error, revertimos los cambios
+      // Así no interrumpimos la experiencia positiva en caso normal
+      setCajas(prevCajas => prevCajas.map(caja => 
+        caja.id_box === selectedCajaForATM ? {
+          ...caja,
+          atm: undefined, // Revertir la asignación
+          isLoading: false
+        } : caja
       ));
+      
+      // Revertir cambios en el mapa global
+      setCajasAsignadas(prevMapa => {
+        const nuevoMapa = new Map(prevMapa);
+        nuevoMapa.delete(selectedCajaForATM);
+        return nuevoMapa;
+      });
+      
+      // Mostrar notificación de error solo si la operación realmente falló
+      showNotification(
+        "Error",
+        "Error al asignar empleado. Por favor, inténtelo de nuevo.",
+        "error"
+      );
+      
+      // Manejo específico para errores de autenticación
+      if (error && typeof error === 'object') {
+        // Detectar errores de autenticación (401/403)
+        const isAuthError = 
+          ('status' in error && ((error as any).status === 401 || (error as any).status === 403)) ||
+          ('response' in error && ((error as any).response?.status === 401 || (error as any).response?.status === 403));
+        
+        if (isAuthError) {
+          console.warn("⚠️ Error de autenticación al asignar empleado");
+          showNotification(
+            "Sesión expirada",
+            "Su sesión ha expirado. Por favor, inicie sesión nuevamente para continuar.",
+            "warning"
+          );
+        }
+      }
     }
   };  // Función para cambiar estado de caja
   const handleToggleCaja = async (cajaId: string) => {
@@ -953,7 +1133,11 @@ function AperturaCierreContent() {
         
         if (!tieneATMAsignado) {
           console.warn("⚠️ No se encontró ATM asignado, mostrando alerta");
-          alert("⚠️ Para abrir una caja, primero debe asignar un empleado.");
+          showNotification(
+            "Empleado requerido",
+            "Para abrir una caja, primero debe asignar un empleado.",
+            "warning"
+          );
           return;
         }
         
@@ -970,7 +1154,11 @@ function AperturaCierreContent() {
       
     } catch (error) {
       console.error("❌ Error al cambiar estado de caja:", error);
-      alert("Error al cambiar el estado de la caja");
+      showNotification(
+        "Error",
+        "Error al cambiar el estado de la caja",
+        "error"
+      );
     }
   };
   
@@ -1000,7 +1188,11 @@ function AperturaCierreContent() {
       setSelectedCajaForArqueo(null);
       
       console.log("✅ Caja abierta correctamente con arqueo inicial");
-      alert("✅ Caja abierta exitosamente");
+      showNotification(
+        "Éxito",
+        "Caja abierta exitosamente",
+        "success"
+      );
       
     } catch (error) {
       // Log más inteligente para evitar confusión con tokens expirados
@@ -1025,7 +1217,11 @@ function AperturaCierreContent() {
         if (apiError.status === 403 || apiError.status === 401) {
           // Error 403/401: Token expirado o acceso no autorizado
           console.warn("⚠️ Token expirado o acceso no autorizado");
-          alert("Su sesión ha expirado. Por favor, inicie sesión nuevamente para continuar.");
+          showNotification(
+            "Sesión expirada",
+            "Su sesión ha expirado. Por favor, inicie sesión nuevamente para continuar.",
+            "warning"
+          );
           
           // Cerrar el modal y no restaurar estado ya que el usuario será redirigido al login
           setShowArqueoModal(false);
@@ -1042,7 +1238,11 @@ function AperturaCierreContent() {
         
         if (httpError.response?.status === 403) {
           console.warn("⚠️ Token expirado o acceso no autorizado");
-          alert("Su sesión ha expirado. Por favor, inicie sesión nuevamente para continuar.");
+          showNotification(
+            "Sesión expirada",
+            "Su sesión ha expirado. Por favor, inicie sesión nuevamente para continuar.",
+            "warning"
+          );
           
           setShowArqueoModal(false);
           setSelectedCajaForArqueo(null);
@@ -1057,7 +1257,11 @@ function AperturaCierreContent() {
         errorMessage += `: ${error.message}`;
       }
       
-      alert(errorMessage);
+      showNotification(
+        "Error",
+        errorMessage,
+        "error"
+      );
       
       // Restaurar estado anterior
       setCajas(prevCajas => 
@@ -1079,31 +1283,50 @@ function AperturaCierreContent() {
       const caja = cajas.find(c => c.id_box === cajaId);
       if (!caja) {
         console.error("❌ Caja no encontrada");
-        alert("Error: No se encontró la caja seleccionada");
+        showNotification(
+          "Error",
+          "No se encontró la caja seleccionada",
+          "error"
+        );
         return;
       }
       
       // Verificar que la caja esté abierta antes de intentar cerrarla
       if (!caja.is_open) {
         console.warn("⚠️ La caja ya está cerrada");
-        alert("Esta caja ya está cerrada.");
+        showNotification(
+          "Información",
+          "Esta caja ya está cerrada.",
+          "info"
+        );
         return;
       }
       
       // Mostrar confirmación antes de cerrar
-      const confirmacion = window.confirm(
-        `¿Estás seguro de que deseas cerrar la caja "${caja.name_box}"?\n\n` +
-        `Esta acción cerrará definitivamente la caja y no podrás realizar más operaciones hasta que la vuelvas a abrir.`
+      showConfirmation(
+        "Confirmar cierre de caja",
+        `¿Estás seguro de que deseas cerrar la caja "${caja.name_box}"?\n\nEsta acción cerrará definitivamente la caja y no podrás realizar más operaciones hasta que la vuelvas a abrir.`,
+        async () => {
+          console.log("✅ Usuario confirmó el cierre de caja, procediendo...");
+          await realizarCierreCaja(cajaId, caja);
+        },
+        "danger",
+        "Cerrar Caja"
       );
       
-      if (!confirmacion) {
-        console.log("❌ Usuario canceló el cierre de caja");
-        return;
-      }
-      
-      console.log("✅ Usuario confirmó el cierre de caja, procediendo...");
-      
-      // Mostrar loading mientras se procesa la solicitud
+    } catch (error) {
+      console.error("❌ Error al iniciar proceso de cierre:", error);
+      showNotification(
+        "Error",
+        "Error al iniciar el proceso de cierre de caja",
+        "error"
+      );
+    }
+  };
+
+  // Función auxiliar para realizar el cierre de caja
+  const realizarCierreCaja = async (cajaId: string, caja: BoxDTO) => {
+    try {
       setCajas(prevCajas => 
         prevCajas.map(c => 
           c.id_box === cajaId 
@@ -1135,7 +1358,11 @@ function AperturaCierreContent() {
         }, 500);
         
         console.log("✅ Caja cerrada correctamente");
-        alert(`✅ Caja "${caja.name_box}" cerrada exitosamente`);
+        showNotification(
+          "Éxito",
+          `Caja "${caja.name_box}" cerrada exitosamente`,
+          "success"
+        );
         
       } else {
         console.error("❌ Respuesta inesperada del servidor:", response);
@@ -1165,7 +1392,11 @@ function AperturaCierreContent() {
         if (apiError.status === 403 || apiError.status === 401) {
           // Error 403/401: Token expirado o acceso no autorizado
           console.warn("⚠️ Token expirado o acceso no autorizado");
-          alert("Su sesión ha expirado. Por favor, inicie sesión nuevamente para continuar.");
+          showNotification(
+            "Sesión expirada",
+            "Su sesión ha expirado. Por favor, inicie sesión nuevamente para continuar.",
+            "warning"
+          );
           
           // No restaurar estado anterior ya que el usuario será redirigido al login
           // El sistema manejará automáticamente el logout
@@ -1174,7 +1405,11 @@ function AperturaCierreContent() {
           // Error 400: La caja ya está cerrada
           if (apiError.message && apiError.message.includes("caja ya esta cerrada")) {
             console.warn("⚠️ La caja ya estaba cerrada según el servidor");
-            alert("Esta caja ya está cerrada.");
+            showNotification(
+              "Información",
+              "Esta caja ya está cerrada.",
+              "info"
+            );
             
             // Actualizar el estado local para reflejar que está cerrada
             setCajas(prevCajas => 
@@ -1203,12 +1438,20 @@ function AperturaCierreContent() {
         
         if (httpError.response?.status === 403) {
           console.warn("⚠️ Token expirado o acceso no autorizado");
-          alert("Su sesión ha expirado. Por favor, inicie sesión nuevamente para continuar.");
+          showNotification(
+            "Sesión expirada",
+            "Su sesión ha expirado. Por favor, inicie sesión nuevamente para continuar.",
+            "warning"
+          );
           return;
         } else if (httpError.response?.status === 400) {
           if (httpError.response.data?.message === "La caja ya esta cerrada") {
             console.warn("⚠️ La caja ya estaba cerrada según el servidor");
-            alert("Esta caja ya está cerrada.");
+            showNotification(
+              "Información",
+              "Esta caja ya está cerrada.",
+              "info"
+            );
             
             setCajas(prevCajas => 
               prevCajas.map(c => 
@@ -1234,7 +1477,11 @@ function AperturaCierreContent() {
         errorMessage += `: ${error.message}`;
       }
       
-      alert(errorMessage);
+      showNotification(
+        "Error",
+        errorMessage,
+        "error"
+      );
       
       // Restaurar estado anterior
       setCajas(prevCajas => 
@@ -1640,12 +1887,26 @@ function AperturaCierreContent() {
               <div className="d-flex gap-2 align-items-center">
                 <button 
                   className="btn btn-light btn-sm"
-                  onClick={loadCajas}
+                  onClick={async () => {
+                    console.log("🔄 Ejecutando sincronización completa desde header");
+                    try {
+                      // 1. Actualizar ATMs
+                      await loadAllATMs();
+                      // 2. Actualizar mapa global
+                      await actualizarMapaCajasAsignadas();
+                      // 3. Actualizar cajas
+                      await loadCajas();
+                    } catch (error) {
+                      console.error("❌ Error en sincronización completa:", error);
+                      showConnectionError("Error al sincronizar. Intente de nuevo.");
+                    }
+                  }}
                   disabled={loading}
                   style={{ borderRadius: '8px' }}
+                  title="Sincronizar cajas, empleados y asignaciones"
                 >
                   <i className="fas fa-sync-alt me-1"></i>
-                  {loading ? 'Actualizando...' : 'Actualizar'}
+                  {loading ? 'Sincronizando...' : 'Sincronizar'}
                 </button>
                 {isAdmin() && (
                   <button 
@@ -1667,20 +1928,7 @@ function AperturaCierreContent() {
         <CajaCard 
           cajas={cajas} 
           loading={loading} 
-          onRefresh={async () => {
-            console.log("🔄 Ejecutando actualización completa desde botón de CajaCard");
-            try {
-              // 1. Actualizar ATMs
-              await loadAllATMs();
-              // 2. Actualizar mapa global
-              await actualizarMapaCajasAsignadas();
-              // 3. Actualizar cajas
-              await loadCajas();
-            } catch (error) {
-              console.error("❌ Error en actualización manual:", error);
-              showConnectionError("Error al actualizar. Intente de nuevo.");
-            }
-          }}
+          onRefresh={undefined}
           onActivarCaja={handleActivarCaja}
           onToggleCaja={handleToggleCaja}
           user={user}
@@ -1923,6 +2171,30 @@ function AperturaCierreContent() {
         onSubmit={handleCreateCaja}
         isLoading={isCreatingCaja}
         cajasExistentes={cajas}
+      />
+
+      {/* Modal de confirmación */}
+      <ConfirmationModal
+        isOpen={confirmationModal.isOpen}
+        title={confirmationModal.title}
+        message={confirmationModal.message}
+        onConfirm={() => {
+          confirmationModal.onConfirm();
+          closeConfirmationModal();
+        }}
+        onClose={closeConfirmationModal}
+        type={confirmationModal.type}
+        confirmText={confirmationModal.confirmText}
+        isLoading={confirmationModal.isLoading}
+      />
+
+      {/* Modal de notificación */}
+      <NotificationModal
+        isOpen={notificationModal.isOpen}
+        title={notificationModal.title}
+        message={notificationModal.message}
+        type={notificationModal.type || 'info'}
+        onClose={closeNotificationModal}
       />
     </MainLayout>
   );
