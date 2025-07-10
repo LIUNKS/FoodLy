@@ -25,19 +25,17 @@ export default function CajaCard({ cajas, loading, onRefresh, onActivarCaja, onT
   // Estado local para rastrear cuando fue la última actualización
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
-  // Efecto para actualizar datos periódicamente
+  // Efecto para actualización automática periódica (sin botón manual)
   useEffect(() => {
-    // Función para actualizar datos
-    const refreshData = () => {
-      console.log("🔄 Actualizando datos automáticamente desde CajaCard");
-      if (onRefresh) {
-        onRefresh();
-        setLastRefresh(new Date());
-      }
-    };
+    // Solo actualizar automáticamente si se proporciona la función onRefresh
+    if (!onRefresh) return;
 
     // Configurar intervalo de actualización (cada 60 segundos)
-    const intervalId = setInterval(refreshData, 60000);
+    const intervalId = setInterval(() => {
+      console.log("🔄 Actualizando datos automáticamente desde CajaCard");
+      onRefresh();
+      setLastRefresh(new Date());
+    }, 60000);
 
     // Limpiar el intervalo cuando el componente se desmonte
     return () => clearInterval(intervalId);
@@ -109,26 +107,11 @@ export default function CajaCard({ cajas, loading, onRefresh, onActivarCaja, onT
       <div className="foodly-card fade-in-up">
         <div className="foodly-card-body pt-4">
           {/* Indicador de última actualización */}
-          <div className="d-flex justify-content-between align-items-center mb-2">
-            <small className="text-muted" style={{ fontSize: '10px' }}>
-              <i className="fas fa-sync-alt me-1"></i>
+          <div className="mb-3">
+            <small className="text-muted d-flex align-items-center" style={{ fontSize: '11px' }}>
+              <i className="fas fa-clock me-2"></i>
               Última actualización: {lastRefresh.toLocaleTimeString()}
             </small>
-            <button 
-              className="btn btn-sm btn-outline-secondary" 
-              style={{ fontSize: '12px' }}
-              onClick={() => {
-                if (onRefresh) {
-                  console.log("🔄 Actualizando datos manualmente desde CajaCard");
-                  onRefresh();
-                  setLastRefresh(new Date());
-                }
-              }}
-              title="Actualizar ahora"
-            >
-              <i className="fas fa-redo-alt me-1"></i>
-              Actualizar
-            </button>
           </div>
           {/* Mensaje para cuando no hay cajas */}
           {sortedCajas.length === 0 && !loading ? (
