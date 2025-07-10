@@ -7,7 +7,7 @@ export interface BoxNameDTO {
 }
 
 export interface ArqueoInitDTO {
-  initial_amount: number;
+  init_amount: number;
   responsible_user?: string;
   notes?: string;
 }
