@@ -11,7 +11,7 @@ interface ArqueoModalProps {
 }
 
 export interface ArqueoInitDTO {
-  initial_amount: number;
+  init_amount: number;
 }
 
 export default function ArqueoModal({ 
@@ -48,7 +48,7 @@ export default function ArqueoModal({
       return;
     }
 
-    onSubmit({ initial_amount: initialAmount });
+    onSubmit({ init_amount: initialAmount });
   };
 
   const handleClose = () => {
