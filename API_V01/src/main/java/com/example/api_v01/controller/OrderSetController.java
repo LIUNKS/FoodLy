@@ -10,8 +10,8 @@ import com.example.api_v01.service.service_aux.OrderSetOrchestratorService;
 import com.example.api_v01.utils.Tuple;
 import com.example.api_v01.utils.UriGeneric;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import net.sf.jasperreports.engine.JRException;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -73,4 +73,17 @@ public class OrderSetController { //CONTROLADOR TESTEADO, LISTO PARA USAR
         return ResponseEntity.ok(successMessage);
     }
 
+    @GetMapping("/invoice/{id_orderSet}")
+    public ResponseEntity<byte[]> generarBoleta(@PathVariable UUID id_orderSet) throws JRException, NotFoundException {
+        byte[] pdfBytes = orderSetOrchestratorService.generateInvoice(id_orderSet);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition
+                .inline()
+                .filename("boleta_" + id_orderSet + ".pdf")
+                .build());
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+    }
 }

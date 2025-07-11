@@ -2,6 +2,7 @@ package com.example.api_v01.service.service_aux;
 
 import com.example.api_v01.dto.entityLike.CustomerOrderDTO;
 import com.example.api_v01.dto.entityLike.OrderSetDTO;
+import com.example.api_v01.dto.response.CustomerOrderResponseDTO;
 import com.example.api_v01.dto.response.OrderSetResponseDTO;
 import com.example.api_v01.dto.response.OrderSetWithListCustomerOrderDTO;
 import com.example.api_v01.handler.BadRequestException;
@@ -14,10 +15,13 @@ import com.example.api_v01.utils.ExceptionMessage;
 import com.example.api_v01.utils.OrderSetMovement;
 import com.example.api_v01.utils.Tuple;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
+import java.io.InputStream;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -77,6 +81,51 @@ public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorServi
     @Override
     public List<OrderSetDTO> findOrderSetByCustomer(String name,int page) throws NotFoundException {
         return orderSetService.getOrderSetByNameCustomer(name,page);
+    }
+
+    //Para generar boleta de la orden de un cliente
+    @Override
+    public byte[] generateInvoice(UUID id_orderSet) throws JRException, NotFoundException {
+        OrderSetWithListCustomerOrderDTO orderSetDTO = getOrderSetDTO(id_orderSet);
+
+        // Parametros
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("cliente", orderSetDTO.getName_client());
+        //fecha
+        parameters.put("total", orderSetDTO.getTotal_order());
+
+        //Lista productos
+        List<Map<String, Object>> detalle = new ArrayList<>();
+        for(CustomerOrderResponseDTO item : orderSetDTO.getOrders()){
+            Map<String, Object> detalleMap = new HashMap<>();
+            detalleMap.put("producto", item.getName_product());
+            detalleMap.put("precio", item.getTotal_rice());
+            detalleMap.put("cantidad", item.getCount());
+            double subTotal = item.getCount()*item.getTotal_rice();
+            detalleMap.put("subtotal", Math.round(subTotal*100.0)/100.0);
+            detalle.add(detalleMap);
+        }
+
+        //logo
+        InputStream logoStream = getClass().getResourceAsStream("/restaurantLogo.jpg");
+        parameters.put("logo", logoStream);
+
+        // Convertir lista
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(detalle);
+        parameters.put("DETALLE_DS", dataSource);
+
+        //Cargar archivo .jasper compilado
+        InputStream jasperStream = this.getClass().getResourceAsStream("/receipts/boleta_orden.jasper");
+        if (jasperStream == null) {
+            throw new JRException("No se encontró el archivo de reporte Jasper: boleta_orden.jasper");
+        }
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObject(jasperStream);
+
+        //llenar reporte
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+        //Exportar a pdf
+        return JasperExportManager.exportReportToPdf(jasperPrint);
     }
 
 }
