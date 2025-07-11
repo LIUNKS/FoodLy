@@ -111,6 +111,15 @@ public class OrderSetController { //CONTROLADOR TESTEADO, LISTO PARA USAR
         return ResponseEntity.ok(successMessage);
     }
 
+    @Operation(
+            summary = "Generar boleta PDF para un conjunto de pedidos",
+            description = "Genera y devuelve un archivo PDF con la boleta correspondiente al conjunto de pedidos especificado mediante su UUID."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Boleta generada correctamente en formato PDF."),
+            @ApiResponse(responseCode = "404", description = "Conjunto de pedidos no encontrado."),
+            @ApiResponse(responseCode = "500", description = "Error interno al generar el PDF.")
+    })
     @GetMapping("/invoice/{id_orderSet}")
     public ResponseEntity<byte[]> generarBoleta(@PathVariable UUID id_orderSet) throws JRException, NotFoundException {
         byte[] pdfBytes = orderSetOrchestratorService.generateInvoice(id_orderSet);
