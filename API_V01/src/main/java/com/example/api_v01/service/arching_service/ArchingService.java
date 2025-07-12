@@ -9,6 +9,7 @@ import com.example.api_v01.handler.BadRequestException;
 import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.Arching;
 import com.example.api_v01.utils.Tuple;
+import net.sf.jasperreports.engine.JRException;
 
 
 import java.util.List;
@@ -25,4 +26,5 @@ public interface ArchingService {
     List<ArchingWithBoxDTO> getArchingByBox(UUID id_box,int page) throws NotFoundException;
     List<ArchingWithAtmDTO> getArchingByNameATM(String name_ATM,int page) throws NotFoundException;
     List<ArchingWithBoxDTO> getArchingByNameBox(String name_BOX,int page) throws NotFoundException;
+    byte[] generateSummaryReceipt(UUID id_arching) throws NotFoundException, JRException;
 }

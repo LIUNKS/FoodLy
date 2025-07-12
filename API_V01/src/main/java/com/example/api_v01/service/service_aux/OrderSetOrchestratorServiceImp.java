@@ -112,7 +112,7 @@ public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorServi
 
         // Convertir lista
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(detalle);
-        parameters.put("DETALLE_DS", dataSource);
+        parameters.put("DETALLES_DS", dataSource);
 
         //Cargar archivo .jasper compilado
         InputStream jasperStream = this.getClass().getResourceAsStream("/receipts/boleta_orden.jasper");

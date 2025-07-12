@@ -16,10 +16,14 @@ import com.example.api_v01.utils.ArchingMovement;
 import com.example.api_v01.utils.ExceptionMessage;
 import com.example.api_v01.utils.Tuple;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -128,6 +132,23 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
         return ArchingMovement.CreateListArchingWithBoxDTO(archingList);
     }
 
+    @Override
+    public byte[] generateSummaryReceipt(UUID id_arching) throws NotFoundException, JRException {
+        ArchingDTO arching = getArchingDTOById(id_arching);
+
+        //Formato
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+        //Datos
+        String caja = arching.getArching_with_box_and_atm().getBoxDTO().getName_box();
+        String cajero = arching.getArching_with_box_and_atm().getAtmDTO().getName_atm();
+        String fechaApertura = arching.getDate().atTime(arching.getStar_time()).format(formatter);
+        String fechaConsulta = LocalDateTime.now().format(formatter);
+        Double montoInicial = arching.getInit_amount();
+        Double montoFinal = arching.getFinal_amount();
+        Double montoTotal = arching.getTotal_amount();
+        return null;
+    }
 
 
 }
