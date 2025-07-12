@@ -3,13 +3,9 @@
 interface LoginResponse {
   token: string;
   role: string;
-  data: {
-    id_admin: string;
-    name_admin: string;
-    email_admin: string;
-    dni_admin: string;
-  };
+  data: Record<string, any>; // para admitir múltiples estructuras
 }
+
 
 interface LoginCredentials {
   username: string;

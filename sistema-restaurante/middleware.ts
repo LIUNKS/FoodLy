@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server"
 // Nota: Debido a limitaciones del middleware, replicamos la lógica aquí
 const UserRole = {
   ADMIN: 'ADMIN',
-  CAJERO: 'CAJERO', 
+  ATM: 'ATM', 
   COCINA: 'COCINA'
 } as const;
 
@@ -23,8 +23,7 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/cocina',
     '/logout'
   ],
-  [UserRole.CAJERO]: [
-    '/apertura-cierre',
+  [UserRole.ATM]: [
     '/arqueo',
     '/pedido',
     '/logout'
@@ -37,7 +36,7 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
 
 const DEFAULT_ROUTES: Record<string, string> = {
   [UserRole.ADMIN]: '/apertura-cierre',
-  [UserRole.CAJERO]: '/apertura-cierre',
+  [UserRole.ATM]: '/pedido',
   [UserRole.COCINA]: '/cocina'
 };
 

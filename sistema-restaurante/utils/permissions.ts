@@ -6,7 +6,7 @@
 // Definición de roles
 export enum UserRole {
   ADMIN = 'ADMIN',
-  CAJERO = 'CAJERO', 
+  ATM = 'ATM', 
   COCINA = 'COCINA'
 }
 
@@ -47,7 +47,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, AppModule[]> = {
     AppModule.LOGOUT
   ],
   
-  [UserRole.CAJERO]: [
+  [UserRole.ATM]: [
     // CAJERO: acceso solo a los módulos de caja y pedidos
     AppModule.APERTURA_CIERRE,
     AppModule.ARQUEO,
@@ -65,7 +65,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, AppModule[]> = {
 // Rutas de redirección por defecto según el rol
 export const DEFAULT_ROUTES: Record<UserRole, string> = {
   [UserRole.ADMIN]: AppModule.APERTURA_CIERRE,
-  [UserRole.CAJERO]: AppModule.APERTURA_CIERRE,
+  [UserRole.ATM]: AppModule.APERTURA_CIERRE,
   [UserRole.COCINA]: AppModule.COCINA
 };
 
@@ -113,7 +113,7 @@ export function isValidRole(role: string): boolean {
 export function getRoleName(role: string): string {
   const roleNames: Record<UserRole, string> = {
     [UserRole.ADMIN]: 'Administrador',
-    [UserRole.CAJERO]: 'Cajero',
+    [UserRole.ATM]: 'Atm',
     [UserRole.COCINA]: 'Cocina'
   };
   
