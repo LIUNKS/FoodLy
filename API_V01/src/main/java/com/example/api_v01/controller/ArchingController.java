@@ -153,4 +153,32 @@ public class ArchingController { //CONTROLADOR TESTEADO, LISTO PARA USAR
         );
     }
 
+    @Operation(
+            summary = "Generar PDF de resumen de arqueo de caja",
+            description = "Genera y devuelve un archivo PDF con el resumen del arqueo de caja para el ID especificado."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "PDF generado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Arching no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno al generar el PDF")
+    })
+    @GetMapping("/receipt/summary/{id_arching}")
+    public ResponseEntity<byte[]> generateSummaryReceipt(@PathVariable UUID id_arching) {
+        try {
+            byte[] pdf = archingService.generateSummaryReceipt(id_arching);
+
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "inline; filename=arqueo_resumen.pdf")
+                    .header("Content-Type", "application/pdf")
+                    .body(pdf);
+
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
+    }
+
 }
