@@ -33,7 +33,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
         // ADMIN puede ver todos los apartados
         return true;
       
-      case 'CAJERO':
+      case 'ATM':
         // CAJERO solo puede ver Caja y Pedidos
         return section === 'Caja' || section === 'Pedido';
       

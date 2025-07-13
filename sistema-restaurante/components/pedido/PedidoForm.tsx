@@ -20,15 +20,13 @@ export default function PedidoForm() {
             <input type="text" id="cliente" className="foodly-form-control" defaultValue="Jorge" />
           </div>
         </div>
-
         <ul className="nav nav-tabs" style={{ borderBottom: '2px solid var(--primary-light)' }}>
           <li className="nav-item">
             <a 
               className="nav-link active" 
               data-bs-toggle="tab" 
               href="#categorias"
-              style={{ color: 'var(--primary)', fontWeight: 500 }}
-            >
+              style={{ color: 'var(--primary)', fontWeight: 500 }}>
               <i className="fas fa-tags me-1"></i>Categorías
             </a>
           </li>
