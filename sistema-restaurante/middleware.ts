@@ -25,6 +25,7 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
   ],
   [UserRole.ATM]: [
     '/arqueo',
+    /*'/apertura-cierre',*/ // ATM no tiene acceso a apertura-cierre por falta id_admin
     '/pedido',
     '/logout'
   ],
