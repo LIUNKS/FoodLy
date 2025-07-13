@@ -14,6 +14,7 @@ export enum UserRole {
 export enum AppModule {
   // Módulos generales
   APERTURA_CIERRE = '/apertura-cierre',
+  APERTURA_CIERRE_ATM = '/apertura-cierre-atm',
   ARQUEO = '/arqueo',
   CONSOLIDADOS = '/consolidados',
   GRAFICOS = '/graficos',
@@ -49,7 +50,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, AppModule[]> = {
   
   [UserRole.ATM]: [
     // CAJERO: acceso solo a los módulos de caja y pedidos
-    AppModule.APERTURA_CIERRE,
+    AppModule.APERTURA_CIERRE_ATM,
     AppModule.ARQUEO,
     AppModule.PEDIDO,
     AppModule.LOGOUT
@@ -65,7 +66,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, AppModule[]> = {
 // Rutas de redirección por defecto según el rol
 export const DEFAULT_ROUTES: Record<UserRole, string> = {
   [UserRole.ADMIN]: AppModule.APERTURA_CIERRE,
-  [UserRole.ATM]: AppModule.APERTURA_CIERRE,
+  [UserRole.ATM]: AppModule.APERTURA_CIERRE_ATM,
   [UserRole.COCINA]: AppModule.COCINA
 };
 

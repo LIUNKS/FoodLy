@@ -16,7 +16,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>(
     {}
   );
-  const { isMobile } = useBreakpoints();  const { user, getStoredRole } = useAuthData();
+  const { isMobile } = useBreakpoints(); const { user, getStoredRole } = useAuthData();
   // Obtener el rol del usuario
   const userRole = user?.role || getStoredRole();
 
@@ -32,15 +32,15 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       case 'ADMIN':
         // ADMIN puede ver todos los apartados
         return true;
-      
+
       case 'ATM':
         // CAJERO solo puede ver Caja y Pedidos
         return section === 'Caja' || section === 'Pedido';
-      
+
       case 'COCINA':
         // COCINA solo puede ver Cocina
         return section === 'Cocina';
-      
+
       default:
         return false;
     }
@@ -66,7 +66,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
         }, 300); // Pequeño retraso para evitar problemas
       }
     };
-    
+
     if (pathname) {
       handleRouteChange();
     }
@@ -85,8 +85,8 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
           <span>FoodLy</span>
         </Link>
         {isMobile && (
-          <button 
-            className="close-sidebar-btn" 
+          <button
+            className="close-sidebar-btn"
             onClick={() => {
               console.log("Close sidebar button clicked");
               toggleSidebar();
@@ -101,7 +101,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
           <li>
             <a
               href="#"
-              className={isSubmenuActive(["/arqueo", "/apertura-cierre"]) ? "active" : ""}
+              className={isSubmenuActive(["/arqueo", "/apertura-cierre", "/apertura-cierre-atm"]) ? "active" : ""}
               onClick={(e) => {
                 e.preventDefault();
                 toggleSubmenu("Caja");
@@ -119,11 +119,22 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                   <i className="fa-regular fa-clipboard"></i> Arqueo
                 </Link>
               </li>
-              <li>
-                <Link href="/apertura-cierre" className={isActive("/apertura-cierre") ? "active" : ""}>
-                  <i className="fa-solid fa-box"></i> Apertura y cierre
-                </Link>
-              </li>
+              {user?.role === "ATM" && (
+                <li>
+                  <Link href="/apertura-cierre-atm" className={isActive("/apertura-cierre-atm") ? "active" : ""}>
+                    <i className="fa-solid fa-box"></i> Apertura y cierre
+                  </Link>
+                </li>
+              )}
+
+              {user?.role === "ADMIN" && (
+                <li>
+                  <Link href="/apertura-cierre" className={isActive("/apertura-cierre") ? "active" : ""}>
+                    <i className="fa-solid fa-box"></i> Apertura y cierre
+                  </Link>
+                </li>
+              )}
+
             </ul>
           </li>
         )}        {/* Menú: Pedido - Visible para ADMIN y CAJERO */}

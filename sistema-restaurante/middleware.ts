@@ -24,8 +24,8 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/logout'
   ],
   [UserRole.ATM]: [
+    '/apertura-cierre-atm',
     '/arqueo',
-    /*'/apertura-cierre',*/ // ATM no tiene acceso a apertura-cierre por falta id_admin
     '/pedido',
     '/logout'
   ],
@@ -37,7 +37,7 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
 
 const DEFAULT_ROUTES: Record<string, string> = {
   [UserRole.ADMIN]: '/apertura-cierre',
-  [UserRole.ATM]: '/pedido',
+  [UserRole.ATM]: '/apertura-cierre-atm',
   [UserRole.COCINA]: '/cocina'
 };
 
