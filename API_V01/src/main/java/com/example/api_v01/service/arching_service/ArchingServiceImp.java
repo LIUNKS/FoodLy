@@ -17,15 +17,18 @@ import com.example.api_v01.utils.ArchingMovement;
 import com.example.api_v01.utils.ExceptionMessage;
 import com.example.api_v01.utils.Tuple;
 import lombok.RequiredArgsConstructor;
-import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -142,14 +145,34 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
         //Datos
-        String caja = arching.getArching_with_box_and_atm().getBoxDTO().getName_box();
-        String cajero = arching.getArching_with_box_and_atm().getAtmDTO().getName_atm();
+        String nombreCaja = arching.getArching_with_box_and_atm().getBoxDTO().getName_box();
+        String nombreCajero = arching.getArching_with_box_and_atm().getAtmDTO().getName_atm();
         String fechaApertura = arching.getDate().atTime(arching.getStar_time()).format(formatter);
         String fechaConsulta = LocalDateTime.now().format(formatter);
+
+        //para visualizar recalcular montos incluso antes de cerrar caja
         Double montoInicial = arching.getInit_amount();
-        Double montoFinal = arching.getFinal_amount();
-        Double montoTotal = orderSetService.totalAmountArching(id_arching);
-        return null;
+        Double montoTotal = orderSetService.totalAmountArching(id_arching); // recalcula
+        Double montoFinal = montoInicial+montoTotal;
+
+        //Parametros
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("caja", nombreCaja);
+        parameters.put("cajero", nombreCajero);
+        parameters.put("fecha_apertura", fechaApertura);
+        parameters.put("fecha_consulta", fechaConsulta);
+        parameters.put("monto_inicial", montoInicial);
+        parameters.put("monto_total", montoTotal);
+        parameters.put("monto_final", montoFinal);
+
+        InputStream reportStream = getClass().getResourceAsStream("/receipts/resumen_arqueo.jasper");
+        if (reportStream == null) {
+            throw new JRException("El archivo de reporte no fue encontrado");
+        }
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(reportStream, parameters, new JREmptyDataSource());
+
+        return JasperExportManager.exportReportToPdf(jasperPrint);
     }
 
 
