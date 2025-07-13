@@ -89,12 +89,6 @@ public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorServi
     public byte[] generateInvoice(UUID id_orderSet) throws JRException, NotFoundException {
         OrderSetWithListCustomerOrderDTO orderSetDTO = getOrderSetDTO(id_orderSet);
 
-        // Parametros
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("cliente", orderSetDTO.getName_client());
-        //fecha
-        parameters.put("total", orderSetDTO.getTotal_order());
-
         //Lista productos
         List<DetalleBoleta> detalle = new ArrayList<>();
         for(CustomerOrderResponseDTO item : orderSetDTO.getOrders()){
@@ -106,6 +100,16 @@ public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorServi
             d.setSubtotal(Math.round(subtotal*100.0)/100.0);
             detalle.add(d);
         }
+
+        //calculo de total sin dependencia
+        double totalCalculado = orderSetDTO.getOrders().stream()
+                .mapToDouble(item -> item.getTotal_rice() * item.getCount())
+                .sum();
+
+        // Parametros
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("cliente", orderSetDTO.getName_client());
+        parameters.put("total", Math.round(totalCalculado*100.0)/100.0);
 
         //logo
         InputStream logoStream = getClass().getResourceAsStream("/restaurantLogo.jpg");

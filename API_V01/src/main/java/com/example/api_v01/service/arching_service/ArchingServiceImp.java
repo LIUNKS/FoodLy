@@ -12,6 +12,7 @@ import com.example.api_v01.model.Box;
 import com.example.api_v01.repository.ArchingRepository;
 import com.example.api_v01.repository.BoxRepository;
 import com.example.api_v01.service.box_service.BoxService;
+import com.example.api_v01.service.order_set_service.OrderSetService;
 import com.example.api_v01.utils.ArchingMovement;
 import com.example.api_v01.utils.ExceptionMessage;
 import com.example.api_v01.utils.Tuple;
@@ -34,6 +35,7 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
     private final ArchingRepository archingRepository;
 
     private final BoxRepository boxRepository;
+    private final OrderSetService orderSetService;
 
     @Value("${Entity-size}")
     private int size;
@@ -146,7 +148,7 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
         String fechaConsulta = LocalDateTime.now().format(formatter);
         Double montoInicial = arching.getInit_amount();
         Double montoFinal = arching.getFinal_amount();
-        Double montoTotal = arching.getTotal_amount();
+        Double montoTotal = orderSetService.totalAmountArching(id_arching);
         return null;
     }
 
