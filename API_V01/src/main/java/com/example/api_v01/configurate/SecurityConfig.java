@@ -42,7 +42,7 @@ public class SecurityConfig {
     };
 
     private final String [] EndpointsATM = {
-            "/box/*","/orderSet/*","/product/*","/stock/*",
+            "/box/*","/orderSet/*","/product/*","/stock/*","/arching/*"
     };
 
 
