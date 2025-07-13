@@ -10,6 +10,7 @@ import com.example.api_v01.handler.NotFoundException;
 import com.example.api_v01.model.CustomerOrder;
 import com.example.api_v01.model.OrderSet;
 import com.example.api_v01.service.customer_order_service.CustomerOrderService;
+import com.example.api_v01.service.order_set_service.DetalleBoleta;
 import com.example.api_v01.service.order_set_service.OrderSetService;
 import com.example.api_v01.utils.ExceptionMessage;
 import com.example.api_v01.utils.OrderSetMovement;
@@ -95,15 +96,15 @@ public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorServi
         parameters.put("total", orderSetDTO.getTotal_order());
 
         //Lista productos
-        List<Map<String, Object>> detalle = new ArrayList<>();
+        List<DetalleBoleta> detalle = new ArrayList<>();
         for(CustomerOrderResponseDTO item : orderSetDTO.getOrders()){
-            Map<String, Object> detalleMap = new HashMap<>();
-            detalleMap.put("producto", item.getName_product());
-            detalleMap.put("precio", item.getTotal_rice());
-            detalleMap.put("cantidad", item.getCount());
-            double subTotal = item.getCount()*item.getTotal_rice();
-            detalleMap.put("subtotal", Math.round(subTotal*100.0)/100.0);
-            detalle.add(detalleMap);
+            DetalleBoleta d = new DetalleBoleta();
+            d.setProducto(item.getName_product());
+            d.setPrecio(item.getTotal_rice());
+            d.setCantidad(String.valueOf(item.getCount()));
+            double subtotal = item.getCount() * item.getTotal_rice();
+            d.setSubtotal(Math.round(subtotal*100.0)/100.0);
+            detalle.add(d);
         }
 
         //logo
@@ -111,8 +112,8 @@ public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorServi
         parameters.put("logo", logoStream);
 
         // Convertir lista
-        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(detalle);
-        parameters.put("DETALLES_DS", dataSource);
+        JRBeanCollectionDataSource tableDataSource = new JRBeanCollectionDataSource(detalle);
+        parameters.put("DETALLES_DS", tableDataSource);
 
         //Cargar archivo .jasper compilado
         InputStream jasperStream = this.getClass().getResourceAsStream("/receipts/boleta_orden.jasper");
@@ -122,7 +123,7 @@ public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorServi
         JasperReport jasperReport = (JasperReport) JRLoader.loadObject(jasperStream);
 
         //llenar reporte
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
 
         //Exportar a pdf
         return JasperExportManager.exportReportToPdf(jasperPrint);
