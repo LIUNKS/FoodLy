@@ -24,6 +24,7 @@ import java.util.UUID;
 public class OrderSetServiceImp implements  OrderSetService, ExceptionMessage {
 
     private final OrderSetRepository orderSetRepository;
+
     private final ArchingService archingService;
 
     @Value("${Entity-size}")

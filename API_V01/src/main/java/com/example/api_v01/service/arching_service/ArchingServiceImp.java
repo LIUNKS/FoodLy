@@ -38,7 +38,6 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
     private final ArchingRepository archingRepository;
 
     private final BoxRepository boxRepository;
-    private final OrderSetService orderSetService;
 
     @Value("${Entity-size}")
     private int size;
@@ -137,43 +136,58 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
         return ArchingMovement.CreateListArchingWithBoxDTO(archingList);
     }
 
-    @Override
-    public byte[] generateSummaryReceipt(UUID id_arching) throws NotFoundException, JRException {
-        ArchingDTO arching = getArchingDTOById(id_arching);
+    public byte[] generateSummaryReceipt(UUID id_arching) throws NotFoundException {
+        try {
+            ArchingDTO arching = getArchingDTOById(id_arching);
 
-        //Formato
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            System.out.println("Prueba 1");
 
-        //Datos
-        String nombreCaja = arching.getArching_with_box_and_atm().getBoxDTO().getName_box();
-        String nombreCajero = arching.getArching_with_box_and_atm().getAtmDTO().getName_atm();
-        String fechaApertura = arching.getDate().atTime(arching.getStar_time()).format(formatter);
-        String fechaConsulta = LocalDateTime.now().format(formatter);
+            //Formato
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
-        //para visualizar recalcular montos incluso antes de cerrar caja
-        Double montoInicial = arching.getInit_amount();
-        Double montoTotal = orderSetService.totalAmountArching(id_arching); // recalcula
-        Double montoFinal = montoInicial+montoTotal;
+            //Datos
+            String nombreCaja = arching.getArching_with_box_and_atm().getBoxDTO().getName_box();
+            String nombreCajero = arching.getArching_with_box_and_atm().getAtmDTO().getName_atm();
+            String fechaApertura = arching.getDate().atTime(arching.getStar_time()).format(formatter);
+            String fechaConsulta = LocalDateTime.now().format(formatter);
 
-        //Parametros
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("caja", nombreCaja);
-        parameters.put("cajero", nombreCajero);
-        parameters.put("fecha_apertura", fechaApertura);
-        parameters.put("fecha_consulta", fechaConsulta);
-        parameters.put("monto_inicial", montoInicial);
-        parameters.put("monto_total", montoTotal);
-        parameters.put("monto_final", montoFinal);
+            Double montoInicial = arching.getInit_amount();
+            Double montoTotal = arching.getTotal_amount();
+            Double montoFinal = arching.getFinal_amount();
 
-        InputStream reportStream = getClass().getResourceAsStream("/receipts/resumen_arqueo.jasper");
-        if (reportStream == null) {
-            throw new JRException("El archivo de reporte no fue encontrado");
+            System.out.println("Prueba 2");
+
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("caja", nombreCaja);
+            parameters.put("cajero", nombreCajero);
+            parameters.put("fecha_apertura", fechaApertura);
+            parameters.put("fecha_consulta", fechaConsulta);
+            parameters.put("monto_inicial", montoInicial);
+            parameters.put("monto_total", montoTotal);
+            parameters.put("monto_final", montoFinal);
+
+            System.out.println("Prueba 3");
+
+            InputStream reportStream = Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream("receipts/resumen_arqueo.jasper");
+
+            if (reportStream == null) {
+                System.err.println("⚠️ Archivo resumen_arqueo.jasper no encontrado.");
+                throw new JRException("Archivo .jasper no encontrado en classpath.");
+            }
+
+            JasperPrint jasperPrint = JasperFillManager.fillReport(reportStream, parameters, new JREmptyDataSource());
+
+            return JasperExportManager.exportReportToPdf(jasperPrint);
+
+        } catch (Exception e) {
+            // Ver el error real en consola
+            System.err.println("❌ Error generando el PDF: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error interno al generar el PDF: " + e.getMessage());
         }
-
-        JasperPrint jasperPrint = JasperFillManager.fillReport(reportStream, parameters, new JREmptyDataSource());
-
-        return JasperExportManager.exportReportToPdf(jasperPrint);
     }
+
 
 
 }

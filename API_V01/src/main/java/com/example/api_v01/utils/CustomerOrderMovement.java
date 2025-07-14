@@ -10,6 +10,7 @@ import com.example.api_v01.model.ProductStock;
 import java.util.List;
 
 public class CustomerOrderMovement {
+
     public static CustomerOrder createCustomerOrder(OrderSet orderSet,Product product, Integer count) {
         if(product.getStock().getCurrent_stock() >= count){
             return CustomerOrder.builder()
@@ -21,6 +22,7 @@ public class CustomerOrderMovement {
         }
         return null;
     }
+
     public static CustomerOrderResponseDTO convertCustomerOrderToCustomerOrderResponseDTO(CustomerOrder customerOrder){
         return CustomerOrderResponseDTO.builder()
                 .name_product(customerOrder.getProduct().getName_product())

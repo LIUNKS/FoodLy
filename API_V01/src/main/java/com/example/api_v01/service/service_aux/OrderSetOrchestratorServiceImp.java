@@ -87,23 +87,33 @@ public class OrderSetOrchestratorServiceImp implements OrderSetOrchestratorServi
     //Para generar boleta de la orden de un cliente
     @Override
     public byte[] generateInvoice(UUID id_orderSet) throws JRException, NotFoundException {
+
         OrderSetWithListCustomerOrderDTO orderSetDTO = getOrderSetDTO(id_orderSet);
 
         //Lista productos
         List<DetalleBoleta> detalle = new ArrayList<>();
+
         for(CustomerOrderResponseDTO item : orderSetDTO.getOrders()){
+
             DetalleBoleta d = new DetalleBoleta();
+
             d.setProducto(item.getName_product());
-            d.setPrecio(item.getTotal_rice());
+
+            d.setPrecio(item.getTotal_rice() / item.getCount());
+
             d.setCantidad(String.valueOf(item.getCount()));
-            double subtotal = item.getCount() * item.getTotal_rice();
+
+            double subtotal = item.getCount() * (item.getTotal_rice() / item.getCount());
+
             d.setSubtotal(Math.round(subtotal*100.0)/100.0);
+
             detalle.add(d);
+
         }
 
         //calculo de total sin dependencia
         double totalCalculado = orderSetDTO.getOrders().stream()
-                .mapToDouble(item -> item.getTotal_rice() * item.getCount())
+                .mapToDouble(item -> item.getCount() * (item.getTotal_rice() / item.getCount()) )
                 .sum();
 
         // Parametros
