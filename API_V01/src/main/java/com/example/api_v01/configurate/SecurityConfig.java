@@ -36,13 +36,13 @@ public class SecurityConfig {
     private final String [] EndpointsFree = {"/auth/login", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html"};
 
     private final String [] EndpointsAdmin = {
-            "/arching/*","/atm/*","/box/*",
-            "/orderSet/*","/product/*","/stock/*",
-            "/admin/*"
+            "/arching/**","/atm/**","/box/**",
+            "/orderSet/**","/product/**","/stock/**",
+            "/admin/**"
     };
 
     private final String [] EndpointsATM = {
-            "/box/*","/orderSet/*","/product/*","/stock/*","/arching/*"
+            "/box/**","/orderSet/**","/product/**","/stock/**","/arching/**"
     };
 
 
@@ -53,8 +53,8 @@ public class SecurityConfig {
                 .cors( cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests( auth -> auth
                         .requestMatchers(EndpointsFree).permitAll()
-                        .requestMatchers(EndpointsAdmin).hasRole("ADMIN")
                         .requestMatchers(EndpointsATM).hasRole("ATM")
+                        .requestMatchers(EndpointsAdmin).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
