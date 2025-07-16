@@ -74,6 +74,7 @@ export default function PedidoForm() {
   const [selectedProduct, setSelectedProduct] = useState<string>("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cliente, setCliente] = useState<string>("");
+  const [showClienteErrorModal, setShowClienteErrorModal] = useState(false);
 
   useEffect(() => {
     async function fetchCategories() {
@@ -226,6 +227,10 @@ export default function PedidoForm() {
 
   // Manejar el flujo de finalizar pedido
   const handleFinalizarPedido = async () => {
+    if (!cliente.trim()) {
+      setShowClienteErrorModal(true);
+      return;
+    }
     try {
       const localToken = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
       const cookieToken = Cookies.get("token");
@@ -258,7 +263,11 @@ export default function PedidoForm() {
       setSelectedProduct("");
       clearCart();
       setShowSuccessModal(true);
+      // Actualizar pedidos recientes automáticamente
       fetchRecentOrders();
+      if (typeof window !== 'undefined' && window.dispatchEvent) {
+        window.dispatchEvent(new Event('pedidoCreado'));
+      }
     } catch (error: any) {
       alert("Ocurrió un error al registrar el pedido. Intente nuevamente.");
     }
@@ -513,6 +522,26 @@ export default function PedidoForm() {
           </div>
         </div>
       </div>
+      {/* Modal de error de cliente obligatorio */}
+      {showClienteErrorModal && (
+        <div className="modal fade show" style={{ display: 'block', background: 'rgba(0,0,0,0.25)' }} tabIndex={-1}>
+          <div className="modal-dialog modal-sm">
+            <div className="modal-content" style={{ borderRadius: 14, textAlign: 'center', padding: '24px 0' }}>
+              <div className="modal-header" style={{ background: 'var(--primary-light)', borderRadius: '14px 14px 0 0', justifyContent: 'center' }}>
+                <h5 className="modal-title" style={{ color: 'var(--primary)', fontWeight: 700, width: '100%' }}>
+                  <i className="fas fa-exclamation-circle me-2" style={{ color: 'var(--primary)', fontSize: '1.5em', verticalAlign: 'middle' }}></i>
+                  El nombre del cliente es obligatorio.
+                </h5>
+              </div>
+              <div className="modal-footer" style={{ justifyContent: 'center', paddingBottom: 18 }}>
+                <button type="button" className="btn btn-primary" style={{ background: 'var(--primary)', borderRadius: 8, fontWeight: 600, padding: '8px 32px', fontSize: '1.05em' }} onClick={() => setShowClienteErrorModal(false)}>
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Modal de confirmación de pedido */}
       {showSuccessModal && (
         <div className="modal fade show" style={{ display: 'block', background: 'rgba(0,0,0,0.25)' }} tabIndex={-1}>
