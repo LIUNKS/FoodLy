@@ -95,6 +95,14 @@ export default function PedidoList() {
 
   useEffect(() => {
     fetchPedidos();
+    // Actualización automática al crear pedido
+    const handlePedidoCreado = () => {
+      fetchPedidos();
+    };
+    window.addEventListener('pedidoCreado', handlePedidoCreado);
+    return () => {
+      window.removeEventListener('pedidoCreado', handlePedidoCreado);
+    };
     // eslint-disable-next-line
   }, []);
 
@@ -153,12 +161,7 @@ export default function PedidoList() {
           </table>
         </div>
       </div>
-      <div style={{ width: '100%', marginTop: 'auto' }}>
-        <button className="foodly-btn w-100" onClick={fetchPedidos}>
-          <i className="fas fa-sync-alt me-2"></i>
-          Actualizar
-        </button>
-      </div>
+      {/* El botón de Actualizar ha sido eliminado. */}
       {/* Modal de detalles del pedido */}
       {showDetailModal && (
         <div
