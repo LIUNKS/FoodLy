@@ -32,29 +32,27 @@ public class SecurityConfig {
     @Value("${port-front}")
     private String portFront;
 
-    //agregar swagger
-    private final String [] EndpointsFree = {"/auth/login", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html"};
-
-    private final String [] EndpointsAdmin = {
-            "/arching/**","/atm/**","/box/**",
-            "/orderSet/**","/product/**","/stock/**",
-            "/admin/**"
+    private final String[] EndpointsFree = {
+            "/auth/login", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html"
     };
 
-    private final String [] EndpointsATM = {
-            "/box/**","/orderSet/**","/product/**","/stock/**","/arching/**"
+    private final String[] EndpointsCompartidos = {
+            "/arching/**", "/box/**", "/orderSet/**", "/product/**", "/stock/**"
     };
 
+    private final String[] EndpointsSoloAdmin = {
+            "/admin/**", "/atm/**"
+    };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors( cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests( auth -> auth
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers(EndpointsFree).permitAll()
-                        .requestMatchers(EndpointsATM).hasRole("ATM")
-                        .requestMatchers(EndpointsAdmin).hasRole("ADMIN")
+                        .requestMatchers(EndpointsCompartidos).hasAnyRole("ADMIN", "ATM")
+                        .requestMatchers(EndpointsSoloAdmin).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
