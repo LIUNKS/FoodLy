@@ -25,14 +25,6 @@ export default function PedidoPage() {
 
         {/* Columna lateral (4/12) con filtros y pedidos recientes */}
         <div className="col-md-4 fade-in-up" style={{ animationDelay: "0.2s" }}>
-          {/* Sección de filtros para búsqueda avanzada */}
-          <div className="foodly-section mb-4">
-            <h5 style={{ color: 'var(--primary)', fontWeight: 600, marginBottom: '1rem' }}>
-              <i className="fas fa-filter me-2"></i>Filtros
-            </h5>
-            <FilterDateRange />
-          </div>
-          
           {/* Sección que muestra los pedidos recientes o filtrados */}
           <div className="foodly-section">
             <h5 style={{ color: 'var(--primary)', fontWeight: 600, marginBottom: '1rem' }}>
