@@ -26,10 +26,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -154,6 +151,7 @@ public class ArchingServiceImp implements ArchingService, ExceptionMessage {
             Double montoInicial = arching.getInit_amount();
             Double montoTotal = arching.getTotal_amount();
             Double montoFinal = arching.getFinal_amount();
+            montoFinal = Optional.ofNullable(montoFinal).orElse(0.0); //Aun no cerraria caja
 
             System.out.println("Prueba 2");
 
