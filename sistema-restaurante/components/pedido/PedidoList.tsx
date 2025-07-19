@@ -105,7 +105,40 @@ export default function PedidoList() {
     };
     // eslint-disable-next-line
   }, []);
+  // Función para descargar Tiket PDF
+  const handleImprimirFactura = async () => {
+    if (!pedidoSeleccionado || !pedidoSeleccionado.id_orderSet ) return;
+    try {
+      const localToken = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+      const cookieToken = Cookies.get("token");
+      const userToken = localToken || cookieToken || null;
+      if (!userToken) return;
 
+      const response = await axios.get(
+        `${API_BASE_URL}orderSet/invoice/${pedidoSeleccionado.id_orderSet }`,
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+            Accept: "application/pdf",
+          },
+          responseType: "blob",
+        }
+      );
+
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Factura_Pedido_${pedidoSeleccionado.id_orderSet }.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error al descargar la factura PDF:", error);
+      alert("No se pudo generar la factura.");
+    }
+  };
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: 800, paddingTop: 32, display: 'flex', flexDirection: 'column' }}>
       <div style={{ flex: 1 }}>
@@ -226,6 +259,9 @@ export default function PedidoList() {
                 )}
               </div>
               <div className="modal-footer" style={{ justifyContent: 'center' }}>
+                <button className="btn btn-success" onClick={handleImprimirFactura}>
+                  <i className="fas fa-download me-1"></i> Descargar Ticket
+                </button>
                 <button type="button" className="btn btn-secondary" onClick={() => { setShowDetailModal(false); setPedidoSeleccionado(null); }}>
                   Cerrar
                 </button>
