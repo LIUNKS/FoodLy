@@ -21,12 +21,14 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
     '/productos',
     '/inventario',
     '/cocina',
+    '/sugerencias',
     '/logout'
   ],
   [UserRole.ATM]: [
     '/apertura-cierre-atm',
     '/arqueo',
     '/pedido',
+    '/sugerencias',
     '/logout'
   ],
   [UserRole.COCINA]: [

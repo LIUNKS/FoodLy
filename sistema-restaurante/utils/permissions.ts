@@ -3,6 +3,8 @@
  * Define los roles, permisos y módulos de la aplicación
  */
 
+import { a } from "framer-motion/client";
+
 // Definición de roles
 export enum UserRole {
   ADMIN = 'ADMIN',
@@ -27,6 +29,7 @@ export enum AppModule {
   INVENTARIO = '/inventario',
   COCINA = '/cocina',
   
+  SUGERENCIAS = '/sugerencias',
   // Módulo de administración
   LOGOUT = '/logout'
 }
@@ -45,6 +48,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, AppModule[]> = {
     AppModule.PRODUCTOS,
     AppModule.INVENTARIO,
     AppModule.COCINA,
+    AppModule.SUGERENCIAS,
     AppModule.LOGOUT
   ],
   
@@ -53,6 +57,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, AppModule[]> = {
     AppModule.APERTURA_CIERRE_ATM,
     AppModule.ARQUEO,
     AppModule.PEDIDO,
+    AppModule.SUGERENCIAS,
     AppModule.LOGOUT
   ],
   

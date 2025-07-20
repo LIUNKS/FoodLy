@@ -35,7 +35,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
 
       case 'ATM':
         // CAJERO solo puede ver Caja y Pedidos
-        return section === 'Caja' || section === 'Pedido';
+        return section === 'Caja' || section === 'Pedido' || section === 'Sugerencias';
 
       case 'COCINA':
         // COCINA solo puede ver Cocina
@@ -105,8 +105,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
               onClick={(e) => {
                 e.preventDefault();
                 toggleSubmenu("Caja");
-              }}
-            >
+              }}>
               <i className="fas fa-th"></i>Caja
               <i className="fas fa-chevron-down toggle-icon"></i>
             </a>
@@ -137,14 +136,16 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
 
             </ul>
           </li>
-        )}        {/* Menú: Pedido - Visible para ADMIN y CAJERO */}
+        )}        
+        {/* Menú: Pedido - Visible para ADMIN y CAJERO */}
         {hasAccess('Pedido') && (
           <li>
             <Link href="/pedido" className={isActive("/pedido") ? "active" : ""}>
               <i className="fa-solid fa-cart-shopping"></i> Pedido
             </Link>
           </li>
-        )}        {/* Menú: Reportes - Solo visible para ADMIN */}
+        )}        
+        {/* Menú: Reportes - Solo visible para ADMIN */}
         {hasAccess('Reportes') && (
           <li>
             <a
@@ -227,6 +228,14 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
           <li>
             <Link href="/logros" className={isActive("/logros") ? "active" : ""}>
               <i className="fa-solid fa-house"></i> Logros
+            </Link>
+          </li>
+        )}
+        {/* Menú: Sugerencias - Visible para ADMIN y CAJERO */}
+        {hasAccess('Sugerencias') && (
+          <li>
+            <Link href="/sugerencias" className={isActive("/sugerencias") ? "active" : ""}>
+              <i className="fa-solid fa-lightbulb"></i> Sugerencias
             </Link>
           </li>
         )}
