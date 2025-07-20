@@ -37,7 +37,7 @@ public class SecurityConfig {
     };
 
     private final String[] EndpointsCompartidos = {
-            "/arching/**", "/box/**", "/orderSet/**", "/product/**", "/stock/**"
+            "/arching/**", "/box/**", "/orderSet/**", "/product/**", "/stock/**", "/api/sugerencias/**"
     };
 
     private final String[] EndpointsSoloAdmin = {
